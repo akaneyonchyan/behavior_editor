@@ -36,7 +36,7 @@ const requests=[],fakeFetch=async(url,init)=>{
 }
 const feishu=new FeishuRepository({FEISHU_APP_ID:'test',FEISHU_APP_SECRET:'test'},fakeFetch),snapshot=await feishu.read()
 assert.deepEqual(snapshot.library.attributes[0].objectTypes,['partner'])
-const emptyLinkFetch=async(url,init)=>{const response=await fakeFetch(url,init);const data=await response.json();if(url.includes('example_attributes'))data.data.items[0].fields.适用对象=[{record_ids:null,text:null,text_arr:[],type:'text'}];return Response.json(data)}
+const emptyLinkFetch=async(url,init)=>{const response=await fakeFetch(url,init);const data=await response.json();if(url.includes('example_attributes'))data.data.items[0].fields.适用对象=[{record_ids:null,text:null,text_arr:[],type:'text'},{text_arr:[],type:'text'}];return Response.json(data)}
 assert.deepEqual((await new FeishuRepository({FEISHU_APP_ID:'test',FEISHU_APP_SECRET:'test'},emptyLinkFetch).read()).library.attributes[0].objectTypes,[])
 const brokenLinkFetch=async(url,init)=>{const response=await fakeFetch(url,init);const data=await response.json();if(url.includes('example_attributes'))data.data.items[0].fields.适用对象=[{record_ids:['missing_record']}];return Response.json(data)}
 await assert.rejects(()=>new FeishuRepository({FEISHU_APP_ID:'test',FEISHU_APP_SECRET:'test'},brokenLinkFetch).read(),/关联已失效/)

@@ -36,7 +36,7 @@ export class FeishuRepository {
           if(typeof link==='string')return [link]
           if(link&&Array.isArray(link.record_ids))return link.record_ids
           if(link?.record_id)return [link.record_id]
-          if(link?.record_ids===null&&!link.text&&!(link.text_arr?.length))return []
+          if(link?.record_ids==null&&link?.type==='text'&&!link.text&&Array.isArray(link.text_arr)&&link.text_arr.length===0)return []
           throw new Error('适用对象关联格式无效，请检查飞书字段')
         })
         return {id,name:text(f['名称']),description:text(f['说明']),enabled:f['启用']===true,...(table==='attributes'?{kind:text(f['数据类型'])}:{}),...(table!=='objects'?{objectTypes:[...new Set(refs.map(id=>{const mapped=objectIds.get(id);if(!mapped)throw new Error('适用对象关联已失效，请修复飞书表格');return mapped}))]}:{})}
