@@ -1,0 +1,56 @@
+name: Publish editor and public library
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '3-58/5 * * * *'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - run: npm ci
+      - run: npm test
+      - name: Read Feishu snapshot
+        run: node scripts/export-public-library.mjs
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_BASE_TOKEN: ${{ secrets.FEISHU_BASE_TOKEN }}
+          FEISHU_OBJECT_TABLE: ${{ secrets.FEISHU_OBJECT_TABLE }}
+          FEISHU_ATTRIBUTE_TABLE: ${{ secrets.FEISHU_ATTRIBUTE_TABLE }}
+          FEISHU_BUFF_TABLE: ${{ secrets.FEISHU_BUFF_TABLE }}
+      - name: Build read-only editor
+        run: npm run build
+        env:
+          VITE_LIBRARY_MODE: published
+          PAGES_BASE: /${{ github.event.repository.name }}/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
