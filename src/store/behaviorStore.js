@@ -15,7 +15,7 @@ export const useBehaviorStore = create((set, get) => {
     undo: () => set(s => s.past.length ? { ...restore(s, s.past.at(-1)), past: s.past.slice(0, -1), future: [snapshot(s), ...s.future] } : {}),
     redo: () => set(s => s.future.length ? { ...restore(s, s.future[0]), past: [...s.past, snapshot(s)], future: s.future.slice(1) } : {}),
     updateBehaviorInfo: updates => commit({ behaviorInfo: { ...get().behaviorInfo, ...updates } }),
-    selectNode: node => set({ selectedNode: node }),
+    selectNode: node => set(s=>({ selectedNode: node, ...(!node?{nodes:s.nodes.map(n=>({...n,selected:false}))}: {}) })),
     addNode: node => commit({ nodes: [...get().nodes.map(n => ({ ...n, selected: false })), { ...node, selected: true }], selectedNode: node }),
     updateNode: (id, updates) => {
       const nodes = get().nodes.map(n => n.id === id ? { ...n, data: { ...n.data, ...updates } } : n)

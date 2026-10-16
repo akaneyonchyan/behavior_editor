@@ -8,19 +8,13 @@ import LibraryRules from './LibraryRules'
 import { useContentLibrary } from '../store/contentLibrary'
 import { EXPECTATIONS } from '../utils/weightFactors'
 import LoopFields from './LoopEditor'
+import BehaviorMetadata from './BehaviorMetadata'
 
 export default function PropertyPanel() {
   const { selectedNode, updateNode, deleteNode } = useBehaviorStore()
 
   if (!selectedNode) {
-    return (
-      <div className="property-panel">
-        <div className="panel-empty">
-          <span className="empty-icon">👈</span>
-          <div className="empty-text">选择节点查看属性</div>
-        </div>
-      </div>
-    )
+    return <BehaviorMetadata />
   }
 
   const config = NODE_CONFIG[selectedNode.type]

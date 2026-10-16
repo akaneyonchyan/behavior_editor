@@ -14,7 +14,14 @@ export function validateConfig(config, types) {
   }
   if (!config || typeof config.behavior?.name !== 'string' || !Array.isArray(config.graph?.nodes) || !Array.isArray(config.graph?.edges)) fail('文件需包含行为名称、节点和连线列表')
   if (!strings(config.behavior.matchTargets)) fail('行为目标必须是文字列表')
+  rules(config.behavior.targetRules)
   const p = config.behavior.preconditions
+  if(p?.interactObjectType!==undefined&&typeof p.interactObjectType!=='string')fail('交互对象类型必须是文字标识')
+  if(p?.consumableRules!==undefined){
+    if(!Array.isArray(p.consumableRules))fail('消耗品规则必须是列表')
+    const seen=new Set()
+    for(const r of p.consumableRules){if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.objectType!=='string'||typeof r.requirement!=='string')fail('消耗品规则需包含唯一标识、对象类型和要求');seen.add(r.id)}
+  }
   rules(p?.attributeRules)
   if (p && (typeof p !== 'object' || !strings(p.consumables) || !strings(p.attributes) || (p.interactObject !== undefined && typeof p.interactObject !== 'string'))) fail('行为准入配置格式错误')
   const ids = new Map()
