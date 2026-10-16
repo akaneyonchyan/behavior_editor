@@ -36,9 +36,13 @@ const requests=[],fakeFetch=async(url,init)=>{
 }
 const feishu=new FeishuRepository({FEISHU_APP_ID:'test',FEISHU_APP_SECRET:'test'},fakeFetch),snapshot=await feishu.read()
 assert.deepEqual(snapshot.library.attributes[0].objectTypes,['partner'])
+const emptyLinkFetch=async(url,init)=>{const response=await fakeFetch(url,init);const data=await response.json();if(url.includes('example_attributes'))data.data.items[0].fields.适用对象=[{record_ids:null,text:null,text_arr:[],type:'text'}];return Response.json(data)}
+assert.deepEqual((await new FeishuRepository({FEISHU_APP_ID:'test',FEISHU_APP_SECRET:'test'},emptyLinkFetch).read()).library.attributes[0].objectTypes,[])
+const brokenLinkFetch=async(url,init)=>{const response=await fakeFetch(url,init);const data=await response.json();if(url.includes('example_attributes'))data.data.items[0].fields.适用对象=[{record_ids:['missing_record']}];return Response.json(data)}
+await assert.rejects(()=>new FeishuRepository({FEISHU_APP_ID:'test',FEISHU_APP_SECRET:'test'},brokenLinkFetch).read(),/关联已失效/)
 await feishu.write({table:'attributes',before:snapshot.library.attributes[0],after:{...snapshot.library.attributes[0],description:'更新说明'}},snapshot)
 assert.deepEqual(JSON.parse(requests.at(-1).init.body).fields,{说明:'更新说明'})
-assert.equal(requests.filter(r=>r.url.includes('tenant_access_token')).length,1)
+assert.equal(requests.filter(r=>r.url.includes('tenant_access_token')).length,3)
 const env={FEISHU_APP_ID:'test',FEISHU_APP_SECRET:'test',EDITOR_ACCESS_KEY:'test1234'}
 const {server,service:httpService}=createEditorServer(env,new MemoryRepository())
 server.listen(0,'127.0.0.1');await once(server,'listening');const origin='http://127.0.0.1:'+server.address().port

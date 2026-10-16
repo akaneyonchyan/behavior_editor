@@ -32,7 +32,13 @@ export class FeishuRepository {
         if(handles[table].has(id))throw new Error('飞书表中存在重复标识：'+id)
         handles[table].set(id,r.record_id)
         const links=f['适用对象']||[]
-        const refs=(Array.isArray(links)?links:[links]).flatMap(link=>typeof link==='string'?[link]:link.record_ids||[link.record_id])
+        const refs=(Array.isArray(links)?links:[links]).flatMap(link=>{
+          if(typeof link==='string')return [link]
+          if(link&&Array.isArray(link.record_ids))return link.record_ids
+          if(link?.record_id)return [link.record_id]
+          if(link?.record_ids===null&&!link.text&&!(link.text_arr?.length))return []
+          throw new Error('适用对象关联格式无效，请检查飞书字段')
+        })
         return {id,name:text(f['名称']),description:text(f['说明']),enabled:f['启用']===true,...(table==='attributes'?{kind:text(f['数据类型'])}:{}),...(table!=='objects'?{objectTypes:[...new Set(refs.map(id=>{const mapped=objectIds.get(id);if(!mapped)throw new Error('适用对象关联已失效，请修复飞书表格');return mapped}))]}:{})}
       })
     }
