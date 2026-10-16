@@ -1,0 +1,259 @@
+{
+  "behavior": {
+    "name": "通用示例：进食循环",
+    "matchTargets": [
+      "恢复饱腹",
+      "消耗食物"
+    ],
+    "preconditions": {
+      "interactObject": "空地",
+      "consumables": [
+        "有可用食物"
+      ],
+      "attributes": [
+        "食物可食用"
+      ]
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "move_1",
+        "type": "move",
+        "data": {
+          "name": "位移到空地",
+          "destinationType": "interactObject",
+          "destination": "空地"
+        },
+        "position": {
+          "y": 320,
+          "x": 80
+        }
+      },
+      {
+        "id": "judge_1",
+        "type": "judge",
+        "data": {
+          "name": "结果判断",
+          "description": "根据食物品质和新鲜度判断",
+          "branches": [
+            {
+              "id": "branch_delicious",
+              "name": "美味食物",
+              "weightFactors": [
+                {
+                  "source": "consumable",
+                  "influence": "越高，越容易触发",
+                  "version": 2,
+                  "attribute": "freshness",
+                  "id": "freshness-delicious"
+                }
+              ],
+              "nextNode": "result_delicious",
+              "weightExpectation": "待定"
+            },
+            {
+              "id": "branch_stale",
+              "name": "不新鲜",
+              "weightFactors": [
+                {
+                  "source": "consumable",
+                  "influence": "越高，越不容易触发",
+                  "version": 2,
+                  "attribute": "freshness",
+                  "id": "freshness-stale"
+                }
+              ],
+              "nextNode": "result_stale",
+              "weightExpectation": "待定"
+            },
+            {
+              "id": "default",
+              "name": "普通",
+              "weightFactors": [],
+              "nextNode": "result_normal",
+              "weightExpectation": "通常发生"
+            }
+          ]
+        },
+        "position": {
+          "y": 240,
+          "x": 460
+        }
+      },
+      {
+        "id": "result_delicious",
+        "type": "result",
+        "data": {
+          "name": "美味结果",
+          "animation": "吃一口享受并发光",
+          "attributeChanges": [
+            "饱腹提升",
+            "清洁度下降",
+            "情绪 +高兴"
+          ],
+          "nextNode": "loop_1"
+        },
+        "position": {
+          "y": 40,
+          "x": 860
+        }
+      },
+      {
+        "id": "result_stale",
+        "type": "result",
+        "data": {
+          "name": "不新鲜结果",
+          "animation": "难以下咽的嫌弃",
+          "attributeChanges": [
+            "饱腹提升",
+            "清洁度下降",
+            "情绪 +恶心"
+          ],
+          "nextNode": "loop_1"
+        },
+        "position": {
+          "y": 340,
+          "x": 860
+        }
+      },
+      {
+        "id": "result_normal",
+        "type": "result",
+        "data": {
+          "name": "普通结果",
+          "animation": "站着吃几口",
+          "attributeChanges": [
+            "饱腹提升",
+            "清洁度下降"
+          ],
+          "nextNode": "loop_1"
+        },
+        "position": {
+          "y": 640,
+          "x": 860
+        }
+      },
+      {
+        "id": "loop_1",
+        "type": "loop",
+        "data": {
+          "name": "循环判定",
+          "loopVersion": 2,
+          "completionCondition": "已完成目标要求的进食次数",
+          "completionRules": [],
+          "resourceCheck": "仍有可食用的食物",
+          "resourceRules": [],
+          "failureReason": "食物用尽或不可食用",
+          "restEnabled": true,
+          "restExpectation": "较少发生",
+          "restCondition": "按伙伴状态决定是否稍息",
+          "restRules": []
+        },
+        "position": {
+          "x": 1260,
+          "y": 100
+        }
+      },
+      {
+        "id": "end_1",
+        "type": "end",
+        "data": {
+          "name": "成功结算",
+          "successAnimation": "擦嘴摸肚子",
+          "failAnimation": "捂着咕咕叫的肚子",
+          "releaseResources": [
+            "空地占用"
+          ]
+        },
+        "position": {
+          "x": 1680,
+          "y": 60
+        }
+      },
+      {
+        "id": "end_failed",
+        "type": "end",
+        "data": {
+          "name": "失败结算：食物不足",
+          "failAnimation": "捂着咕咕叫的肚子",
+          "releaseResources": [
+            "空地占用"
+          ]
+        },
+        "position": {
+          "x": 1680,
+          "y": 360
+        }
+      },
+      {
+        "id": "wait_rest",
+        "type": "wait",
+        "data": {
+          "name": "个性化稍息"
+        },
+        "position": {
+          "x": 1680,
+          "y": 700
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "move_1",
+        "target": "judge_1"
+      },
+      {
+        "source": "judge_1",
+        "target": "result_delicious",
+        "sourceHandle": "branch_delicious"
+      },
+      {
+        "source": "judge_1",
+        "target": "result_stale",
+        "sourceHandle": "branch_stale"
+      },
+      {
+        "source": "judge_1",
+        "target": "result_normal",
+        "sourceHandle": "default"
+      },
+      {
+        "source": "result_delicious",
+        "target": "loop_1"
+      },
+      {
+        "source": "result_stale",
+        "target": "loop_1"
+      },
+      {
+        "source": "result_normal",
+        "target": "loop_1"
+      },
+      {
+        "source": "loop_1",
+        "sourceHandle": "complete",
+        "target": "end_1"
+      },
+      {
+        "source": "loop_1",
+        "sourceHandle": "insufficient",
+        "target": "end_failed"
+      },
+      {
+        "source": "loop_1",
+        "sourceHandle": "rest",
+        "target": "wait_rest"
+      },
+      {
+        "source": "loop_1",
+        "sourceHandle": "continue",
+        "target": "judge_1"
+      },
+      {
+        "source": "wait_rest",
+        "target": "judge_1"
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+.text-choice { position: relative; min-width: 0; flex: 1; }
+.text-choice input { box-sizing: border-box; width: 100%; margin: 0 !important; padding: 7px 27px 7px 9px !important; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-2); color: var(--text-primary); font: inherit; }
+.text-choice-toggle { position: absolute; right: 3px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; padding: 3px 5px; }
+.text-choice-menu { position: fixed; z-index: 2000; box-sizing: border-box; overflow-y: auto; background: #202833; color: #e5e7eb; border: 1px solid #465466; border-radius: 6px; padding: 4px; box-shadow: 0 8px 24px #0008; font-size: 12px; }
+.text-choice-menu [role="option"] { padding: 9px 10px; cursor: pointer; border-radius: 4px; overflow-wrap: anywhere; }
+.text-choice-menu [role="option"]:hover,.text-choice-menu .active { background: #32475e; }
+.text-choice-empty { padding: 9px; color: #94a3b8; }

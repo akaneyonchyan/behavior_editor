@@ -1,0 +1,13 @@
+.loop-stages { padding: 0 14px 14px; font-size: 12px; line-height: 1.6; }
+.loop-stages section { border-top: 1px solid #48505b; padding-top: 10px; margin-top: 8px; }
+.loop-stages strong { color: #f9a8d4; }
+.loop-stages p { white-space: pre-wrap; overflow-wrap: anywhere; color: #bdc7d5; margin: 5px 0; }
+.loop-output { position: relative; margin: 7px 0; padding: 6px 10px; background: #342b38; border-radius: 5px; }
+.loop-output .node-handle { right: -20px; }
+.loop-output.inactive { opacity: .45; }
+.loop-down { color: #a3b7cc; font-size: 12px; padding: 6px 0; }
+.loop-legacy { color: #fcd34d; font-size: 12px; padding: 8px; border: 1px dashed #94762d; border-radius: 5px; }
+.loop-editor section { margin-top: 16px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+.loop-editor h4 { color: #f9a8d4; margin-bottom: 12px; font-size: 13px; }
+.loop-editor .loop-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 12px; }
+.loop-editor .loop-legacy textarea { width: 100%; background: var(--surface-1); color: var(--text-primary); margin-top: 8px; }
