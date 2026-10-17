@@ -6,3 +6,4 @@
 .text-choice-menu [role="option"]:hover,.text-choice-menu .active { background: #32475e; }
 .text-choice-empty { padding: 9px; color: #94a3b8; }
 .custom-choice { text-decoration: underline; text-underline-offset: 3px; text-decoration-style: dotted; }
+.judge-branches .text-choice input[aria-label="影响方式"] { font-size: 12px; }
