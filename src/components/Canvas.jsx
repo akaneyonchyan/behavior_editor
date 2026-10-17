@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactFlow, { Background, Controls, MiniMap, MarkerType, ConnectionLineType } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { useBehaviorStore } from '../store/behaviorStore'
@@ -30,7 +30,7 @@ export default function Canvas() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
   return <div className="canvas">
-    <ReactFlow nodes={s.nodes} edges={s.edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
+    <ReactFlow nodes={s.nodes} edges={s.edges.filter(e=>!(e.sourceHandle==='rest'&&s.nodes.some(n=>n.id===e.source&&n.type==='loop'&&n.data.restEnabled===false)))} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
       onNodesChange={s.changeNodes} onEdgesChange={s.changeEdges} onConnect={s.connect}
       isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return source?.type!=='loop'||(isLoopOutput(connection.sourceHandle)&&connection.target!==connection.source&&(connection.sourceHandle!=='rest'||source.data.restEnabled!==false))}}
       onNodeDragStart={s.checkpoint} onNodeClick={(_, node) => s.selectNode(node)} onPaneClick={() => s.selectNode(null)}

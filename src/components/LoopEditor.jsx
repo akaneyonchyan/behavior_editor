@@ -23,11 +23,11 @@ export function LoopNodeStages({id,data}) {
       {output('complete','达成 → 成功结算')}<div className="loop-down">未达成 ↓ 进入第二步</div></section>
     <section><strong>② 资源检查</strong><p>{summary(data.resourceCheck,data.resourceRules)}</p>
       {output('insufficient','不足 → 失败结算')}{data.failureReason&&<p>原因：{data.failureReason}</p>}
-      <div className="loop-down">{enabled?'充足 ↓ 进入第三步':'充足 ↓ 跳过稍息，继续执行'}</div></section>
-    <section><strong>③ 稍息判定{enabled?'':'（已关闭）'}</strong>
+      {enabled?<div className="loop-down">充足 ↓ 进入第三步</div>:output('continue','充足 → 继续执行')}</section>
+    {enabled&&<section><strong>③ 稍息判定</strong>
       {enabled&&<><p>发生倾向：{data.restExpectation||'待定'}</p><p>{summary(data.restCondition,data.restRules)}</p></>}
       {output('rest',enabled?'触发 → 待机节点':'稍息出口已停用（旧连线保留）',!enabled)}
-      {output('continue',enabled?'不触发 → 继续执行':'直接继续执行')}</section>
+      {output('continue','不触发 → 继续执行')}</section>}
     {legacy&&<div className="loop-output loop-legacy">旧版出口 · 请在侧栏归类<Handle type="source" position={Position.Right} isConnectable={false} className="node-handle"/></div>}
   </div>
 }

@@ -37,14 +37,14 @@ export const NODE_CONFIG = {
         {
           id: 'branch_1',
           name: '分支1',
-          weightExpectation: '待定',
+          weightExpectation: '中',
           weightFactors: [],
           nextNode: ''
         },
         {
           id: 'default',
           name: '默认分支',
-          weightExpectation: '待定',
+          weightExpectation: '中',
           weightFactors: [],
           nextNode: ''
         }
@@ -58,6 +58,7 @@ export const NODE_CONFIG = {
     description: '播放表演并结算属性',
     defaultData: {
       animation: '',
+      playMode: '单次',
       attributeChanges: [],
       outputs: [],
       nextNode: ''
