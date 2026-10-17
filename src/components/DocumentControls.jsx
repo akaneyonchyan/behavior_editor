@@ -43,8 +43,8 @@ export default function DocumentControls() {
     {s.ready && s.firstRun && <div className="dialog-overlay"><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="setup-title">
       <div className="dialog-header"><h3 id="setup-title">首次使用：设置本地保存目录</h3></div>
       <div className="dialog-content setup-copy">
-        <p>选择保存目录后，首次使用会生成空白行为模板。默认模板和每 15 秒生成的恢复备份只写入该目录的 .behavior-editor-cache 子目录。</p>
-        <p>操作停止约 0.5 秒后保存浏览器草稿，持续操作时每 2 秒补存一次。刷新或重开后可恢复；自动备份不会覆盖正式文件。</p>
+        <p>选择保存目录后，首次使用会生成空白行为模板。自动保存每 15 秒更新 .behavior-editor-cache 内同一个“当前行为缓存.json”，不会不断新增文件。</p>
+        <p>操作停止约 0.5 秒后保存浏览器草稿，持续操作时每 2 秒补存一次。多页面各自保留浏览器草稿，磁盘缓存保留最近一次备份；正式文件仅在手动保存时写入。</p>
         <p>仅点击“保存／另存为”才写正式文件。下次优先恢复上次文件及未保存草稿；文件找不到时使用空白缓存模板。“打开”和“另存为”默认定位此目录，权限失效时可一键重新授权。</p>
         {!supportsDirectory() && <p className="unsaved">当前浏览器不支持目录写入。可先使用浏览器草稿与 JSON 下载；完整本地备份请使用 Chrome／Edge + HTTPS 或 localhost。</p>}
         {s.error && <p role="alert" className="unsaved">{s.error}</p>}

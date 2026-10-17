@@ -52,7 +52,7 @@ async function main() {
   const backups = new Map(); let granted = true
   window.showDirectoryPicker = async () => ({ name: 'test-dir', async queryPermission() { return granted ? 'granted' : 'denied' }, async getDirectoryHandle(){return {async getFileHandle(n,options){if(!backups.has(n)){if(!options?.create)throw Object.assign(Error('missing'),{name:'NotFoundError'});backups.set(n,handle(n))}return backups.get(n)}}} })
   await a.chooseDirectory(); assert.equal(backups.size,2)
-  const backup = [...backups.values()].find(h=>h.name.startsWith('行为恢复-')), count = backup.writes
+  const backup = backups.get(a.AUTOSAVE_FILE), count = backup.writes
   await a.backupToDirectory(); assert.equal(backup.writes,count)
   a.graph.getState().updateNode('move_1', { destination: 'timer backup' })
   await [...intervals.values()].find(v=>v.ms===15000).fn()

@@ -15,6 +15,7 @@ let localTimer, writing = false
 let needsTemplate=true, startup=Promise.resolve(), referenceQueue=Promise.resolve(), pendingRestore=null
 export const CACHE_DIRECTORY='.behavior-editor-cache'
 export const TEMPLATE_FILE='空白行为模板.json'
+export const AUTOSAVE_FILE='当前行为缓存.json'
 export const waitForInitialization=()=>startup
 export const useDocumentSession = create(() => ({ dirty: false, busy: false, fileName: '', directoryName: '', draftTime: '', backupTime: '', error: '', notice: '', firstRun: true, ready: false, needsAuthorization:false }))
 const status = patch => useDocumentSession.setState(patch)
@@ -154,11 +155,22 @@ export async function backupToDirectory() {
     if (await directory.queryPermission({ mode: 'readwrite' }) !== 'granted') {
       status({ needsAuthorization:true,error: '本地目录写入授权已失效。点击“恢复访问授权”继续备份；浏览器草稿仍继续保存。' }); return
     }
-    const cache=await ensureTemplateCache()
-    const target = await cache.getFileHandle('行为恢复-' + id + '-' + draftKey.split(':').at(-1) + '.json', { create: true })
-    const stream = await target.createWritable()
-    try { await stream.write(JSON.stringify(config, null, 2)); await stream.close() }
-    catch (e) { await stream.abort().catch(() => {}); throw e }
+    // Disk holds the latest snapshot only. Independent tab drafts stay in browser storage.
+    // Never create a new disk file for a page reload or a document switch.
+    flushDraft()
+    const writeSnapshot=async()=>{
+      const cache=await ensureTemplateCache()
+      const target=await cache.getFileHandle(AUTOSAVE_FILE,{create:true})
+      const text=JSON.stringify(config,null,2)
+      const previous=await (await target.getFile()).text()
+      try{if(previous&&fingerprint(parse(previous))===current)return}catch{ /* Replace an incomplete cache snapshot. */ }
+      const stream=await target.createWritable()
+      try{await stream.write(text);await stream.close()}
+      catch(e){await stream.abort().catch(()=>{});throw e}
+    }
+    // Serialize same-origin tabs so concurrent writers cannot race on the shared cache.
+    if(globalThis.navigator?.locks)await navigator.locks.request('pps-behavior-disk-cache',writeSnapshot)
+    else await writeSnapshot()
     if (id === documentId) {
       diskFingerprint = current
       const error = useDocumentSession.getState().error

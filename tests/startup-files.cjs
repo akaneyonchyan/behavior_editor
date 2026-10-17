@@ -38,6 +38,17 @@ async function main(){
   other.exists=false
   const f=await boot();assert.equal(config(f).behavior.name,'空白行为');assert.equal(config(f).graph.nodes.length,8);assert.equal(state(f).fileName,'');assert.match(state(f).notice,/找不到/);assert.ok(f.recoveryDrafts().some(r=>r.fileName==='other.json'));f.stop()
   assert.equal(pickerCount,1,'restoration never reopens directory picker')
+  // Reloads, edits, and switches must reuse the same two disk cache files.
+  const g=await boot(),writes=cache.get(g.AUTOSAVE_FILE).writes;g.stop()
+  const h=await boot();assert.equal(cache.get(h.AUTOSAVE_FILE).writes,writes,'unchanged reload must not rewrite cache')
+  h.newDocument();await h.backupToDirectory();assert.equal(cache.size,2)
+  const i=await boot()
+  h.graph.getState().updateBehaviorInfo({name:'tab one'});h.flushDraft();await h.backupToDirectory()
+  i.graph.getState().updateBehaviorInfo({name:'tab two'});i.flushDraft();await i.backupToDirectory()
+  assert.equal(cache.size,2,'multiple tabs and document switches must not create recovery files')
+  assert.equal(JSON.parse(cache.get(i.AUTOSAVE_FILE).text).behavior.name,'tab two')
+  assert.ok(i.recoveryDrafts().some(d=>d.config.behavior.name==='tab one'),'other tab draft remains recoverable')
+  h.stop();i.stop()
   console.log('PASS: first-use cache-only template, blank fields, fixed cache subdirectory, file handle restore, external disk refresh, dirty draft priority, conflict guard, picker defaults, permission reauthorization, missing-file fallback, no-cache file restore')
 }
 main().catch(e=>{console.error(e);process.exitCode=1})
