@@ -7,7 +7,9 @@
 - [工具说明](docs/tool/README.md)：产品定位、使用方法、开发与协作。
 - [公共内容库说明](docs/content-library/README.md)：字段与使用规则、飞书维护、同步排查、规则来源与待核对事项。
 - [Agent 协作入口](AGENTS.md)：当前产品约束、验证要求和修改边界。
-- [行为编辑器 Skill](.agents/skills/behavior-editor/SKILL.md)：可供团队安装的使用与维护流程；[安装及调用示例](docs/tool/README.md#通过-skill-使用与维护)。
+- [行为编辑器 Skill](docs/tool/skills/behavior-editor/SKILL.md)：工具说明目录内的完整 Skill，可阅读或复制安装；[安装及调用示例](docs/tool/README.md#通过-skill-使用与维护)。
+
+使用入口：让 agent 加载上述 Skill，然后说“使用 behavior-editor Skill，帮我维护编辑器，并验证旧行为文件兼容性”。仓库的 `.agents/skills/behavior-editor/` 同时保留自动发现入口。
 
 文档更新日期：2026-10-17。自动保存更新缓存目录内固定文件，不再新增随机编号恢复文件；完整保存与恢复规则见[使用方法](docs/tool/usage.md)。
 

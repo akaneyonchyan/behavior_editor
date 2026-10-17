@@ -8,6 +8,7 @@
 | 绘制行为、保存文件、恢复草稿 | [使用方法](usage.md) |
 | 本地运行、改代码、测试、部署 | [开发与协作](development.md) |
 | 维护下拉框中的对象、属性、Buff | [公共内容库说明](../content-library/README.md) |
+| 通过 Skill 使用和维护工具 | [behavior-editor Skill](skills/behavior-editor/SKILL.md) |
 
 线上地址：https://akaneyonchyan.github.io/behavior_editor/
 
@@ -15,7 +16,9 @@
 
 ## 通过 Skill 使用与维护
 
-工程包含 [behavior-editor Skill](../../.agents/skills/behavior-editor/SKILL.md)，覆盖使用指导、编辑器修改、公共库维护和发布排查。它按任务读取本目录及公共库文档，不另存一套重复手册。
+本目录提供完整的 [behavior-editor Skill](skills/behavior-editor/SKILL.md)，覆盖使用指导、编辑器修改、公共库维护和发布排查。可直接让 agent 读取，或复制 `skills/behavior-editor/` 文件夹安装。它按任务读取本目录及公共库文档，不另存一套重复手册。
+
+仓库的 [自动发现版本](../../.agents/skills/behavior-editor/SKILL.md) 与此文件内容一致。维护时以 `.agents/skills/behavior-editor/SKILL.md` 为共享源，同时同步至 `docs/tool/skills/behavior-editor/SKILL.md`；两份文件应在同一提交中更新。
 
 在支持项目 `.agents/skills` 的环境中，以本仓库作为工作区，新建或重启 agent 会话即可发现。也可将整个 `behavior-editor` 文件夹安装到自己工作区的 `.agents/skills/`；保留工程文档访问能力，更新时从仓库同步，避免各自维护副本。其他宿主可按自身 Skill 安装方式加载，或显式提供 SKILL.md 路径。
 
