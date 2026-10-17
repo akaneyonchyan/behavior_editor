@@ -165,6 +165,22 @@
 
 .judge-branches {
   margin-top: 20px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.branch-item > label {
+  display: block;
+  margin: 8px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.judge-branches .weight-factor > strong {
+  display: block;
+  font-size: 12px;
+  overflow-wrap: anywhere;
 }
 
 .branch-item {
@@ -184,12 +200,19 @@
 
 .branch-name-input {
   flex: 1;
+  min-width: 0;
   padding: 6px 8px;
   background: var(--surface-3);
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--text-primary);
   font-size: 12px;
+  font-family: inherit;
+}
+
+.branch-name-input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .btn-remove {
