@@ -21,3 +21,8 @@
 .result-output-section { border-top: 1px solid var(--node-color); padding: 6px 0; color: var(--node-color); overflow-wrap: anywhere; font-size: 12px; line-height: 1.6; }
 .result-output-section ol { margin: 6px 0 0; padding-left: 22px; }
 .result-output-section li { padding: 3px 0; white-space: normal; }
+.start-summary { font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.start-section { border-top: 1px solid #ffffff18; margin-top: 8px; padding-top: 8px; }
+.start-section > strong { color: var(--node-color); font-size: 12px; }
+.start-section ol { padding-left: 18px; margin: 4px 0; }
+.start-section li { padding: 2px 0; }

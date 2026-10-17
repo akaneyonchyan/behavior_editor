@@ -23,6 +23,11 @@ export function validateConfig(config, types) {
     for(const r of p.consumableRules){if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.objectType!=='string'||typeof r.requirement!=='string')fail('消耗品规则需包含唯一标识、对象类型和要求');seen.add(r.id)}
   }
   rules(p?.attributeRules)
+  if(p?.interactObjectRules!==undefined){
+    if(!Array.isArray(p.interactObjectRules))fail('交互对象规则必须是列表')
+    const seen=new Set()
+    for(const r of p.interactObjectRules){if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.objectType!=='string')fail('交互对象规则需要唯一标识和对象类型');seen.add(r.id)}
+  }
   if (p && (typeof p !== 'object' || !strings(p.consumables) || !strings(p.attributes) || (p.interactObject !== undefined && typeof p.interactObject !== 'string'))) fail('行为准入配置格式错误')
   const ids = new Map()
   for (const n of config.graph.nodes) {
@@ -63,8 +68,12 @@ export function validateConfig(config, types) {
     ids.set(n.id, n)
   }
   const loopPorts=new Set()
+  const starts=config.graph.nodes.filter(n=>n.type==='start')
+  if(starts.length>1)fail('每个行为只能有一个开始节点')
+  if(starts.length&&config.graph.edges.filter(e=>e.source===starts[0].id).length>1)fail('开始节点只能连接一个入口')
   for (const e of config.graph.edges) {
     if (!e || !ids.has(e.source) || !ids.has(e.target)) fail('连线引用了不存在的节点')
+    if(ids.get(e.target).type==='start')fail('开始节点不能作为连线终点')
     if(ids.get(e.source).type==='loop'){
       if(e.sourceHandle){
         if(!isLoopOutput(e.sourceHandle))fail('连线引用了不存在的循环出口')

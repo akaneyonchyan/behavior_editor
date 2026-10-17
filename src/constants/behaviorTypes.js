@@ -1,5 +1,6 @@
 // 节点类型定义
 export const NODE_TYPES = {
+  START: 'start',
   MOVE: 'move',
   WAIT: 'wait',
   JUDGE: 'judge',
@@ -10,6 +11,7 @@ export const NODE_TYPES = {
 
 // 节点类型配置
 export const NODE_CONFIG = {
+  [NODE_TYPES.START]: {label:'开始',color:'#38BDF8',icon:'▶',description:'行为元数据与唯一入口',defaultData:{}},
   [NODE_TYPES.MOVE]: {
     label: '位移',
     color: '#38BDF8',

@@ -4,10 +4,11 @@ import 'reactflow/dist/style.css'
 import { useBehaviorStore } from '../store/behaviorStore'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
 import BehaviorNode from './BehaviorNode'
+import StartNode from './StartNode'
 import FlowingEdge from './FlowingEdge'
 import { isLoopOutput } from '../utils/loopFlow'
 import './Canvas.css'
-const nodeTypes = Object.fromEntries(Object.keys(NODE_CONFIG).map(type => [type, BehaviorNode]))
+const nodeTypes = {...Object.fromEntries(Object.keys(NODE_CONFIG).map(type => [type, BehaviorNode])),start:StartNode}
 const edgeTypes = { default: FlowingEdge, smoothstep: FlowingEdge, routed: FlowingEdge }
 const edgeOptions = { type: 'default', markerEnd: { type: MarkerType.ArrowClosed, color: '#94A3B8' }, style: { stroke: '#94A3B8', strokeWidth: 2 } }
 export default function Canvas() {
@@ -32,13 +33,13 @@ export default function Canvas() {
   return <div className="canvas">
     <ReactFlow nodes={s.nodes} edges={s.edges.filter(e=>!(e.sourceHandle==='rest'&&s.nodes.some(n=>n.id===e.source&&n.type==='loop'&&n.data.restEnabled===false)))} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
       onNodesChange={s.changeNodes} onEdgesChange={s.changeEdges} onConnect={s.connect}
-      isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return source?.type!=='loop'||(isLoopOutput(connection.sourceHandle)&&connection.target!==connection.source&&(connection.sourceHandle!=='rest'||source.data.restEnabled!==false))}}
+      isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return !s.nodes.some(n=>n.id===connection.target&&n.type==='start')&&(source?.type!=='loop'||(isLoopOutput(connection.sourceHandle)&&connection.target!==connection.source&&(connection.sourceHandle!=='rest'||source.data.restEnabled!==false)))}}
       onNodeDragStart={s.checkpoint} onNodeClick={(_, node) => s.selectNode(node)} onPaneClick={() => s.selectNode(null)}
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
       onDrop={e => {
         e.preventDefault()
         const type = e.dataTransfer.getData('application/reactflow')
-        if (!NODE_CONFIG[type] || !flow.current) return
+        if (!NODE_CONFIG[type] || type==='start' || !flow.current) return
         s.addNode({ id: crypto.randomUUID(), type, position: flow.current.screenToFlowPosition({ x: e.clientX, y: e.clientY }), data: { ...structuredClone(NODE_CONFIG[type].defaultData), name: NODE_CONFIG[type].label + '节点' } })
       }}
       defaultEdgeOptions={edgeOptions} connectionLineType={ConnectionLineType.Bezier}

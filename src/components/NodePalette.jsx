@@ -19,7 +19,7 @@ export default function NodePalette({ onAddNode }) {
         Ctrl+D 快速复制
       </div>
       <div className="palette-content">
-        {Object.entries(NODE_CONFIG).map(([type, config]) => (
+        {Object.entries(NODE_CONFIG).filter(([type])=>type!=='start').map(([type, config]) => (
           <div
             key={type}
             className="palette-node"

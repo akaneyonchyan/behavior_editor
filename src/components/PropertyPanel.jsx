@@ -12,7 +12,7 @@ import ResultFields from './ResultFields'
 export default function PropertyPanel() {
   const { selectedNode, updateNode, deleteNode } = useBehaviorStore()
 
-  if (!selectedNode) {
+  if (!selectedNode || selectedNode.type==='start') {
     return <BehaviorMetadata />
   }
 

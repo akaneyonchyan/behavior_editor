@@ -27,7 +27,8 @@ config.graph.nodes.find(n=>n.type==='result').data.effectRules=[rule]
 config.graph.nodes.find(n=>n.type==='loop').data.loopRules=[{...rule,influence:'具有鼓舞时'}]
 config.behavior.preconditions.attributeRules=[{...rule,influence:'具有鼓舞时'}]
 validateConfig(config,NODE_CONFIG);graph.getState().importConfig(config)
-assert.deepEqual(graph.getState().exportConfig().behavior.preconditions.attributeRules,[{...rule,influence:'具有鼓舞时'}])
+assert.deepEqual(graph.getState().exportConfig().behavior.preconditions.attributeRules.find(r=>r.id==='rule'),{...rule,influence:'具有鼓舞时'})
+assert.ok(graph.getState().exportConfig().behavior.preconditions.attributeRules.some(r=>r.influence==='食物可食用'))
 const result=graph.getState().nodes.find(n=>n.type==='result');graph.getState().updateNode(result.id,{effectRules:[]});graph.getState().undo()
 assert.deepEqual(graph.getState().nodes.find(n=>n.id===result.id).data.effectRules,[rule])
 config.graph.nodes.find(n=>n.type==='result').data.effectRules=[{...rule,influence:3}];assert.throws(()=>validateConfig(config,NODE_CONFIG))

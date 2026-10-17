@@ -7,7 +7,7 @@ let html=renderToStaticMarkup(React.createElement(Panel));assert.ok(html.include
 store.getState().updateBehaviorInfo({targetRules:[{id:'goal',source:'actor',attribute:'energy',influence:'恢复至正常状态'}],preconditions:{interactObject:'旧对象',consumables:['旧消耗品'],attributes:['旧门槛'],interactObjectType:'food',consumableRules:[{id:'c',objectType:'food',requirement:'有可用存量'}],attributeRules:[{id:'a',source:'actor',attribute:'energy',influence:'较低时'}]}})
 const config=store.getState().exportConfig();validateConfig(config,NODE_CONFIG);store.getState().importConfig(config);assert.deepEqual(store.getState().exportConfig(),config)
 store.getState().updateBehaviorInfo({name:'修改名称'});store.getState().undo();assert.equal(store.getState().behaviorInfo.name,config.behavior.name)
-assert.equal(store.getState().behaviorInfo.preconditions.interactObject,'旧对象')
+assert.ok(store.getState().behaviorInfo.preconditions.interactObjectRules.some(r=>r.objectType==='旧对象'))
 const node={id:'test',type:'wait',position:{x:0,y:0},data:{name:'待机'}};store.getState().addNode(node);assert.equal(store.getState().selectedNode.id,'test')
 store.getState().selectNode(null);assert.ok(store.getState().nodes.every(n=>!n.selected));html=renderToStaticMarkup(React.createElement(Panel));assert.ok(html.includes('aria-label="行为元数据"'))
 const bad=structuredClone(config);bad.behavior.targetRules[0].attribute=1;assert.throws(()=>validateConfig(bad,NODE_CONFIG));const bad2=structuredClone(config);bad2.behavior.preconditions.consumableRules.push(bad2.behavior.preconditions.consumableRules[0]);assert.throws(()=>validateConfig(bad2,NODE_CONFIG))

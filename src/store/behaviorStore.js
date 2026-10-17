@@ -1,40 +1,46 @@
-﻿import { create } from 'zustand'
+import { create } from 'zustand'
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
 import { validateConfig } from './documentValidation'
 import { isLoopOutput } from '../utils/loopFlow'
+import {emptyBehavior,normalizeMetadata,ensureStart} from '../utils/behaviorMetadata'
 const clone = value => JSON.parse(JSON.stringify(value))
 const snapshot = s => clone({ nodes: s.nodes, edges: s.edges, behaviorInfo: s.behaviorInfo })
 export const useBehaviorStore = create((set, get) => {
   const commit = patch => { get().checkpoint(); set(patch) }
   const restore = (s, patch) => ({ ...patch, selectedNode: patch.nodes.find(n => n.id === s.selectedNode?.id) || null })
   return {
-    behaviorInfo: { name: '未命名行为', matchTargets: [], preconditions: { interactObject: '', consumables: [], attributes: [] } },
-    nodes: [], edges: [], selectedNode: null, past: [], future: [], clipboard: null, pasteCount: 0,
+    behaviorInfo: emptyBehavior().behavior,
+    nodes: emptyBehavior().graph.nodes, edges: [], selectedNode: null, past: [], future: [], clipboard: null, pasteCount: 0,
     checkpoint: () => set(s => ({ past: [...s.past.slice(-99), snapshot(s)], future: [] })),
     undo: () => set(s => s.past.length ? { ...restore(s, s.past.at(-1)), past: s.past.slice(0, -1), future: [snapshot(s), ...s.future] } : {}),
     redo: () => set(s => s.future.length ? { ...restore(s, s.future[0]), past: [...s.past, snapshot(s)], future: s.future.slice(1) } : {}),
-    updateBehaviorInfo: updates => commit({ behaviorInfo: { ...get().behaviorInfo, ...updates } }),
+    updateBehaviorInfo: updates => commit({ behaviorInfo: normalizeMetadata({ ...get().behaviorInfo, ...updates }) }),
     selectNode: node => set(s=>({ selectedNode: node, ...(!node?{nodes:s.nodes.map(n=>({...n,selected:false}))}: {}) })),
-    addNode: node => commit({ nodes: [...get().nodes.map(n => ({ ...n, selected: false })), { ...node, selected: true }], selectedNode: node }),
+    addNode: node => {if(node.type==='start')return;commit({ nodes: [...get().nodes.map(n => ({ ...n, selected: false })), { ...node, selected: true }], selectedNode: node })},
     updateNode: (id, updates) => {
       const nodes = get().nodes.map(n => n.id === id ? { ...n, data: { ...n.data, ...updates } } : n)
       const edges = get().edges.filter(e => e.source !== id || !updates.branches || !e.sourceHandle || updates.branches.some(b => b.id === e.sourceHandle))
       commit({ nodes, edges, selectedNode: nodes.find(n => n.id === get().selectedNode?.id) || null })
     },
     changeNodes: changes => set(s => {
-      const nodes = applyNodeChanges(changes, s.nodes)
+      const nodes = applyNodeChanges(changes.filter(c=>!(c.type==='remove'&&s.nodes.some(n=>n.id===c.id&&n.type==='start'))), s.nodes)
       return { nodes, selectedNode: nodes.find(n => n.id === s.selectedNode?.id) || null }
     }),
     changeEdges: changes => set(s => ({ edges: applyEdgeChanges(changes, s.edges) })),
     connect: params => {
       const source=get().nodes.find(n=>n.id===params.source)
+      if(!source||get().nodes.some(n=>n.id===params.target&&n.type==='start'))return
+      if(source.type==='start'){
+        if(params.sourceHandle||!get().nodes.some(n=>n.id===params.target))return
+        commit({edges:addEdge({...params,id:crypto.randomUUID(),type:'default'},get().edges.filter(e=>e.source!==source.id))});return
+      }
       if(source?.type==='loop')return get().setLoopTarget(params.source,params.sourceHandle,params.target)
       commit({ edges: addEdge({ ...params, id: crypto.randomUUID(), type: 'default' }, get().edges) })
     },
     setLoopTarget: (id,handle,target) => {
       const s=get(),node=s.nodes.find(n=>n.id===id)
-      if(node?.type!=='loop'||!isLoopOutput(handle)||(handle==='rest'&&node.data.restEnabled===false)||target===id||(target&&!s.nodes.some(n=>n.id===target)))return
+      if(node?.type!=='loop'||!isLoopOutput(handle)||(handle==='rest'&&node.data.restEnabled===false)||target===id||(target&&!s.nodes.some(n=>n.id===target&&n.type!=='start')))return
       const existing=s.edges.find(e=>e.source===id&&e.sourceHandle===handle)
       if((existing?.target||'')===target)return
       const edges=s.edges.filter(e=>!(e.source===id&&e.sourceHandle===handle))
@@ -49,24 +55,27 @@ export const useBehaviorStore = create((set, get) => {
     deleteNode: id => get().deleteSelection([id]),
     deleteSelection: ids => {
       const s = get(), removed = new Set(ids || s.nodes.filter(n => n.selected).map(n => n.id))
+      s.nodes.filter(n=>n.type==='start').forEach(n=>removed.delete(n.id))
       if (!removed.size && !s.edges.some(e => e.selected)) return
       commit({ nodes: s.nodes.filter(n => !removed.has(n.id)), edges: s.edges.filter(e => !e.selected && !removed.has(e.source) && !removed.has(e.target)), selectedNode: removed.has(s.selectedNode?.id) ? null : s.selectedNode })
     },
     copy: () => {
-      const s = get(), nodes = s.nodes.filter(n => n.selected), ids = new Set(nodes.map(n => n.id))
+      const s = get(), nodes = s.nodes.filter(n => n.selected&&n.type!=='start'), ids = new Set(nodes.map(n => n.id))
+      if(!nodes.length){set({clipboard:null});return}
       if (nodes.length) set({ clipboard: clone({ nodes, edges: s.edges.filter(e => ids.has(e.source) && ids.has(e.target)) }), pasteCount: 0 })
     },
     paste: () => {
       const s = get(); if (!s.clipboard) return
-      const count = s.pasteCount + 1, ids = new Map(s.clipboard.nodes.map(n => [n.id, crypto.randomUUID()]))
-      const nodes = clone(s.clipboard.nodes).map(n => {
+      const copied=s.clipboard.nodes.filter(n=>n.type!=='start');if(!copied.length)return
+      const count = s.pasteCount + 1, ids = new Map(copied.map(n => [n.id, crypto.randomUUID()]))
+      const nodes = clone(copied).map(n => {
         n.id = ids.get(n.id); n.selected = true; n.dragging = false
         n.position = { x: n.position.x + count * 40, y: n.position.y + count * 40 }
         if (n.data.nextNode) n.data.nextNode = ids.get(n.data.nextNode) || ''
         n.data.branches?.forEach(b => { b.nextNode = ids.get(b.nextNode) || '' })
         return n
       })
-      const edges = clone(s.clipboard.edges).map(e => ({ ...e, id: crypto.randomUUID(), source: ids.get(e.source), target: ids.get(e.target), selected: false }))
+      const edges = clone(s.clipboard.edges).filter(e=>ids.has(e.source)&&ids.has(e.target)).map(e => ({ ...e, id: crypto.randomUUID(), source: ids.get(e.source), target: ids.get(e.target), selected: false }))
       commit({ nodes: [...s.nodes.map(n => ({ ...n, selected: false })), ...nodes], edges: [...s.edges.map(e => ({ ...e, selected: false })), ...edges], selectedNode: nodes[0], pasteCount: count })
     },
     exportConfig: () => {
@@ -86,7 +95,7 @@ export const useBehaviorStore = create((set, get) => {
         if (!ids.has(e.source) || !ids.has(e.target)) throw new Error('连线引用了不存在的节点')
         return { ...clone(e), id: crypto.randomUUID(), type: 'default' }
       })
-      commit({ behaviorInfo: clone(config.behavior), nodes, edges, selectedNode: null })
+      commit({ behaviorInfo: normalizeMetadata(clone(config.behavior)), ...ensureStart(nodes,edges), selectedNode: null })
     }
   }
 })

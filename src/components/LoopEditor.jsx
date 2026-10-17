@@ -39,7 +39,7 @@ export default function LoopFields({node}) {
   const legacy=edges.filter(e=>e.source===node.id&&!e.sourceHandle)
   const target=(handle,label)=>{
     const outgoing=edges.find(e=>e.source===node.id&&e.sourceHandle===handle)
-    return <div className="form-group"><label>{label}</label><select aria-label={label} value={outgoing?.target||''} disabled={handle==='rest'&&!enabled} onChange={e=>setLoopTarget(node.id,handle,e.target.value)}><option value="">未连接</option>{nodes.filter(n=>n.id!==node.id).map(n=><option value={n.id} key={n.id}>{n.data.name||n.type} · {n.id.slice(0,8)}</option>)}</select></div>
+    return <div className="form-group"><label>{label}</label><select aria-label={label} value={outgoing?.target||''} disabled={handle==='rest'&&!enabled} onChange={e=>setLoopTarget(node.id,handle,e.target.value)}><option value="">未连接</option>{nodes.filter(n=>n.id!==node.id&&n.type!=='start').map(n=><option value={n.id} key={n.id}>{n.data.name||n.type} · {n.id.slice(0,8)}</option>)}</select></div>
   }
   return <div className="loop-editor">
     <p className="form-hint">按 ① → ② → ③ 依次判断；一旦从出口离开，就不再进行后面的判定。每个出口连接一个后续节点。</p>

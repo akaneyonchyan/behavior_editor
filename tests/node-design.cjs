@@ -10,7 +10,7 @@ assert.equal(data.branches[0].weightFactors[0].influence,'自定义影响');asse
 assert.equal(branchFactors({},attrs).length,2);assert.ok(branchFactors({},attrs).every(f=>f.influence==='不影响'))
 const removed=setJudgeAttributes(data,attrs.slice(1));assert.ok(removed.branches.every(b=>b.weightFactors.length===1))
 store.getState().addNode({id:'j',type:'judge',position:{x:0,y:0},data});let config=store.getState().exportConfig();validateConfig(config,NODE_CONFIG);store.getState().importConfig(config);assert.deepEqual(store.getState().exportConfig(),config)
-store.getState().updateNode('j',removed);store.getState().undo();assert.deepEqual(store.getState().nodes[0].data,data)
+store.getState().updateNode('j',removed);store.getState().undo();assert.deepEqual(store.getState().nodes.find(n=>n.id==='j').data,data)
 const effects={effectRules:[{id:'a',source:'actor',attribute:'energy',influence:'增'},{id:'b',source:'actor',attribute:'buff:happy',influence:'减'},{id:'c',kind:'buff',source:'自定义对象',attribute:'自定义Buff',influence:'自定义方式'}],outputs:['自定义产物'],playMode:'计时',playExpectation:'短暂播放'}
 assert.equal(resultRules(effects,'attribute').length,1);assert.equal(resultRules(effects,'buff').length,2)
 const html=render(React.createElement(ResultFields,{node:{id:'r',data:effects}}));assert.ok(html.includes('Buff名'));assert.ok(html.includes('时长期望'));assert.ok(html.includes('产物名'));assert.ok(!html.includes('属性 / Buff'))

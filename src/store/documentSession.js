@@ -2,11 +2,12 @@ import { create } from 'zustand'
 import { useBehaviorStore as graph } from './behaviorStore'
 import { validateConfig } from './documentValidation'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
+import { emptyBehavior } from '../utils/behaviorMetadata'
 const PREFIX = 'pps-behavior-v2:'
 const draftKey = PREFIX + 'draft:' + crypto.randomUUID()
-const empty = () => ({ behavior: { name: '未命名行为', matchTargets: [], preconditions: { interactObject: '', consumables: [], attributes: [] } }, graph: { nodes: [], edges: [] } })
+const empty = emptyBehavior
 const content = () => graph.getState().exportConfig()
-export const fingerprint = c => JSON.stringify({ ...c, graph: { ...c.graph, edges: c.graph.edges.map(({ id, ...e }) => e) } })
+export const fingerprint = c => JSON.stringify({ ...c, graph: { ...c.graph, nodes:c.graph.nodes.map(({id,type,data,position})=>({id,type,data,position})), edges: c.graph.edges.map(({ id, ...e }) => e) } })
 let baseline = fingerprint(empty()), fileHandle = null, diskText = null, directory = null
 let documentId = crypto.randomUUID(), localFingerprint = '', diskFingerprint = '', initialized = false
 let localTimer, writing = false
