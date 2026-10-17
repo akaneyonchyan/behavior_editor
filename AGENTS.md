@@ -2,6 +2,8 @@
 
 修改本仓库前先读 [工具说明](docs/tool/README.md)；公共库任务另读 [公共库说明](docs/content-library/README.md) 和 [来源](docs/content-library/sources.md)。核对实际源码与当前文件变更，不把历史文档当作实时实现。
 
+可加载项目 [behavior-editor Skill](.agents/skills/behavior-editor/SKILL.md)，按任务读取文档并执行使用指导、功能维护、内容库核对或发布排查。Skill 共享源随本仓库维护。
+
 ## 当前产品约束
 
 - 线上为 GitHub Pages 静态编辑器，行为图本地保存；公共库由飞书维护、Actions 发布、网页只读。旧 Node 后台仅保留兼容。

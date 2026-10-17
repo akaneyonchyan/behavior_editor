@@ -12,3 +12,18 @@
 线上地址：https://akaneyonchyan.github.io/behavior_editor/
 
 新加入的开发者或 agent：先读仓库根目录 [AGENTS.md](../../AGENTS.md)，再按上述入口阅读。文档描述当前实现，不代表游戏引擎已支持相同配置。修改功能时同步更新对应说明。
+
+## 通过 Skill 使用与维护
+
+工程包含 [behavior-editor Skill](../../.agents/skills/behavior-editor/SKILL.md)，覆盖使用指导、编辑器修改、公共库维护和发布排查。它按任务读取本目录及公共库文档，不另存一套重复手册。
+
+在支持项目 `.agents/skills` 的环境中，以本仓库作为工作区，新建或重启 agent 会话即可发现。也可将整个 `behavior-editor` 文件夹安装到自己工作区的 `.agents/skills/`；保留工程文档访问能力，更新时从仓库同步，避免各自维护副本。其他宿主可按自身 Skill 安装方式加载，或显式提供 SKILL.md 路径。
+
+调用示例：
+
+- “使用 behavior-editor Skill，教我创建并保存一张行为图。”
+- “使用 behavior-editor Skill，修复结果节点的展示，并验证旧文件兼容。”
+- “使用 behavior-editor Skill，核对飞书公共库的属性，先给出修改清单。”
+- “使用 behavior-editor Skill，排查公共库更新后网页仍显示旧数据的问题。”
+
+Skill 的调用不额外授予飞书写入或发布权限；按具体任务已有授权执行。仅将文件放进仓库不等于发布到 SkillHub。
