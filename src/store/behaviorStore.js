@@ -11,7 +11,7 @@ export const useBehaviorStore = create((set, get) => {
   const restore = (s, patch) => ({ ...patch, selectedNode: patch.nodes.find(n => n.id === s.selectedNode?.id) || null })
   return {
     behaviorInfo: emptyBehavior().behavior,
-    nodes: emptyBehavior().graph.nodes, edges: [], selectedNode: null, past: [], future: [], clipboard: null, pasteCount: 0,
+    nodes: emptyBehavior().graph.nodes, edges: [], selectedNode: null, past: [], future: [], clipboard: null, pasteCount: 0, documentRevision:0,
     checkpoint: () => set(s => ({ past: [...s.past.slice(-99), snapshot(s)], future: [] })),
     undo: () => set(s => s.past.length ? { ...restore(s, s.past.at(-1)), past: s.past.slice(0, -1), future: [snapshot(s), ...s.future] } : {}),
     redo: () => set(s => s.future.length ? { ...restore(s, s.future[0]), past: [...s.past, snapshot(s)], future: s.future.slice(1) } : {}),
@@ -95,7 +95,7 @@ export const useBehaviorStore = create((set, get) => {
         if (!ids.has(e.source) || !ids.has(e.target)) throw new Error('连线引用了不存在的节点')
         return { ...clone(e), id: crypto.randomUUID(), type: 'default' }
       })
-      commit({ behaviorInfo: normalizeMetadata(clone(config.behavior)), ...ensureStart(nodes,edges), selectedNode: null })
+      commit({ behaviorInfo: normalizeMetadata(clone(config.behavior)), ...ensureStart(nodes,edges), selectedNode: null, documentRevision:get().documentRevision+1 })
     }
   }
 })

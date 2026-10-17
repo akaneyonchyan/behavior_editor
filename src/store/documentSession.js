@@ -3,6 +3,7 @@ import { useBehaviorStore as graph } from './behaviorStore'
 import { validateConfig } from './documentValidation'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
 import { emptyBehavior } from '../utils/behaviorMetadata'
+import { blankTemplate } from '../utils/blankTemplate'
 const PREFIX = 'pps-behavior-v2:'
 const draftKey = PREFIX + 'draft:' + crypto.randomUUID()
 const empty = emptyBehavior
@@ -11,61 +12,150 @@ export const fingerprint = c => JSON.stringify({ ...c, graph: { ...c.graph, node
 let baseline = fingerprint(empty()), fileHandle = null, diskText = null, directory = null
 let documentId = crypto.randomUUID(), localFingerprint = '', diskFingerprint = '', initialized = false
 let localTimer, writing = false
-export const useDocumentSession = create(() => ({ dirty: false, busy: false, fileName: '', directoryName: '', draftTime: '', backupTime: '', error: '', notice: '', firstRun: true, ready: false }))
+let needsTemplate=true, startup=Promise.resolve(), referenceQueue=Promise.resolve(), pendingRestore=null
+export const CACHE_DIRECTORY='.behavior-editor-cache'
+export const TEMPLATE_FILE='空白行为模板.json'
+export const waitForInitialization=()=>startup
+export const useDocumentSession = create(() => ({ dirty: false, busy: false, fileName: '', directoryName: '', draftTime: '', backupTime: '', error: '', notice: '', firstRun: true, ready: false, needsAuthorization:false }))
 const status = patch => useDocumentSession.setState(patch)
 const time = () => new Date().toLocaleTimeString('zh-CN', { hour12: false })
 export const supportsDirectory = () => window.isSecureContext && 'showDirectoryPicker' in window
 const parse = text => JSON.parse(text.charCodeAt(0) === 0xfeff ? text.slice(1) : text)
-function preferences(mode, value) {
+function preferences(mode, value, key='directory') {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('pps-behavior-settings', 1)
     request.onupgradeneeded = () => request.result.createObjectStore('settings')
     request.onerror = () => reject(request.error)
     request.onsuccess = () => {
       const db = request.result, tx = db.transaction('settings', mode === 'get' ? 'readonly' : 'readwrite')
-      const op = mode === 'get' ? tx.objectStore('settings').get('directory') : tx.objectStore('settings').put(value, 'directory')
+      const op = mode === 'get' ? tx.objectStore('settings').get(key) : tx.objectStore('settings').put(value, key)
       tx.oncomplete = () => { db.close(); resolve(op.result) }
       tx.onerror = tx.onabort = () => { db.close(); reject(tx.error) }
     }
   })
 }
+function rememberReference(){
+  const ref={documentId,handle:fileHandle,diskText}
+  referenceQueue=referenceQueue.then(async()=>{
+    await preferences('set',ref,'document:'+ref.documentId)
+    await preferences('set',{documentId:ref.documentId},'last-document')
+  }).catch(()=>status({notice:'浏览器未能记住文件授权；编辑草稿仍会缓存，下次可通过“打开”选择文件。'}))
+  return referenceQueue
+}
+function adopt(config,{saved=false,draft=null,id=null,name='',handle=null,text=null}={}){
+  graph.getState().importConfig(config)
+  graph.setState({past:[],future:[],selectedNode:null,clipboard:null})
+  documentId=id||crypto.randomUUID();fileHandle=handle;diskText=text;needsTemplate=false
+  baseline=draft?.baseline||(saved?fingerprint(content()):fingerprint(config))
+  localFingerprint='';diskFingerprint=''
+  status({fileName:name,dirty:fingerprint(content())!==baseline})
+}
+async function cachedTemplate(){
+  if(directory){
+    try{
+      const cache=await directory.getDirectoryHandle(CACHE_DIRECTORY)
+      const file=await (await cache.getFileHandle(TEMPLATE_FILE)).getFile()
+      const config=parse(await file.text());validateConfig(config,NODE_CONFIG);return config
+    }catch{ /* A missing or inaccessible cache is recreated from the built-in template. */ }
+  }
+  return blankTemplate()
+}
+async function ensureTemplateCache(){
+  const cache=await directory.getDirectoryHandle(CACHE_DIRECTORY,{create:true})
+  try{await cache.getFileHandle(TEMPLATE_FILE);return cache}catch(e){if(e.name!=='NotFoundError')throw e}
+  const target=await cache.getFileHandle(TEMPLATE_FILE,{create:true}),stream=await target.createWritable()
+  try{await stream.write(JSON.stringify(blankTemplate(),null,2));await stream.close()}catch(e){await stream.abort().catch(()=>{});throw e}
+  return cache
+}
+async function restoreFile(ref,draft){
+  const capture=fingerprint(content())
+  if(await ref.handle.queryPermission({mode:'read'})!=='granted'){
+    pendingRestore={ref,draft,capture};status({needsAuthorization:true,notice:'上次文件需要重新授权。点击“恢复访问授权”即可，无需重新选择路径。'});return
+  }
+  try{
+    const file=await ref.handle.getFile(),text=await file.text(),config=parse(text);validateConfig(config,NODE_CONFIG)
+    if(fingerprint(content())!==capture)return
+    const dirtyDraft=draft&&fingerprint(draft.config)!==draft.baseline
+    if(dirtyDraft){
+      // Preserve the last observed disk text so external changes still trigger conflict protection.
+      fileHandle=typeof ref.diskText==='string'?ref.handle:null;diskText=ref.diskText??null
+      status({notice:fileHandle?'已恢复上次文件及未保存的编辑草稿；正式文件仍需手动保存。':'已恢复未保存草稿；原文件版本无法核对，请另存为。'})
+    }else{
+      adopt(config,{saved:true,id:ref.documentId,name:file.name,handle:ref.handle,text})
+      status({notice:'已加载上次编辑的文件：'+file.name})
+    }
+  }catch(e){
+    if(e.name==='NotAllowedError'||e.name==='SecurityError'){pendingRestore={ref,draft,capture};status({needsAuthorization:true,notice:'文件访问授权已失效，点击“恢复访问授权”重试。'});return}
+    const template=await cachedTemplate()
+    if(fingerprint(content())!==capture)return
+    adopt(template)
+    status({notice:e.name==='NotFoundError'?'上次文件已找不到，已加载空白缓存模板；原编辑草稿仍可在“恢复草稿”中找回。':'上次文件无法读取，已加载空白缓存模板；原文件和编辑草稿均保留。'})
+  }
+}
+export async function authorizeStoredAccess(){
+  if(useDocumentSession.getState().busy)return
+  status({busy:true,error:''})
+  try{
+    // Request permission directly from this button click; do not reopen a picker.
+    const filePermission=pendingRestore?pendingRestore.ref.handle.requestPermission({mode:'read'}):null
+    const dirPermission=directory?directory.requestPermission({mode:'readwrite'}):null
+    const [fileResult,dirResult]=await Promise.all([filePermission,dirPermission])
+    if(pendingRestore&&fileResult==='granted'){
+      const pending=pendingRestore;pendingRestore=null
+      if(fingerprint(content())===pending.capture)await restoreFile(pending.ref,pending.draft)
+      else status({notice:'当前已有新的编辑，已保留；如需切换上次文件，请使用“打开”。'})
+    }
+    status({needsAuthorization:!!pendingRestore||!!directory&&dirResult!=='granted'})
+    if(fileResult==='denied'||dirResult==='denied')status({error:'访问授权未获允许；当前草稿保留，可稍后再次授权。'})
+    flushDraft();if(!pendingRestore)await rememberReference();await backupToDirectory()
+  }catch(e){status({error:'恢复访问授权失败：'+e.message+'。草稿已保留，可稍后重试。'})}
+  finally{status({busy:false})}
+}
 export function flushDraft() {
-  if (!useDocumentSession.getState().ready) return
+  if (!useDocumentSession.getState().ready || needsTemplate) return
   const config = content(), current = fingerprint(config)
   if (current === localFingerprint) return
   try {
-    localStorage.setItem(draftKey, JSON.stringify({ config, baseline, savedAt: Date.now(), fileName: useDocumentSession.getState().fileName }))
+    localStorage.setItem(draftKey, JSON.stringify({ config, baseline, documentId, savedAt: Date.now(), fileName: useDocumentSession.getState().fileName }))
     localStorage.setItem(PREFIX + 'latest', draftKey)
     localFingerprint = current; status({ draftTime: time() })
   } catch { status({ error: '浏览器恢复草稿写入失败（空间不足或存储被禁用）。请立即保存 JSON 文件。' }) }
 }
 export async function chooseDirectory() {
   if (!supportsDirectory()) { status({ error: '当前浏览器不能直接写入目录。请用 Chrome／Edge 通过 HTTPS 或 localhost 打开；当前仍可恢复浏览器草稿并下载 JSON。' }); return }
-  if (writing) return
+  if (writing || useDocumentSession.getState().busy) return
+  status({busy:true})
   try {
-    const selected = await window.showDirectoryPicker({ mode: 'readwrite', id: 'pps-behavior' })
+    const selected = await window.showDirectoryPicker({ mode: 'readwrite', id: 'pps-behavior',...(directory?{startIn:directory}:{}) })
     directory = selected; diskFingerprint = ''
-    status({ directoryName: selected.name, firstRun: false, error: '', backupTime: '' })
+    status({ directoryName: selected.name, error: '', backupTime: '',needsAuthorization:!!pendingRestore })
     try { await preferences('set', selected); localStorage.setItem(PREFIX + 'setup', 'done') }
     catch { status({ error: '目录已可用，但浏览器未能记住授权；下次打开需重新选择。' }) }
-    await backupToDirectory()
+    if(needsTemplate)adopt(await cachedTemplate())
+    status({firstRun:false})
+    flushDraft();if(!pendingRestore)await rememberReference();await backupToDirectory()
   } catch (e) { if (e.name !== 'AbortError') status({ error: '选择目录失败：' + e.message }) }
+  finally { status({busy:false}) }
 }
 export function skipSetup() {
+  if(useDocumentSession.getState().busy)return
+  if(needsTemplate)adopt(blankTemplate())
   status({ firstRun: false })
   try { localStorage.setItem(PREFIX + 'setup', 'done') } catch { /* flushDraft reports storage failures */ }
+  flushDraft();void rememberReference()
 }
 export async function backupToDirectory() {
-  if (!directory || writing || !useDocumentSession.getState().ready) return
+  if (!directory || writing || !useDocumentSession.getState().ready || needsTemplate) return
   const config = content(), current = fingerprint(config)
   if (current === diskFingerprint) return
   const id = documentId
   writing = true
   try {
     if (await directory.queryPermission({ mode: 'readwrite' }) !== 'granted') {
-      status({ error: '本地目录写入授权已失效。点击“保存目录”重新授权；浏览器草稿仍继续保存。' }); return
+      status({ needsAuthorization:true,error: '本地目录写入授权已失效。点击“恢复访问授权”继续备份；浏览器草稿仍继续保存。' }); return
     }
-    const target = await directory.getFileHandle('行为恢复-' + id + '.json', { create: true })
+    const cache=await ensureTemplateCache()
+    const target = await cache.getFileHandle('行为恢复-' + id + '-' + draftKey.split(':').at(-1) + '.json', { create: true })
     const stream = await target.createWritable()
     try { await stream.write(JSON.stringify(config, null, 2)); await stream.close() }
     catch (e) { await stream.abort().catch(() => {}); throw e }
@@ -90,10 +180,12 @@ function replace(config, { name = '', handle = null, text = null, saved = false 
   graph.getState().importConfig(config)
   graph.setState({ past: [], future: [], selectedNode: null, clipboard: null })
   documentId = crypto.randomUUID(); fileHandle = handle; diskText = text
+  needsTemplate=false;pendingRestore=null
   baseline = saved ? fingerprint(content()) : fingerprint(empty())
   localFingerprint = ''; diskFingerprint = ''
   status({ fileName: name, dirty: fingerprint(content()) !== baseline, backupTime: '', notice: '', error: archiveError })
   flushDraft()
+  void rememberReference()
 }
 export function newDocument() { if (canReplace()) replace(empty()) }
 export function loadExample(config) { if (canReplace()) replace(config) }
@@ -102,7 +194,7 @@ export async function openDocument(fallbackInput) {
   if (!window.showOpenFilePicker) { fallbackInput.click(); return }
   status({ busy: true })
   try {
-    const [handle] = await window.showOpenFilePicker({ types: [{ description: '行为图 JSON', accept: { 'application/json': ['.json'] } }], multiple: false })
+    const [handle] = await window.showOpenFilePicker({ id:'pps-behavior-files',...(directory?{startIn:directory}:{}),types: [{ description: '行为图 JSON', accept: { 'application/json': ['.json'] } }], multiple: false })
     const file = await handle.getFile(), text = await file.text()
     replace(parse(text), { name: file.name, handle, text, saved: true })
   } catch (e) { if (e.name !== 'AbortError') status({ error: '打开失败：' + e.message + '。原行为未替换，请检查 JSON 格式。' }) }
@@ -123,7 +215,7 @@ export async function saveDocument(asNew = false) {
   status({ busy: true, error: '' })
   try {
     let handle = asNew ? null : fileHandle
-    if (!handle && window.showSaveFilePicker) handle = await window.showSaveFilePicker({ suggestedName: name, ...(directory ? { startIn: directory } : {}), types: [{ description: '行为图 JSON', accept: { 'application/json': ['.json'] } }] })
+    if (!handle && window.showSaveFilePicker) handle = await window.showSaveFilePicker({ id:'pps-behavior-files',suggestedName: name, ...(directory ? { startIn: directory } : {}), types: [{ description: '行为图 JSON', accept: { 'application/json': ['.json'] } }] })
     if (!handle) {
       const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
       const a = document.createElement('a'); a.href = url; a.download = name; a.click()
@@ -138,7 +230,7 @@ export async function saveDocument(asNew = false) {
     catch (e) { await stream.abort().catch(() => {}); throw e }
     fileHandle = handle; diskText = text; baseline = current; localFingerprint = ''
     status({ fileName: handle.name, dirty: fingerprint(content()) !== baseline, notice: '已保存到文件：' + handle.name })
-    flushDraft(); return true
+    flushDraft();await rememberReference(); return true
   } catch (e) { if (e.name !== 'AbortError') status({ error: '保存失败：' + e.message }); return false }
   finally { status({ busy: false }) }
 }
@@ -154,21 +246,55 @@ export function recoverDraft(draft) {
   try { replace(draft.config); status({ notice: '已恢复草稿，请另存为正式文件。' }); return true }
   catch (e) { status({ error: '草稿恢复失败：' + e.message }); return false }
 }
+async function initializeSession(){
+  status({busy:true,ready:false})
+  let draft=null,setupDone=false
+  try{
+    setupDone=localStorage.getItem(PREFIX+'setup')==='done'
+    status({firstRun:!setupDone})
+    const key=localStorage.getItem(PREFIX+'latest'),raw=key&&localStorage.getItem(key)
+    if(raw){
+      draft=JSON.parse(raw);validateConfig(draft.config,NODE_CONFIG)
+      adopt(draft.config,{draft,id:draft.documentId,name:draft.fileName||''})
+      status({notice:'已恢复上次编辑草稿，正在检查本地文件。'})
+    }
+  }catch{draft=null;status({error:'上次草稿无法读取，原始数据已保留；将使用空白模板，可从“恢复草稿”查找其他版本。'})}
+  const capture=fingerprint(content())
+  try{
+    const rememberedDirectory=await preferences('get').catch(()=>null)
+    if(rememberedDirectory&&!directory){directory=rememberedDirectory;status({directoryName:directory.name,firstRun:false})}
+    let ref=null
+    if(draft?.documentId)ref=await preferences('get',null,'document:'+draft.documentId).catch(()=>null)
+    else if(!draft){
+      const last=await preferences('get',null,'last-document').catch(()=>null)
+      if(last?.documentId)ref=await preferences('get',null,'document:'+last.documentId).catch(()=>null)
+    }
+    // Upgrade old drafts only when the remembered directory contains the exact saved version.
+    // A matching filename alone is not enough to attach an unrelated file for future writes.
+    if(!ref?.handle&&draft?.fileName&&directory){
+      try{
+        const handle=await directory.getFileHandle(draft.fileName),file=await handle.getFile(),text=await file.text()
+        const config=parse(text);validateConfig(config,NODE_CONFIG)
+        if(fingerprint(config)===draft.baseline)ref={documentId,handle,diskText:text}
+      }catch{ /* Keep the old draft when its original file cannot be identified safely. */ }
+    }
+    if(fingerprint(content())!==capture){needsTemplate=false;status({notice:'已保留当前新编辑，未用启动恢复数据覆盖。'})}
+    else if(ref?.handle){
+      if(!draft){const template=await cachedTemplate();if(fingerprint(content())!==capture){needsTemplate=false;return}adopt(template,{id:ref.documentId})}
+      await restoreFile(ref,draft)
+    }else if(!draft&&(directory||setupDone)){const template=await cachedTemplate();if(fingerprint(content())===capture)adopt(template);else needsTemplate=false}
+    else if(draft)status({notice:draft.fileName?'已恢复编辑草稿；未能确认原文件授权，请打开或保存一次，之后可自动重开原文件。':'已恢复上次未保存的缓存行为。'})
+    if(directory&&await directory.queryPermission({mode:'readwrite'})!=='granted')status({needsAuthorization:true})
+  }catch(e){status({notice:'本地文件暂不可访问，当前缓存保留。可点击“恢复访问授权”或“打开”重试。',needsAuthorization:!!directory})}
+  finally{
+    status({ready:true,busy:false,dirty:fingerprint(content())!==baseline})
+    if(!needsTemplate){flushDraft();if(!pendingRestore)await rememberReference();await backupToDirectory()}
+  }
+}
 export function startPersistence() {
   if (!initialized) {
     initialized = true
-    try {
-      status({ firstRun: localStorage.getItem(PREFIX + 'setup') !== 'done' })
-      const key = localStorage.getItem(PREFIX + 'latest'), raw = key && localStorage.getItem(key)
-      if (raw) {
-        const draft = JSON.parse(raw); validateConfig(draft.config, NODE_CONFIG)
-        graph.getState().importConfig(draft.config); graph.setState({ past: [], future: [] })
-        baseline = draft.baseline || fingerprint(empty())
-        status({ fileName: draft.fileName || '', dirty: fingerprint(content()) !== baseline, notice: '已恢复上次草稿。重新保存时请选择文件；不会自动覆盖原文件。' })
-      }
-    } catch { status({ error: '上次草稿无法读取，已保留原始草稿。可通过“恢复草稿”查找其他版本，或打开已有 JSON。' }) }
-    status({ ready: true })
-    preferences('get').then(handle => { if (handle && !directory) { directory = handle; status({ directoryName: handle.name }) } }).catch(() => {})
+    startup=initializeSession()
   }
   const unsubscribe = graph.subscribe(() => {
     status({ dirty: fingerprint(content()) !== baseline })

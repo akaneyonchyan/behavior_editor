@@ -78,9 +78,10 @@ function MoveFields({ node }) {
       <div className="form-group">
         <label>目的地类型</label>
         <select
-          value={node.data.destinationType || 'interactObject'}
+          value={node.data.destinationType ?? 'interactObject'}
           onChange={(e) => updateNode(node.id, { destinationType: e.target.value })}
         >
+          <option value="">未配置</option>
           <option value="interactObject">交互对象</option>
           <option value="coordinate">固定坐标</option>
         </select>

@@ -27,6 +27,7 @@ function handle(name) {
 }
 async function main() {
   const a = load(), stop = a.startPersistence(), s = () => a.useDocumentSession.getState()
+  await a.waitForInitialization()
   assert.equal(s().firstRun, true)
   a.skipSetup(); a.loadExample(a.example)
   assert.equal(s().dirty, true)
@@ -49,9 +50,9 @@ async function main() {
   window.showSaveFilePicker = async () => { const e = Error('cancel'); e.name='AbortError'; throw e }
   assert.equal(await a.saveDocument(true), false); assert.equal(s().dirty,true)
   const backups = new Map(); let granted = true
-  window.showDirectoryPicker = async () => ({ name: 'test-dir', async queryPermission() { return granted ? 'granted' : 'denied' }, async getFileHandle(n) { if (!backups.has(n)) backups.set(n,handle(n)); return backups.get(n) } })
-  await a.chooseDirectory(); assert.equal(backups.size,1)
-  const backup = [...backups.values()][0], count = backup.writes
+  window.showDirectoryPicker = async () => ({ name: 'test-dir', async queryPermission() { return granted ? 'granted' : 'denied' }, async getDirectoryHandle(){return {async getFileHandle(n,options){if(!backups.has(n)){if(!options?.create)throw Object.assign(Error('missing'),{name:'NotFoundError'});backups.set(n,handle(n))}return backups.get(n)}}} })
+  await a.chooseDirectory(); assert.equal(backups.size,2)
+  const backup = [...backups.values()].find(h=>h.name.startsWith('行为恢复-')), count = backup.writes
   await a.backupToDirectory(); assert.equal(backup.writes,count)
   a.graph.getState().updateNode('move_1', { destination: 'timer backup' })
   await [...intervals.values()].find(v=>v.ms===15000).fn()
@@ -64,6 +65,7 @@ async function main() {
   await a.openFallback({name:'bad.json',text:async()=>JSON.stringify(broken)}); assert.equal(a.fingerprint(a.graph.getState().exportConfig()),before)
   a.flushDraft(); stop()
   const b = load(), stopB = b.startPersistence()
+  await b.waitForInitialization()
   assert.equal(b.graph.getState().nodes.find(n=>n.id==='move_1').data.destination,'permission lost')
   assert.equal(b.useDocumentSession.getState().dirty,true)
   assert.equal(b.useDocumentSession.getState().firstRun,false)
