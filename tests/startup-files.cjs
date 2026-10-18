@@ -16,9 +16,9 @@ async function boot(){const m=new Module(filename,module);m.filename=filename;m.
 const state=a=>a.useDocumentSession.getState(),config=a=>a.graph.getState().exportConfig()
 async function main(){
   const a=await boot();assert.equal(state(a).firstRun,true);assert.equal(localStorage.getItem('pps-behavior-v2:latest'),null)
-  await a.chooseDirectory();assert.equal(config(a).graph.nodes.length,8);assert.equal(config(a).graph.edges.length,11);assert.equal(state(a).fileName,'');assert.equal(state(a).dirty,false)
+  await a.chooseDirectory();assert.equal(config(a).graph.nodes.length,9);assert.equal(config(a).graph.edges.length,11);assert.equal(state(a).fileName,'');assert.equal(state(a).dirty,false)
   assert.equal(config(a).behavior.targetRules[0].influence,'');a.validateConfig(config(a),a.NODE_CONFIG)
-  assert.equal(cache.size,2);assert.ok(cache.has(a.TEMPLATE_FILE));assert.equal(JSON.parse(cache.get(a.TEMPLATE_FILE).text).graph.nodes.length,8);assert.ok(localStorage.getItem('pps-behavior-v2:latest'))
+  assert.equal(cache.size,2);assert.ok(cache.has(a.TEMPLATE_FILE));assert.equal(JSON.parse(cache.get(a.TEMPLATE_FILE).text).graph.nodes.length,9);assert.ok(localStorage.getItem('pps-behavior-v2:latest'))
   assert.ok(config(a).graph.nodes.filter(n=>n.type==='result').every(n=>n.data.animation===''&&n.data.playMode===''))
   const formal=file('behavior.json');window.showSaveFilePicker=async options=>{saveOptions=options;return formal}
   assert.equal(formal.writes,0);assert.equal(await a.saveDocument(),true);assert.equal(formal.writes,1);assert.equal(saveOptions.startIn,directory);a.stop()
@@ -36,7 +36,7 @@ async function main(){
   localStorage.removeItem('pps-behavior-v2:latest')
   const e=await boot();assert.equal(state(e).fileName,'other.json');assert.equal(config(e).graph.nodes.find(n=>n.id==='template_result_1').data.animation,'发生冲突');e.stop()
   other.exists=false
-  const f=await boot();assert.equal(config(f).behavior.name,'空白行为');assert.equal(config(f).graph.nodes.length,8);assert.equal(state(f).fileName,'');assert.match(state(f).notice,/找不到/);assert.ok(f.recoveryDrafts().some(r=>r.fileName==='other.json'));f.stop()
+  const f=await boot();assert.equal(config(f).behavior.name,'空白行为');assert.equal(config(f).graph.nodes.length,9);assert.equal(state(f).fileName,'');assert.match(state(f).notice,/找不到/);assert.ok(f.recoveryDrafts().some(r=>r.fileName==='other.json'));f.stop()
   assert.equal(pickerCount,1,'restoration never reopens directory picker')
   // Reloads, edits, and switches must reuse the same two disk cache files.
   const g=await boot(),writes=cache.get(g.AUTOSAVE_FILE).writes;g.stop()

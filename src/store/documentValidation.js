@@ -41,7 +41,7 @@ export function validateConfig(config, types) {
     if(n.data.loopVersion!==undefined&&n.data.loopVersion!==2)fail('不支持的循环节点版本')
     if(n.data.objectType!==undefined&&typeof n.data.objectType!=='string')fail('对象类型必须是文字标识')
     if (n.data.outputs !== undefined && !Array.isArray(n.data.outputs)) fail('产出必须是列表')
-    for(const key of ['playMode','playExpectation'])if(n.data[key]!==undefined&&typeof n.data[key]!=='string')fail(key+' 必须是文字')
+    for(const key of ['playMode','playExpectation','endReason','targetCondition'])if(n.data[key]!==undefined&&typeof n.data[key]!=='string')fail(key+' 必须是文字')
     if(n.data.judgeAttributes!==undefined){
       if(!Array.isArray(n.data.judgeAttributes))fail('参与判断的属性必须是列表')
       const selected=new Set()

@@ -8,6 +8,8 @@ import LoopFields from './LoopEditor'
 import BehaviorMetadata from './BehaviorMetadata'
 import JudgeFields from './JudgeFields'
 import ResultFields from './ResultFields'
+import EndFields from './EndFields'
+import {endLabel} from '../utils/endings'
 
 export default function PropertyPanel() {
   const { selectedNode, updateNode, deleteNode } = useBehaviorStore()
@@ -25,7 +27,7 @@ export default function PropertyPanel() {
           <span className="panel-icon" style={{ background: config.color }}>
             {config.icon}
           </span>
-          {config.label}节点
+          {selectedNode.type==='end'?endLabel(selectedNode.data):config.label+'节点'}
         </div>
         <button
           className="btn-delete"
@@ -62,7 +64,7 @@ export default function PropertyPanel() {
         {selectedNode.type === NODE_TYPES.JUDGE && <JudgeFields node={selectedNode} />}
         {selectedNode.type === NODE_TYPES.RESULT && <ResultFields node={selectedNode} />}
         {selectedNode.type === NODE_TYPES.LOOP && <LoopFields node={selectedNode} />}
-        {selectedNode.type === NODE_TYPES.END && <EndFields node={selectedNode} />}
+        {selectedNode.type === NODE_TYPES.END && <EndFields key={selectedNode.id} node={selectedNode} />}
       </div>
     </div>
   )
@@ -104,31 +106,3 @@ function MoveFields({ node }) {
   )
 }
 
-// 结束节点字段
-function EndFields({ node }) {
-  const { updateNode } = useBehaviorStore()
-
-  return (
-    <>
-      <div className="form-group">
-        <label>成功表演</label>
-        <input
-          type="text"
-          value={node.data.successAnimation || ''}
-          onChange={(e) => updateNode(node.id, { successAnimation: e.target.value })}
-          placeholder="成功动画"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>失败表演</label>
-        <input
-          type="text"
-          value={node.data.failAnimation || ''}
-          onChange={(e) => updateNode(node.id, { failAnimation: e.target.value })}
-          placeholder="失败动画"
-        />
-      </div>
-    </>
-  )
-}

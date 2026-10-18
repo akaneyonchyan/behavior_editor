@@ -8,7 +8,7 @@ test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',route=>route.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
  await page.goto('/')
  await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
- await expect(page.locator('.react-flow__node')).toHaveCount(8)
+ await expect(page.locator('.react-flow__node')).toHaveCount(9)
  await expect(page.locator('.react-flow__edge-path')).toHaveCount(11)
  await page.waitForTimeout(500)
 })

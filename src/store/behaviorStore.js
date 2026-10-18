@@ -3,6 +3,7 @@ import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
 import { validateConfig } from './documentValidation'
 import { isLoopOutput } from '../utils/loopFlow'
+import {splitLegacyEnd} from '../utils/endings'
 import {emptyBehavior,normalizeMetadata,ensureStart} from '../utils/behaviorMetadata'
 const clone = value => JSON.parse(JSON.stringify(value))
 const snapshot = s => clone({ nodes: s.nodes, edges: s.edges, behaviorInfo: s.behaviorInfo })
@@ -30,7 +31,7 @@ export const useBehaviorStore = create((set, get) => {
     changeEdges: changes => set(s => ({ edges: applyEdgeChanges(changes, s.edges) })),
     connect: params => {
       const source=get().nodes.find(n=>n.id===params.source)
-      if(!source||get().nodes.some(n=>n.id===params.target&&n.type==='start'))return
+      if(!source||source.type==='end'||get().nodes.some(n=>n.id===params.target&&n.type==='start'))return
       if(source.type==='start'){
         if(params.sourceHandle||!get().nodes.some(n=>n.id===params.target))return
         commit({edges:addEdge({...params,id:crypto.randomUUID(),type:'default'},get().edges.filter(e=>e.source!==source.id))});return
@@ -52,6 +53,7 @@ export const useBehaviorStore = create((set, get) => {
       if(!edge||edge.sourceHandle||!isLoopOutput(handle)||s.nodes.find(n=>n.id===edge.source)?.type!=='loop'||s.edges.some(e=>e.source===edge.source&&e.sourceHandle===handle))return
       commit({edges:s.edges.map(e=>e.id===edgeId?{...e,sourceHandle:handle}:e)})
     },
+    splitEnd: (id,assignments) => {const s=get(),patch=splitLegacyEnd(s.nodes,s.edges,id,assignments);commit({...patch,selectedNode:patch.nodes.find(n=>n.id===id),documentRevision:s.documentRevision+1})},
     deleteNode: id => get().deleteSelection([id]),
     deleteSelection: ids => {
       const s = get(), removed = new Set(ids || s.nodes.filter(n => n.selected).map(n => n.id))

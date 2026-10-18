@@ -62,8 +62,9 @@ export default function Canvas() {
         if(document.querySelector('.dialog-overlay'))return
         if(Array.from(e.dataTransfer.types).includes('Files')||e.dataTransfer.files.length){void openDroppedFiles(e.dataTransfer);return}
         const type = e.dataTransfer.getData('application/reactflow')
+        const endReason=e.dataTransfer.getData('application/behavior-end-reason')
         if (!NODE_CONFIG[type] || type==='start' || !flow.current) return
-        s.addNode({ id: crypto.randomUUID(), type, position: flow.current.screenToFlowPosition({ x: e.clientX, y: e.clientY }), data: { ...structuredClone(NODE_CONFIG[type].defaultData), name: NODE_CONFIG[type].label + '节点' } })
+        s.addNode({ id: crypto.randomUUID(), type, position: flow.current.screenToFlowPosition({ x: e.clientX, y: e.clientY }), data: { ...structuredClone(NODE_CONFIG[type].defaultData), ...(type==='end'&&['完成','中断'].includes(endReason)?{endReason,name:endReason+'结束'}:{name:NODE_CONFIG[type].label+'节点'}) } })
       }}
       defaultEdgeOptions={edgeOptions} connectionLineType={ConnectionLineType.Bezier}
       deleteKeyCode={null} multiSelectionKeyCode="Shift" minZoom={0.15} maxZoom={2} fitView>

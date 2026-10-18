@@ -160,11 +160,13 @@
         "type": "end",
         "data": {
           "name": "成功结算",
-          "successAnimation": "擦嘴摸肚子",
-          "failAnimation": "捂着咕咕叫的肚子",
           "releaseResources": [
             "空地占用"
-          ]
+          ],
+          "endReason": "完成",
+          "animation": "擦嘴摸肚子",
+          "playMode": "单次",
+          "playExpectation": ""
         },
         "position": {
           "x": 1680,
@@ -176,10 +178,13 @@
         "type": "end",
         "data": {
           "name": "失败结算：食物不足",
-          "failAnimation": "捂着咕咕叫的肚子",
           "releaseResources": [
             "空地占用"
-          ]
+          ],
+          "endReason": "中断",
+          "animation": "捂着咕咕叫的肚子",
+          "playMode": "单次",
+          "playExpectation": ""
         },
         "position": {
           "x": 1680,

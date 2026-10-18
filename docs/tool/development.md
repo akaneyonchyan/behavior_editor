@@ -95,3 +95,12 @@ PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `np
 ## 协作交付
 
 提交说明写清问题、最终行为、兼容处理、验证结果和限制；新增能力同步更新本目录。调整公共库字段/映射时同步更新公共库文档和测试。不要宣称未实现的模拟执行、精确数值计算或引擎导出能力。
+
+
+## 结束表演（2026-10-19修正）
+
+数据仍使用 type=end，以 endReason 区分完成／中断；animation、playMode、playExpectation 表达单套表演。utils/endings.js 负责旧 successAnimation/failAnimation 的显式拆分：完成节点保留旧 ID，中断节点生成新 ID；legacyEndConfig 保留原始数据；只有循环 complete/insufficient 入线可推断，其余要求用户指定。splitEnd 原子写入撤销历史，结束节点不能新建出线。targetCondition 与 releaseResources 保持独立，不由结束类型推定目标是否达成。
+
+回归：tests/endings.cjs（无损拆分、连线、撤销与导入导出）、tests/endings.spec.cjs（预设、拖放、播放与拆分）、tests/end-node.spec.cjs（播放编辑与旧字段展示）。
+
+每种结束表演使用独立结束节点；完成与中断分别连接。结束节点配置结束类型、单一表演、播放方式（单次／计次／计时）和次数／时长期望。旧successAnimation/failAnimation原样保留并显示迁移提示，不猜测未知来源连线、不自动丢弃内容。资源释放与目标调度继续沿用通用规则。
