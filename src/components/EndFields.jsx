@@ -2,6 +2,7 @@ import React from 'react'
 import {useBehaviorStore} from '../store/behaviorStore'
 import {useState} from 'react'
 import {END_REASONS,isLegacyEnd,inferredEndReason} from '../utils/endings'
+import {ReleaseSummary} from './OccupiedResources'
 import TextChoice from './TextChoice'
 import {PLAY_MODES} from '../utils/nodeDesign'
 export default function EndFields({node}) {
@@ -15,10 +16,10 @@ export default function EndFields({node}) {
    {error&&<p role="alert">{error}</p>}<button className="btn-primary" onClick={()=>{try{graph.splitEnd(node.id,assignments);setError('')}catch(e){setError(e.message)}}}>拆分为两个结束节点</button>
  </div>
  return <>
+  <ReleaseSummary id={node.id} panel/>
+  {!!d.releaseResources?.length&&<details><summary>旧版释放说明（仅供核对）</summary><p className="form-hint">原文保留，但不参与自动引用；请在前序节点声明对应占用。</p><ul>{d.releaseResources.map((text,i)=><li key={i}>{text}</li>)}</ul></details>}
   <div className="form-group"><label>结束表演</label><textarea aria-label="结束表演" value={d.animation||''} onChange={e=>update({animation:e.target.value})}/></div>
   <div className="form-group"><label>播放方式</label><TextChoice label="结束播放方式" options={PLAY_MODES} value={d.playMode??'单次'} onChange={playMode=>update({playMode})}/></div>
   {['计次','计时'].includes(d.playMode)&&<div className="form-group"><label>{d.playMode==='计次'?'次数期望':'时长期望'}</label><input aria-label="结束播放期望" value={d.playExpectation||''} onChange={e=>update({playExpectation:e.target.value})}/></div>}
-  <div className="form-group"><label>资源释放（按顺序，每行一项）</label><textarea aria-label="结束资源释放" value={(d.releaseResources||[]).join('\n')} onChange={e=>update({releaseResources:e.target.value.split('\n')})}/><p className="form-hint">留空沿用通用顺序：交互物点位 → 空地 → 伙伴占用状态。</p></div>
-  <div className="form-group"><label>目标判定规则</label><textarea aria-label="结束目标判定" value={d.targetCondition||''} onChange={e=>update({targetCondition:e.target.value})}/><p className="form-hint">达成后匹配下一目标；未达成则重新匹配行为。</p></div>
  </>
 }

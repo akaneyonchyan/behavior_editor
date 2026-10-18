@@ -12,8 +12,8 @@ export function blankTemplate(){
     node('template_result_2','result',1080,380,{animation:'',playMode:'',effectRules:[],outputs:[]}),
     node('template_loop','loop',1440,180,{loopVersion:2,completionCondition:'',completionRules:[],resourceCheck:'',resourceRules:[],failureReason:'',restEnabled:true,restExpectation:'',restCondition:'',restRules:[]}),
     node('template_wait','wait',1800,560),
-    node('template_end','end',1800,0,{animation:'',playMode:'单次',playExpectation:'',releaseResources:[]}),
-    node('template_interrupted','end',2200,380,{animation:'',playMode:'单次',playExpectation:'',releaseResources:[]})
+    node('template_end','end',1800,0,{animation:'',playMode:'单次',playExpectation:''}),
+    node('template_interrupted','end',2200,380,{animation:'',playMode:'单次',playExpectation:''})
   ]
   const edge=(source,target,sourceHandle)=>({id:`${source}_${sourceHandle||'next'}`,source,target,...(sourceHandle?{sourceHandle}:{})})
   config.graph.edges=[edge('behavior_start','template_move'),edge('template_move','template_judge'),edge('template_judge','template_result_1','branch_1'),edge('template_judge','template_result_2','branch_2'),edge('template_result_1','template_loop'),edge('template_result_2','template_loop'),edge('template_loop','template_end','complete'),edge('template_loop','template_interrupted','insufficient'),edge('template_loop','template_wait','rest'),edge('template_loop','template_judge','continue'),edge('template_wait','template_judge')]

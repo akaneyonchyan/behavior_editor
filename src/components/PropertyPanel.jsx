@@ -8,6 +8,7 @@ import LoopFields from './LoopEditor'
 import BehaviorMetadata from './BehaviorMetadata'
 import JudgeFields from './JudgeFields'
 import ResultFields from './ResultFields'
+import {OccupiedResources} from './OccupiedResources'
 import EndFields from './EndFields'
 import {endLabel} from '../utils/endings'
 
@@ -60,6 +61,7 @@ export default function PropertyPanel() {
         </div>
 
         {/* 类型特定字段 */}
+        {[NODE_TYPES.MOVE,NODE_TYPES.RESULT].includes(selectedNode.type)&&<OccupiedResources node={selectedNode}/> }
         {selectedNode.type === NODE_TYPES.MOVE && <MoveFields node={selectedNode} />}
         {selectedNode.type === NODE_TYPES.JUDGE && <JudgeFields node={selectedNode} />}
         {selectedNode.type === NODE_TYPES.RESULT && <ResultFields node={selectedNode} />}

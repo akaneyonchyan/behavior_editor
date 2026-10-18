@@ -92,8 +92,7 @@ export const NODE_CONFIG = {
     defaultData: {
       animation: '',
       playMode: '单次',
-      playExpectation: '',
-      releaseResources: []
+      playExpectation: ''
     }
   }
 }

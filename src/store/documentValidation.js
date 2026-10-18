@@ -42,6 +42,14 @@ export function validateConfig(config, types) {
     if(n.data.objectType!==undefined&&typeof n.data.objectType!=='string')fail('对象类型必须是文字标识')
     if (n.data.outputs !== undefined && !Array.isArray(n.data.outputs)) fail('产出必须是列表')
     for(const key of ['playMode','playExpectation','endReason','targetCondition'])if(n.data[key]!==undefined&&typeof n.data[key]!=='string')fail(key+' 必须是文字')
+    if(n.data.occupiedResources!==undefined){
+      if(!Array.isArray(n.data.occupiedResources))fail('占用资源必须是列表')
+      const seen=new Set()
+      for(const r of n.data.occupiedResources){
+        if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.source!=='string'||typeof r.attribute!=='string')fail('占用资源需要唯一标识、来源和属性名')
+        seen.add(r.id)
+      }
+    }
     if(n.data.judgeAttributes!==undefined){
       if(!Array.isArray(n.data.judgeAttributes))fail('参与判断的属性必须是列表')
       const selected=new Set()
