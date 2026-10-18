@@ -31,7 +31,7 @@ jobs:
       - name: Verify canvas file drop and PNG export in browser
         if: github.event_name == 'push'
         run: npm run test:browser
-      - name: Read Feishu snapshot
+      - name: Read and validate Feishu rows
         run: node scripts/export-public-library.mjs
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
@@ -40,6 +40,8 @@ jobs:
           FEISHU_OBJECT_TABLE: ${{ secrets.FEISHU_OBJECT_TABLE }}
           FEISHU_ATTRIBUTE_TABLE: ${{ secrets.FEISHU_ATTRIBUTE_TABLE }}
           FEISHU_BUFF_TABLE: ${{ secrets.FEISHU_BUFF_TABLE }}
+      - name: Validate public library before publishing
+        run: node scripts/validate-public-library.mjs
       - name: Build read-only editor
         run: npm run build
         env:

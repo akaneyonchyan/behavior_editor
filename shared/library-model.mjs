@@ -1,6 +1,10 @@
 export const TABLES = ['objects','attributes','buffs']
 export function validateLibrary(data) {
   if(!data || data.version!==1)throw new Error('公共库版本无效')
+  if(Array.isArray(data.attributes)){
+    const invalid=data.attributes.filter(row=>row&& !['数值','枚举'].includes(row.kind))
+    if(invalid.length)throw new Error('属性类型请选择数值或枚举；非法条目：'+invalid.map(row=>JSON.stringify({id:row.id,name:row.name,kind:row.kind??null})).join('；'))
+  }
   for(const key of TABLES) {
     if(!Array.isArray(data[key])||data[key].length>10000)throw new Error('公共库表无效或条目过多：'+key)
     const ids=new Set(),names=new Set()

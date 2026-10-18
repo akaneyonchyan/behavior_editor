@@ -36,7 +36,7 @@ Pages 的 Source 选择 GitHub Actions。Repository Secrets 需要以下六项�
 
 应用需已发布、具备读取多维表格记录的权限，并获该表格的访问授权；组织管理员审批按团队规则处理。生产只读同步不要求网页用户填写密钥。不要放到 VITE_ 变量、源码、行为 JSON 或浏览器存储。
 
-缺少部分 Secrets 时发布失败；只有 push 事件且全部未配置时才允许首次仅发布编辑器。当前工作流没有 workflow_dispatch 手动入口；正常由推送和计划任务触发。检查 Actions 最新运行及失败步骤；修复原因后可按 GitHub 的重跑入口重跑已有任务。
+缺少任意飞书 Secrets 时发布失败，不跳过公共库校验。当前工作流没有 workflow_dispatch 手动入口；正常由推送和计划任务触发。检查 Actions 最新运行及失败步骤；修复原因后可按 GitHub 的重跑入口重跑已有任务。
 
 ## 排查表
 
@@ -80,3 +80,11 @@ node --input-type=module -e "import {readFileSync} from 'node:fs'; import {valid
 飞书直接编辑不经过仓库校验器，Skill 也不是飞书服务端约束。即使字段界面列出了限定选项，也要避免通过其他 API 增加新类型。此次补充没有修改生产表字段选项或权限。
 
 2026-10-19 排查：旧版本 65a363d 的同步报“属性类型请选择数值或枚举”。文档已有类型边界，但 Skill 仅笼统要求验证类型，缺少写入前执行校验的步骤。现已同步仓库源、工具说明副本与工作区安装副本；不把这次历史错误认定为副本不同步。
+
+## Workflow 发布前校验（2026-10-19）
+
+每次定时同步和推送发布都会依次执行：Read and validate Feishu rows → Validate public library before publishing → Build read-only editor → deploy。
+
+读取阶段继续调用 validateLibrary，生成的 public/data/library.json 再由 scripts/validate-public-library.mjs 独立校验：同步时间、快照结构、对象／属性／Buff标识与名称、适用对象引用、属性类型（含停用条目）。非法类型错误列出全部涉及条目的 ID、名称及 kind，不自动转成枚举。
+
+任一步失败均停止后续构建和发布，保留线上最后成功版本。飞书 Secrets 缺失也失败退出，生产流程不再允许缺少全部 Secrets 时只发布无公共库的编辑器。回归 tests/library-publish-validation.mjs 用临时数据验证合法快照通过、非法数据非零退出，不修改飞书。
