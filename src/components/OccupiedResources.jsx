@@ -25,6 +25,6 @@ export function ReleaseSummary({id,panel=false}){
  const rows=upstreamOccupancies(nodes,edges,id)
  return <div className={panel?'form-group':'summary-row'} aria-label="自动释放资源"><span>释放资源（自动）</span><div>
   {rows.length?<ol>{rows.map(r=><li key={r.nodeId+':'+r.id}><ResourceText rule={r}/><small> ← {r.nodeName}</small></li>)}</ol>:<div>暂无可追溯的前序占用</div>}
-  {panel&&<p className="form-hint">引用从开始可达、且能通向此结束节点的位移／结果节点。前序配置和连线变化会自动同步；仅释放本次路径实际产生、且仍由本行为持有的占用。未声明的旧文字占用不会自动猜测。</p>}
+  {panel&&<p className="form-hint">引用从开始可达、且能通向此结束节点的位移／执行节点。前序配置和连线变化会自动同步；仅释放本次路径实际产生、且仍由本行为持有的占用。未声明的旧文字占用不会自动猜测。</p>}
  </div></div>
 }

@@ -25,7 +25,7 @@
 调用示例：
 
 - “使用 behavior-editor Skill，教我创建并保存一张行为图。”
-- “使用 behavior-editor Skill，修复结果节点的展示，并验证旧文件兼容。”
+- “使用 behavior-editor Skill，修复执行节点的展示，并验证旧文件兼容。”
 - “使用 behavior-editor Skill，核对飞书公共库的属性，先给出修改清单。”
 - “使用 behavior-editor Skill，排查公共库更新后网页仍显示旧数据的问题。”
 

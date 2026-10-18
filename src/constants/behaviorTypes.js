@@ -54,7 +54,7 @@ export const NODE_CONFIG = {
     }
   },
   [NODE_TYPES.RESULT]: {
-    label: '结果',
+    label: '执行',
     color: '#6EE7B7',
     icon: '✓',
     description: '播放表演并结算属性',
