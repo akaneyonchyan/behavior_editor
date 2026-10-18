@@ -72,9 +72,13 @@ VITE_LIBRARY_MODE=published npm run dev
 | 元数据和开始节点 | metadata.cjs、start-metadata.cjs |
 | 公共库模型、发布与兼容服务 | content-library.cjs、published-library.cjs、team-sync.mjs |
 | PNG范围、像素限制与文件名 | png-export.cjs |
+| JSON拖入、文件句柄、取消与读取期间修改 | drop-files.cjs |
+| 画布文件拖放、错误输入、恢复草稿及节点拖放兼容 | drop-files.spec.cjs（npm run test:browser） |
 | 浏览器下载、状态隔离、隐藏元素、超限与失败恢复 | png-export.spec.cjs（npm run test:png） |
 
 PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `npm run test:png`。测试自动在5192端口启动Vite，使用隔离浏览器与模拟公共快照，不修改用户文件；输出在已忽略的test-results目录。也可设置PW_CHANNEL=chrome使用本机Chrome。CI在push发布时安装Chromium并运行浏览器测试，定时公共库同步只运行原有单元测试流程。
+
+`npm run test:browser` 运行全部浏览器回归（含文件拖入及PNG），push发布流程采用此命令。拖入文件走documentSession.openDroppedFiles：在drop事件内立即请求FileSystemHandle，读取并校验后复用未保存确认、replace归档和文件基线。DataTransfer只在事件中取出所需数据，不能等异步操作后再访问。
 
 导出基于html-to-image，克隆当前已渲染画布，保留SVG marker定义及节点样式。完整图按实际DOM节点和曲线包围盒换算到图坐标再加入48px留白；视口导出保留当前变换。只在副本移除编辑控件和选中样式，结束后释放副本。新增自定义节点或连线效果时，同时检查测量、图外曲线、文字和样式的导出兼容。
 

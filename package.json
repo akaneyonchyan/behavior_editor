@@ -15,11 +15,12 @@
     "vite": "^5.0.0"
   },
   "scripts": {
-    "test": "node tests/persistence.cjs && node tests/routing-weights.cjs && node tests/content-library.cjs && node tests/team-sync.mjs && node tests/loop-flow.cjs && node tests/published-library.cjs && node tests/metadata.cjs && node tests/node-design.cjs && node tests/start-metadata.cjs && node tests/startup-files.cjs && node tests/png-export.cjs",
+    "test": "node tests/persistence.cjs && node tests/routing-weights.cjs && node tests/content-library.cjs && node tests/team-sync.mjs && node tests/loop-flow.cjs && node tests/published-library.cjs && node tests/metadata.cjs && node tests/node-design.cjs && node tests/start-metadata.cjs && node tests/startup-files.cjs && node tests/png-export.cjs && node tests/drop-files.cjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "server": "node --env-file-if-exists=.env server/index.mjs",
-    "test:png": "playwright test"
+    "test:png": "playwright test png-export.spec.cjs",
+    "test:browser": "playwright test"
   }
 }

@@ -28,9 +28,9 @@ jobs:
       - name: Install Chromium for PNG regression tests
         if: github.event_name == 'push'
         run: npx playwright install --with-deps chromium
-      - name: Verify PNG export in browser
+      - name: Verify canvas file drop and PNG export in browser
         if: github.event_name == 'push'
-        run: npm run test:png
+        run: npm run test:browser
       - name: Read Feishu snapshot
         run: node scripts/export-public-library.mjs
         env:

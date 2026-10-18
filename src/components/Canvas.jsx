@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react'
 import ReactFlow, { Background, Controls, MiniMap, MarkerType, ConnectionLineType, useNodesInitialized, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
+import { useState } from 'react'
+import { openDroppedFiles } from '../store/documentSession'
 import { useBehaviorStore } from '../store/behaviorStore'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
 import BehaviorNode from './BehaviorNode'
@@ -27,6 +29,7 @@ function DocumentViewport(){
 }
 export default function Canvas() {
   const flow = useRef(null)
+  const dragDepth=useRef(0),[fileHover,setFileHover]=useState(false)
   const s = useBehaviorStore()
   useEffect(() => {
     const onKey = e => {
@@ -44,14 +47,20 @@ export default function Canvas() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
-  return <div className="canvas">
+  return <div className="canvas"
+    onDragEnter={e=>{if(Array.from(e.dataTransfer.types).includes('Files')){e.preventDefault();dragDepth.current++;setFileHover(true)}}}
+    onDragLeave={()=>{dragDepth.current=Math.max(0,dragDepth.current-1);if(!dragDepth.current)setFileHover(false)}}>
+    {fileHover&&<div className="canvas-file-drop-hint" role="status">松开以打开行为图 JSON（替换当前画布，未保存时会先提示）</div>}
     <ReactFlow nodes={s.nodes} edges={s.edges.filter(e=>!(e.sourceHandle==='rest'&&s.nodes.some(n=>n.id===e.source&&n.type==='loop'&&n.data.restEnabled===false)))} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
       onNodesChange={s.changeNodes} onEdgesChange={s.changeEdges} onConnect={s.connect}
       isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return !s.nodes.some(n=>n.id===connection.target&&n.type==='start')&&(source?.type!=='loop'||(isLoopOutput(connection.sourceHandle)&&connection.target!==connection.source&&(connection.sourceHandle!=='rest'||source.data.restEnabled!==false)))}}
       onNodeDragStart={s.checkpoint} onNodeClick={(_, node) => s.selectNode(node)} onPaneClick={() => s.selectNode(null)}
-      onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
+      onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = Array.from(e.dataTransfer.types).includes('Files')?'copy':'move' }}
       onDrop={e => {
         e.preventDefault()
+        dragDepth.current=0;setFileHover(false)
+        if(document.querySelector('.dialog-overlay'))return
+        if(Array.from(e.dataTransfer.types).includes('Files')||e.dataTransfer.files.length){void openDroppedFiles(e.dataTransfer);return}
         const type = e.dataTransfer.getData('application/reactflow')
         if (!NODE_CONFIG[type] || type==='start' || !flow.current) return
         s.addNode({ id: crypto.randomUUID(), type, position: flow.current.screenToFlowPosition({ x: e.clientX, y: e.clientY }), data: { ...structuredClone(NODE_CONFIG[type].defaultData), name: NODE_CONFIG[type].label + '节点' } })

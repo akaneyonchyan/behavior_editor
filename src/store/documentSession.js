@@ -219,6 +219,32 @@ export async function openFallback(file) {
   catch (e) { status({ error: '打开失败：' + e.message + '。原行为未替换。' }) }
   finally { status({ busy: false }) }
 }
+export async function openDroppedFiles(transfer) {
+  const state=useDocumentSession.getState()
+  if(!state.ready || state.busy || writing){status({notice:'正在加载或保存，请稍后再拖入文件。'});return false}
+  const files=Array.from(transfer?.files||[]),items=Array.from(transfer?.items||[]).filter(i=>i.kind==='file')
+  if(items.some(i=>i.webkitGetAsEntry?.()?.isDirectory)){status({error:'请拖入行为图 JSON 文件，不支持拖入文件夹。'});return false}
+  if(files.length!==1 || items.length>1){status({error:'请每次只拖入一个行为图 JSON 文件。'});return false}
+  const file=files[0]
+  if(!/\.json$/i.test(file.name)){status({error:'仅支持拖入 .json 格式的行为图文件。'});return false}
+  // Request the handle synchronously while the drop event is still active.
+  let handlePromise=Promise.resolve(null)
+  try{if(items[0]?.getAsFileSystemHandle)handlePromise=Promise.resolve(items[0].getAsFileSystemHandle()).catch(()=>null)}catch{ /* File fallback. */ }
+  const capture=fingerprint(content())
+  status({busy:true,error:'',notice:''})
+  try{
+    const [text,handle]=await Promise.all([file.text(),handlePromise])
+    const config=parse(text);validateConfig(config,NODE_CONFIG)
+    if(fingerprint(content())!==capture){status({notice:'读取文件期间当前行为发生了修改，已保留当前内容；请重新拖入。'});return false}
+    status({busy:false})
+    if(!canReplace())return false
+    const fileRef=handle?.kind==='file'?handle:null
+    replace(config,{name:file.name,handle:fileRef,text:fileRef?text:null,saved:true})
+    status({notice:'已载入：'+file.name+(fileRef?'':'。浏览器未提供原文件句柄，首次保存需选择文件位置。')})
+    return true
+  }catch(e){status({error:'拖入文件失败：'+e.message+'。原行为未替换，请检查行为图 JSON。'});return false}
+  finally{status({busy:false})}
+}
 export async function saveDocument(asNew = false) {
   if (useDocumentSession.getState().busy) return false
   const config = content(), current = fingerprint(config)
