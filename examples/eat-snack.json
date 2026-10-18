@@ -163,7 +163,6 @@
           "releaseResources": [
             "空地占用"
           ],
-          "endReason": "完成",
           "animation": "擦嘴摸肚子",
           "playMode": "单次",
           "playExpectation": ""
@@ -181,7 +180,6 @@
           "releaseResources": [
             "空地占用"
           ],
-          "endReason": "中断",
           "animation": "捂着咕咕叫的肚子",
           "playMode": "单次",
           "playExpectation": ""

@@ -1,12 +1,11 @@
 import React from 'react'
 import { NODE_CONFIG, NODE_TYPES } from '../constants/behaviorTypes'
 import './NodePalette.css'
-const palette=Object.entries(NODE_CONFIG).filter(([type])=>type!=='start').flatMap(([type,config])=>type==='end'?['完成','中断'].map(reason=>[type,{...config,label:reason+'结束',description:reason==='完成'?'完成表演与结束结算':'中断表演与结束结算',reason}]):[[type,config]])
+const palette=Object.entries(NODE_CONFIG).filter(([type])=>type!=='start')
 
 export default function NodePalette({ onAddNode }) {
-  const handleDragStart = (event, nodeType, reason) => {
+  const handleDragStart = (event, nodeType) => {
     event.dataTransfer.setData('application/reactflow', nodeType)
-    if(reason)event.dataTransfer.setData('application/behavior-end-reason',reason)
     event.dataTransfer.effectAllowed = 'move'
   }
 
@@ -23,11 +22,11 @@ export default function NodePalette({ onAddNode }) {
       <div className="palette-content">
         {palette.map(([type, config]) => (
           <div
-            key={type+(config.reason||'')}
+            key={type}
             className="palette-node"
             draggable
-            onDragStart={(e) => handleDragStart(e, type,config.reason)}
-            onClick={() => onAddNode(type,config.reason)}
+            onDragStart={(e) => handleDragStart(e, type)}
+            onClick={() => onAddNode(type)}
           >
             <div
               className="palette-node-icon"

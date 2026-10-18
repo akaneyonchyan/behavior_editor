@@ -99,8 +99,8 @@ PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `np
 
 ## 结束表演（2026-10-19修正）
 
-数据仍使用 type=end，以 endReason 区分完成／中断；animation、playMode、playExpectation 表达单套表演。utils/endings.js 负责旧 successAnimation/failAnimation 的显式拆分：完成节点保留旧 ID，中断节点生成新 ID；legacyEndConfig 保留原始数据；只有循环 complete/insufficient 入线可推断，其余要求用户指定。splitEnd 原子写入撤销历史，结束节点不能新建出线。targetCondition 与 releaseResources 保持独立，不由结束类型推定目标是否达成。
+结束只有一种节点、一个工具栏入口。每个实例配置一套表演和播放方式（单次／计次／计时），计次／计时可填写文字期望。“完成”“中断”由设计者通过名称、说明、表演与连线表达，不设结束类型字段或固定规则。默认图的两条结束路径使用相同的普通结束节点。
 
-回归：tests/endings.cjs（无损拆分、连线、撤销与导入导出）、tests/endings.spec.cjs（预设、拖放、播放与拆分）、tests/end-node.spec.cjs（播放编辑与旧字段展示）。
+已有图的表演、名称、连线不变；旧 endReason 仅作为兼容数据保留，不展示、不参与规则，新建节点不生成该字段。旧 successAnimation/failAnimation 仍提供“拆分为两个结束节点”入口：按旧表演分配入线，保留原配置，支持撤销。拆分后的两个节点类型完全相同。正式文件仅手动保存后写回。
 
-每种结束表演使用独立结束节点；完成与中断分别连接。结束节点配置结束类型、单一表演、播放方式（单次／计次／计时）和次数／时长期望。旧successAnimation/failAnimation原样保留并显示迁移提示，不猜测未知来源连线、不自动丢弃内容。资源释放与目标调度继续沿用通用规则。
+规则来源：[行为通用规则](https://xd.feishu.cn/wiki/HpD0wJZg7icrpKkXdkDcAjHDnBg)。结束类型不是编辑器规则，这是2026-10-19用户明确修正的产品约束。相关回归见 tests/endings.cjs、tests/endings.spec.cjs、tests/end-node.spec.cjs。

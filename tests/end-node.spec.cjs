@@ -15,7 +15,7 @@ test('split ends import, edit playback and roundtrip without loss',async({page})
 })
 test('legacy dual animations remain visible for splitting and invalid playback is rejected',async({page})=>{
  const result=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const c=g.getState().exportConfig();const n=c.graph.nodes.find(n=>n.type==='end');n.data={name:'旧结束',successAnimation:'旧成功',failAnimation:'旧失败'};g.getState().importConfig(c);g.getState().selectNode(g.getState().nodes.find(x=>x.id===n.id));const bad=structuredClone(c);bad.graph.nodes.find(x=>x.id===n.id).data.playMode=17;try{g.getState().importConfig(bad);return false}catch{return true}})
- expect(result).toBe(true);await expect(page.locator('.property-panel')).toContainText('完成表演：旧成功');await expect(page.locator('.property-panel')).toContainText('中断表演：旧失败');await expect(page.getByRole('button',{name:'拆分为完成／中断结束'})).toBeVisible()
+ expect(result).toBe(true);await expect(page.locator('.property-panel')).toContainText('完成表演：旧成功');await expect(page.locator('.property-panel')).toContainText('中断表演：旧失败');await expect(page.getByRole('button',{name:'拆分为两个结束节点',exact:true})).toBeVisible()
 })
 
 

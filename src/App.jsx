@@ -13,7 +13,7 @@ export default function App() {
   useEffect(()=>{if(publishedMode)return startPublishedLibrary();connectTeamLibrary()},[])
   const { addNode } = useBehaviorStore()
 
-  const handleAddNode = (type,endReason) => {
+  const handleAddNode = (type) => {
     const newNode = {
       id: `${type}_${Date.now()}`,
       type,
@@ -23,11 +23,9 @@ export default function App() {
       },
       data: {
         ...structuredClone(NODE_CONFIG[type].defaultData),
-        ...(endReason?{endReason}:{}),
         name: `${NODE_CONFIG[type].label}节点`
       }
     }
-    if(endReason)newNode.data.name=endReason+'结束'
     addNode(newNode)
   }
 

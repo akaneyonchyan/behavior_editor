@@ -1,19 +1,20 @@
 const {test,expect}=require('@playwright/test')
 test.beforeEach(async({page})=>{await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}));await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await expect(page.locator('.react-flow__node')).toHaveCount(9)})
-test('separate ending presets and playback configuration',async({page})=>{
- await page.locator('.node-palette').getByText('中断结束',{exact:true}).click()
- await expect(page.getByRole('combobox',{name:'结束类型',exact:true})).toHaveValue('中断')
+test('single generic ending entry and playback configuration',async({page})=>{
+ await page.locator('.node-palette').getByText('结束',{exact:true}).click()
+ await expect(page.getByRole('combobox',{name:'结束类型',exact:true})).toHaveCount(0)
+ await expect(page.locator('.node-palette .palette-node').filter({hasText:'结束'})).toHaveCount(1)
  await page.getByLabel('结束表演',{exact:true}).fill('失败后叹气')
  for(const mode of ['计次','计时']){await page.getByRole('combobox',{name:'结束播放方式',exact:true}).fill(mode);await page.getByLabel('结束播放期望').fill('短暂');await expect(page.locator('.react-flow__node.selected')).toContainText(mode)}
- const dt=await page.evaluateHandle(()=>{const d=new DataTransfer();d.setData('application/reactflow','end');d.setData('application/behavior-end-reason','完成');return d})
+ const dt=await page.evaluateHandle(()=>{const d=new DataTransfer();d.setData('application/reactflow','end');return d})
  await page.locator('.canvas > .react-flow').dispatchEvent('drop',{dataTransfer:dt,clientX:650,clientY:350});await dt.dispose()
- await expect(page.getByRole('combobox',{name:'结束类型',exact:true})).toHaveValue('完成')
+ await expect(page.getByRole('combobox',{name:'结束类型',exact:true})).toHaveCount(0)
  await expect(page.getByRole('combobox',{name:'结束播放方式',exact:true})).toHaveValue('单次')
 })
 test('legacy end requires unknown input assignment and supports undo',async({page})=>{
  await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().importConfig({behavior:{name:'旧图'},graph:{nodes:[{id:'r',type:'result',position:{x:0,y:0},data:{}},{id:'e',type:'end',position:{x:400,y:0},data:{successAnimation:'欢呼',failAnimation:'叹气'}}],edges:[{id:'in',source:'r',target:'e'}]}});g.getState().selectNode(g.getState().nodes.find(n=>n.id==='e'))})
- await page.getByRole('button',{name:'拆分为完成／中断结束'}).click();await expect(page.getByRole('alert')).toContainText('每条入线')
- await page.getByLabel(/^结束入线 /).selectOption('中断');await page.getByRole('button',{name:'拆分为完成／中断结束'}).click()
+ await page.getByRole('button',{name:'拆分为两个结束节点',exact:true}).click();await expect(page.getByRole('alert')).toContainText('每条入线')
+ await page.getByLabel(/^结束入线 /).selectOption('中断');await page.getByRole('button',{name:'拆分为两个结束节点',exact:true}).click()
  await expect(page.locator('.react-flow__node-end')).toHaveCount(2)
  expect(await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const s=g.getState();return s.nodes.find(n=>n.id===s.edges.find(e=>e.source==='r').target).data.animation})).toBe('叹气')
  await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().undo()});await expect(page.locator('.react-flow__node-end')).toHaveCount(1)

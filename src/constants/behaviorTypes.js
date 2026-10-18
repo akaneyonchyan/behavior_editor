@@ -90,7 +90,6 @@ export const NODE_CONFIG = {
     icon: '■',
     description: '行为结束',
     defaultData: {
-      endReason: '完成',
       animation: '',
       playMode: '单次',
       playExpectation: '',
