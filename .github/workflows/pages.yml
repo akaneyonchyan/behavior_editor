@@ -25,6 +25,12 @@ jobs:
           enablement: true
       - run: npm ci
       - run: npm test
+      - name: Install Chromium for PNG regression tests
+        if: github.event_name == 'push'
+        run: npx playwright install --with-deps chromium
+      - name: Verify PNG export in browser
+        if: github.event_name == 'push'
+        run: npm run test:png
       - name: Read Feishu snapshot
         run: node scripts/export-public-library.mjs
         env:

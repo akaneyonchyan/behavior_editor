@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useBehaviorStore } from '../store/behaviorStore'
 import { useDocumentSession, startPersistence, supportsDirectory, authorizeStoredAccess, chooseDirectory, skipSetup, newDocument, openDocument, openFallback, saveDocument, loadExample, recoveryDrafts, recoverDraft } from '../store/documentSession'
 import example from '../../examples/eat-snack.json'
+import PngExport from './PngExport'
 
 export default function DocumentControls() {
   const s = useDocumentSession(), name = useBehaviorStore(state => state.behaviorInfo.name)
@@ -25,6 +26,7 @@ export default function DocumentControls() {
         <button className="toolbar-btn" disabled={s.busy} onClick={() => openDocument(input.current)}>打开</button>
         <button className="toolbar-btn" disabled={s.busy} onClick={() => saveDocument()} title="Ctrl+S">保存</button>
         <button className="toolbar-btn" disabled={s.busy} onClick={() => saveDocument(true)} title="Ctrl+Shift+S">另存为</button>
+        <PngExport />
         <button className="toolbar-btn" disabled={s.busy} onClick={chooseDirectory}>保存目录</button>
         {s.needsAuthorization&&<button className="toolbar-btn" disabled={s.busy} onClick={authorizeStoredAccess}>恢复访问授权</button>}
         <button className="toolbar-btn" disabled={s.busy} onClick={() => setDrafts(recoveryDrafts())}>恢复草稿</button>

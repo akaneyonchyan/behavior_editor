@@ -3,20 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "html-to-image": "^1.11.13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reactflow": "^11.10.0",
     "zustand": "^4.4.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@vitejs/plugin-react": "^4.2.0",
     "vite": "^5.0.0"
   },
   "scripts": {
-    "test": "node tests/persistence.cjs && node tests/routing-weights.cjs && node tests/content-library.cjs && node tests/team-sync.mjs && node tests/loop-flow.cjs && node tests/published-library.cjs && node tests/metadata.cjs && node tests/node-design.cjs && node tests/start-metadata.cjs && node tests/startup-files.cjs",
+    "test": "node tests/persistence.cjs && node tests/routing-weights.cjs && node tests/content-library.cjs && node tests/team-sync.mjs && node tests/loop-flow.cjs && node tests/published-library.cjs && node tests/metadata.cjs && node tests/node-design.cjs && node tests/start-metadata.cjs && node tests/startup-files.cjs && node tests/png-export.cjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "server": "node --env-file-if-exists=.env server/index.mjs"
+    "server": "node --env-file-if-exists=.env server/index.mjs",
+    "test:png": "playwright test"
   }
 }

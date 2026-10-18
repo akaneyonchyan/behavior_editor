@@ -1,6 +1,6 @@
 # 开发与协作
 
-更新日期：2026-10-17。运行事实以源码、package.json、工作流为准。
+更新日期：2026-10-19。运行事实以源码、package.json、工作流为准。
 
 ## 本地启动
 
@@ -46,6 +46,7 @@ VITE_LIBRARY_MODE=published npm run dev
 | src/components/TextChoice.jsx、DesignInputs.jsx | 自定义下拉与非候选标记 |
 | src/utils/behaviorMetadata.js、nodeDesign.js、loopFlow.js | 元数据迁移、节点规则和循环出口 |
 | src/utils/blankTemplate.js | 首次空白骨架 |
+| src/components/PngExport.jsx、src/utils/pngExport.js | 导出选项、节点及曲线范围、离屏副本、像素限制、PNG下载 |
 | src/store/publishedLibrary.js | 已发布公共快照、缓存、刷新 |
 | shared/library-model.mjs、server/feishu.mjs | 公共库校验及飞书字段转换 |
 | scripts/export-public-library.mjs | Actions 读取并生成公开快照 |
@@ -62,7 +63,7 @@ VITE_LIBRARY_MODE=published npm run dev
 
 ## 验证
 
-运行 npm test（现有10组测试）和 npm run build。按改动补相应回归：
+运行 npm test 和 npm run build。按改动补相应回归：
 
 | 范围 | 测试文件（tests/） |
 |---|---|
@@ -70,6 +71,12 @@ VITE_LIBRARY_MODE=published npm run dev
 | 判断、结果与循环 | node-design.cjs、routing-weights.cjs、loop-flow.cjs |
 | 元数据和开始节点 | metadata.cjs、start-metadata.cjs |
 | 公共库模型、发布与兼容服务 | content-library.cjs、published-library.cjs、team-sync.mjs |
+| PNG范围、像素限制与文件名 | png-export.cjs |
+| 浏览器下载、状态隔离、隐藏元素、超限与失败恢复 | png-export.spec.cjs（npm run test:png） |
+
+PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `npm run test:png`。测试自动在5192端口启动Vite，使用隔离浏览器与模拟公共快照，不修改用户文件；输出在已忽略的test-results目录。也可设置PW_CHANNEL=chrome使用本机Chrome。CI在push发布时安装Chromium并运行浏览器测试，定时公共库同步只运行原有单元测试流程。
+
+导出基于html-to-image，克隆当前已渲染画布，保留SVG marker定义及节点样式。完整图按实际DOM节点和曲线包围盒换算到图坐标再加入48px留白；视口导出保留当前变换。只在副本移除编辑控件和选中样式，结束后释放副本。新增自定义节点或连线效果时，同时检查测量、图外曲线、文字和样式的导出兼容。
 
 自动测试不能代替真实浏览器交互。涉及界面时检查拖放、缩放、下拉、自定义文字、键盘焦点；涉及保存时检查取消选择、授权失效、重开、两标签页和外部修改冲突。使用测试目录，不改用户正式文件。
 
