@@ -28,7 +28,7 @@
 - 情绪分类、PAD推导结果与情绪 Buff 分开；旧情绪总入口不能替代全部分类。
 - 手持物、食物等设计筛选类别保留引用兼容，不据此复制实际对象实例。
 - 文档示例编号、参数不能冒充工程正式配置。编辑器英文标识不是引擎数值 ID。
-- 行为表 provideGoals/requireGoals 与叙事文档 supportedGoals/preconditionGoals 不应视为已实现的同一格式；编辑器元数据也不等同于完整工程导出。
+- 行为表 provideGoals/requireGoals 与叙事文档 supportedGoals/preconditionGoals 不应视为已实现的同一格式；编辑器行为准入数据也不等同于完整工程导出。
 
 ## 待补证据
 

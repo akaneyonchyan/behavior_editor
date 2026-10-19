@@ -9,6 +9,6 @@ const config=store.getState().exportConfig();validateConfig(config,NODE_CONFIG);
 store.getState().updateBehaviorInfo({name:'修改名称'});store.getState().undo();assert.equal(store.getState().behaviorInfo.name,config.behavior.name)
 assert.ok(store.getState().behaviorInfo.preconditions.interactObjectRules.some(r=>r.objectType==='旧对象'))
 const node={id:'test',type:'wait',position:{x:0,y:0},data:{name:'待机'}};store.getState().addNode(node);assert.equal(store.getState().selectedNode.id,'test')
-store.getState().selectNode(null);assert.ok(store.getState().nodes.every(n=>!n.selected));html=renderToStaticMarkup(React.createElement(Panel));assert.ok(html.includes('aria-label="行为元数据"'))
+store.getState().selectNode(null);assert.ok(store.getState().nodes.every(n=>!n.selected));html=renderToStaticMarkup(React.createElement(Panel));assert.ok(html.includes('aria-label="行为准入数据"'))
 const bad=structuredClone(config);bad.behavior.targetRules[0].attribute=1;assert.throws(()=>validateConfig(bad,NODE_CONFIG));const bad2=structuredClone(config);bad2.behavior.preconditions.consumableRules.push(bad2.behavior.preconditions.consumableRules[0]);assert.throws(()=>validateConfig(bad2,NODE_CONFIG))
 console.log('PASS: metadata panel, selection switching, legacy retention, structured rules round trip, undo and validation')

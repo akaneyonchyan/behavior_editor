@@ -86,7 +86,7 @@ export const useBehaviorStore = create((set, get) => {
     },
     importConfig: config => {
       validateConfig(config, NODE_CONFIG)
-      if (!config?.behavior || !Array.isArray(config?.graph?.nodes) || !Array.isArray(config?.graph?.edges)) throw new Error('缺少行为或节点图数据')
+      if (!config?.behavior || !Array.isArray(config?.graph?.nodes) || !Array.isArray(config?.graph?.edges)) throw new Error('缺少行为或行为设计节点数据')
       const ids = new Set()
       const nodes = config.graph.nodes.map((n, i) => {
         if (!n.id || ids.has(n.id) || !NODE_CONFIG[n.type] || !n.data) throw new Error('节点 ID、类型或数据无效')

@@ -11,8 +11,8 @@ export default function BehaviorMetadata(){
   const goals=info.targetRules,interactions=p.interactObjectRules||[],consumables=p.consumableRules||[]
   const pre=patch=>update({preconditions:{...p,...patch}})
   const objectSelect=(value,onChange,label)=><TextChoice label={label} options={objects.filter(o=>o.enabled).map(o=>o.name)} value={objects.find(o=>o.id===value)?.name||value||''} placeholder="选择对象类型或自定义" onChange={name=>onChange(objects.find(o=>o.enabled&&o.name===name)?.id||name)}/>
-  return <div className="property-panel" aria-label="行为元数据"><div className="panel-header"><div className="panel-title">开始 · 行为元数据</div></div><div className="panel-content">
-    <p className="form-hint">选择节点可编辑节点属性；点击开始节点或画布空白处编辑行为元数据。</p>
+  return <div className="property-panel" aria-label="行为准入数据"><div className="panel-header"><div className="panel-title">开始 · 行为准入数据</div></div><div className="panel-content">
+    <p className="form-hint">选择节点可编辑节点属性；点击开始节点或画布空白处编辑行为准入数据。</p>
     <div className="form-group"><label>行为名称</label><input aria-label="行为名称" value={info.name} onChange={e=>update({name:e.target.value})}/></div>
     <div className="weight-factors"><div className="section-header"><label>满足目标</label><button className="btn-small" onClick={()=>update({targetRules:[...goals,{id:crypto.randomUUID(),source:'actor',attribute:'',influence:'增加'}]})}>+ 添加目标</button></div>
       {goals.map((r,i)=><div className="weight-factor" key={r.id}><div className="factor-actions"><strong>目标 {i+1}</strong>{goals.length>1&&<button className="btn-small" onClick={()=>update({targetRules:goals.filter((_,j)=>i!==j)})}>删除</button>}</div><PropertyInputs rule={r} onChange={patch=>update({targetRules:goals.map((row,j)=>j===i?{...row,...patch}:row)})}/><label>规则类型<TextChoice label="目标规则类型" options={GOAL_TYPES} value={r.influence} onChange={influence=>update({targetRules:goals.map((row,j)=>i===j?{...row,influence}:row)})}/></label></div>)}

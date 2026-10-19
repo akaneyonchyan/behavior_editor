@@ -18,7 +18,7 @@ export default function StartNode({id,selected}){
       <Section title="交互对象">{(p.interactObjectRules||[]).map(r=>object(r.objectType))}</Section>
       <Section title="消耗品">{(p.consumableRules||[]).map(r=><>{object(r.objectType)} · <ChoiceText value={r.requirement} options={CONSUMPTION_TYPES}/></>)}</Section>
       <Section title="准入条件">{(p.attributeRules||[]).map(r=><RuleText rule={r} kind={r.attribute?.startsWith('buff:')?'buff':'attribute'} influences={CONDITIONS}/>)}</Section>
-      <p className="form-hint">{connected?'点击此节点编辑行为元数据':'请从右侧出口连接第一个行为节点'}</p>
+      <p className="form-hint">{connected?'点击此节点编辑行为准入数据':'请从右侧出口连接第一个行为节点'}</p>
     </div></div>
     <Handle type="source" position={Position.Right} className="node-handle"/>
   </div>

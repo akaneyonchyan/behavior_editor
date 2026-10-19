@@ -44,7 +44,7 @@ VITE_LIBRARY_MODE=published npm run dev
 | src/components/PropertyPanel.jsx、BehaviorNode.jsx、StartNode.jsx | 属性编辑和节点摘要 |
 | src/components/JudgeFields.jsx、ResultFields.jsx、LoopEditor.jsx | 判断、结果、循环编辑 |
 | src/components/TextChoice.jsx、DesignInputs.jsx | 自定义下拉与非候选标记 |
-| src/utils/behaviorMetadata.js、nodeDesign.js、loopFlow.js | 元数据迁移、节点规则和循环出口 |
+| src/utils/behaviorMetadata.js、nodeDesign.js、loopFlow.js | 行为准入数据迁移、节点规则和循环出口 |
 | src/utils/blankTemplate.js | 首次空白骨架 |
 | src/components/PngExport.jsx、src/utils/pngExport.js | 导出选项、节点及曲线范围、离屏副本、像素限制、PNG下载 |
 | src/store/publishedLibrary.js | 已发布公共快照、缓存、刷新 |
@@ -55,7 +55,7 @@ VITE_LIBRARY_MODE=published npm run dev
 
 ## 数据与兼容约束
 
-行为 JSON 顶层为 behavior（元数据）和 graph；graph.nodes 保存 id/type/data/position，graph.edges 保存端点及端口。具体字段读取默认值、校验器与迁移工具，不把此说明当作完整 JSON Schema。
+行为 JSON 顶层为 behavior（行为准入数据）和 graph；graph.nodes 保存 id/type/data/position，graph.edges 保存端点及端口。具体字段读取默认值、校验器与迁移工具，不把此说明当作完整 JSON Schema。
 
 导入会重新生成连线 ID；测试往返等价时比较端点/端口和业务内容，不依赖旧连线 ID。旧数字权重等兼容数据可能保存在 legacyConfig，不能在未确认转换规则时丢弃。
 
@@ -69,7 +69,7 @@ VITE_LIBRARY_MODE=published npm run dev
 |---|---|
 | 文件保存、恢复与初始化 | persistence.cjs、startup-files.cjs |
 | 判断、结果与循环 | node-design.cjs、routing-weights.cjs、loop-flow.cjs |
-| 元数据和开始节点 | metadata.cjs、start-metadata.cjs |
+| 行为准入数据和开始节点 | metadata.cjs、start-metadata.cjs |
 | 公共库模型、发布与兼容服务 | content-library.cjs、published-library.cjs、team-sync.mjs |
 | PNG范围、像素限制与文件名 | png-export.cjs |
 | JSON拖入、文件句柄、取消与读取期间修改 | drop-files.cjs |
@@ -113,6 +113,8 @@ PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `np
 
 实现：occupiedResources=[{id,source,attribute}] 存在来源节点，utils/occupiedResources.js 按有效边遍历，排除禁用稍息路径、孤立节点和结束节点后的边。派生引用只在展示时计算，不复制写入结束节点。旧 releaseResources 原文放在核对区，需整理为前序声明；旧 targetCondition 仅兼容保留、不展示、不执行。
 
-结束节点不再配置或展示目标判定。目标是否达成及后续调度属于行为之外的目标策略流程；开始元数据的满足目标、循环中的循环判定仍保留。回归见 occupied-resources.cjs 与 occupied-resources.spec.cjs。
+结束节点不再配置或展示目标判定。目标是否达成及后续调度属于行为之外的目标策略流程；开始节点中行为准入数据的满足目标、循环中的循环判定仍保留。回归见 occupied-resources.cjs 与 occupied-resources.spec.cjs。
 
 2026-10-19：界面“结果节点”更名为“执行节点”。JSON 类型继续使用 result，保持旧图、连线及配置兼容；用户填写的节点名称保留。
+
+术语统一：界面和产品说明使用“行为准入数据”“行为设计节点”；内部 BehaviorMetadata、behaviorMetadata.js、behavior/graph 键和既有测试文件名保留，不涉及 JSON 格式迁移。

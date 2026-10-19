@@ -11,7 +11,7 @@ export default function NodePalette({ onAddNode }) {
 
   return (
     <div className="node-palette">
-      <div className="palette-header">节点工具</div>
+      <div className="palette-header">行为设计节点</div>
       <div style={{ padding: '12px 16px', fontSize: 12, lineHeight: 1.9, color: '#94A3B8' }}>
         拖入画布添加 · Shift 多选<br />
         Del 删除 · Ctrl+Z 撤销<br />
