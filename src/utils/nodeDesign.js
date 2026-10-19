@@ -1,6 +1,6 @@
 import { designFactor } from './weightFactors'
 export const PROBABILITIES = ['极高','高','中','低','极低']
-export const EFFECTS = ['越高，概率越大','越低，概率越小','指定值，概率提高','指定值，概率降低','不影响']
+export const EFFECTS = ['越高，概率越大','越低，概率越大','指定值，概率提高','指定值，概率降低','不影响']
 export const CHANGES = ['增','减']
 export const PLAY_MODES = ['单次','计次','计时']
 // Derive a common list for old files without changing the saved branch effects.

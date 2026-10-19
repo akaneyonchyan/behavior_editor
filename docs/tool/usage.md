@@ -84,3 +84,5 @@
 实现：occupiedResources=[{id,source,attribute}] 存在来源节点，utils/occupiedResources.js 按有效边遍历，排除禁用稍息路径、孤立节点和结束节点后的边。派生引用只在展示时计算，不复制写入结束节点。旧 releaseResources 原文放在核对区，需整理为前序声明；旧 targetCondition 仅兼容保留、不展示、不执行。
 
 结束节点不再配置或展示目标判定。目标是否达成及后续调度属于行为之外的目标策略流程；开始节点中行为准入数据的满足目标、循环中的循环判定仍保留。回归见 occupied-resources.cjs 与 occupied-resources.spec.cjs。
+
+判断分支的连续属性影响分别为“越高，概率越大”和“越低，概率越大”。旧版误写的“越低，概率越小”若已存入行为文件，会作为非标准文字保留并加下划线；请按实际意图重新选择，编辑器不自动反转旧规则含义。
