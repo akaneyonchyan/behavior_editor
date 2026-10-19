@@ -199,7 +199,7 @@ function replace(config, { name = '', handle = null, text = null, saved = false 
   flushDraft()
   void rememberReference()
 }
-export function newDocument() { if (canReplace()) replace(empty()) }
+export function newDocument() { if (canReplace()) replace(blankTemplate(), { saved: true }) }
 export function loadExample(config) { if (canReplace()) replace(config) }
 export async function openDocument(fallbackInput) {
   if (!canReplace()) return
