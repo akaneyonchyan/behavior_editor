@@ -90,6 +90,13 @@ export function validateConfig(config, types) {
         if(loopPorts.has(key))fail('每个循环出口只能连接一个后续节点')
         loopPorts.add(key)
       } // Old unlabelled edges are retained for explicit reassignment.
+    }else if(ids.get(e.source).type==='move'){
+      if(e.sourceHandle&&e.sourceHandle!=='unreachable')fail('连线引用了不存在的位移出口')
+      if(e.sourceHandle==='unreachable'){
+        if(ids.get(e.target).type!=='end')fail('目的地不可达必须连接结束节点')
+        if(loopPorts.has(e.source))fail('目的地不可达只能连接一个结束节点')
+        loopPorts.add(e.source)
+      }
     }else if (e.sourceHandle && !ids.get(e.source).data.branches?.some(b => b.id === e.sourceHandle)) fail('连线引用了不存在的分支出口')
   }
 }

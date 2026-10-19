@@ -75,7 +75,7 @@ export default function PropertyPanel() {
 
 // 位移节点字段
 function MoveFields({ node }) {
-  const { updateNode } = useBehaviorStore()
+  const { updateNode,nodes,edges,setMoveEndTarget } = useBehaviorStore()
   const objects=useContentLibrary(s=>s.library.objects)
 
   return (
@@ -97,6 +97,7 @@ function MoveFields({ node }) {
         <TextChoice label="交互对象类型" options={objects.filter(o=>o.enabled).map(o=>o.name)} value={objects.find(o=>o.id===node.data.objectType)?.name||node.data.objectType||''} onChange={name=>updateNode(node.id,{objectType:objects.find(o=>o.enabled&&o.name===name)?.id||name})} placeholder="从公共库选择对象类型"/>
       </div><div className="form-group"><ObjectNameInput type={node.data.objectType} value={node.data.objectName??node.data.destination??''} onChange={objectName=>updateNode(node.id,{objectName})}/></div></>}
       {node.data.destinationType==='coordinate'&&<div className="form-group"><label>目的地</label><input aria-label="目的地坐标" value={node.data.destination||''} onChange={e=>updateNode(node.id,{destination:e.target.value})} placeholder="x, y, z"/></div>}
+      <div className="form-group"><label>目的地不可达时</label><select aria-label="位移不可达结束节点" value={edges.find(e=>e.source===node.id&&e.sourceHandle==='unreachable')?.target||''} onChange={e=>setMoveEndTarget(node.id,e.target.value)}><option value="">选择中断收尾的结束节点</option>{nodes.filter(n=>n.type==='end').map(n=><option key={n.id} value={n.id}>{n.data.name||'结束节点'} · {n.id.slice(0,8)}</option>)}</select><p className="form-hint">可达出口保留原后续连线；不可达出口只连接普通结束节点，由名称和表演表达中断。也可以在画布直接连线。</p></div>
     </>
   )
 }

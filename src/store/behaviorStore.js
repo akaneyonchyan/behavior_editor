@@ -18,7 +18,12 @@ export const useBehaviorStore = create((set, get) => {
     redo: () => set(s => s.future.length ? { ...restore(s, s.future[0]), past: [...s.past, snapshot(s)], future: s.future.slice(1) } : {}),
     updateBehaviorInfo: updates => commit({ behaviorInfo: normalizeMetadata({ ...get().behaviorInfo, ...updates }) }),
     selectNode: node => set(s=>({ selectedNode: node, ...(!node?{nodes:s.nodes.map(n=>({...n,selected:false}))}: {}) })),
-    addNode: node => {if(node.type==='start')return;commit({ nodes: [...get().nodes.map(n => ({ ...n, selected: false })), { ...node, selected: true }], selectedNode: node })},
+    addNode: node => {
+      if(node.type==='start')return
+      const s=get(),targets=[...new Set(s.edges.filter(e=>e.sourceHandle==='unreachable'&&s.nodes.some(n=>n.id===e.source&&n.type==='move')&&s.nodes.some(n=>n.id===e.target&&n.type==='end')).map(e=>e.target))]
+      const edges=node.type==='move'&&targets.length===1?[...s.edges,{id:crypto.randomUUID(),source:node.id,target:targets[0],sourceHandle:'unreachable',type:'default'}]:s.edges
+      commit({ nodes: [...s.nodes.map(n => ({ ...n, selected: false })), { ...node, selected: true }],edges, selectedNode: node })
+    },
     updateNode: (id, updates) => {
       const nodes = get().nodes.map(n => n.id === id ? { ...n, data: { ...n.data, ...updates } } : n)
       const edges = get().edges.filter(e => e.source !== id || !updates.branches || !e.sourceHandle || updates.branches.some(b => b.id === e.sourceHandle))
@@ -37,7 +42,18 @@ export const useBehaviorStore = create((set, get) => {
         commit({edges:addEdge({...params,id:crypto.randomUUID(),type:'default'},get().edges.filter(e=>e.source!==source.id))});return
       }
       if(source?.type==='loop')return get().setLoopTarget(params.source,params.sourceHandle,params.target)
+      if(source.type==='move'){
+        if(params.sourceHandle&&params.sourceHandle!=='unreachable')return
+        if(params.sourceHandle==='unreachable'&&get().nodes.find(n=>n.id===params.target)?.type!=='end')return
+        commit({edges:addEdge({...params,id:crypto.randomUUID(),type:'default'},get().edges.filter(e=>!(e.source===source.id&&(e.sourceHandle||'')===(params.sourceHandle||''))))});return
+      }
       commit({ edges: addEdge({ ...params, id: crypto.randomUUID(), type: 'default' }, get().edges) })
+    },
+    setMoveEndTarget: (id,target) => {
+      const s=get();if(s.nodes.find(n=>n.id===id)?.type!=='move'||(target&&!s.nodes.some(n=>n.id===target&&n.type==='end')))return
+      const edges=s.edges.filter(e=>!(e.source===id&&e.sourceHandle==='unreachable'))
+      if(target)edges.push({id:crypto.randomUUID(),source:id,target,sourceHandle:'unreachable',type:'default'})
+      commit({edges})
     },
     setLoopTarget: (id,handle,target) => {
       const s=get(),node=s.nodes.find(n=>n.id===id)

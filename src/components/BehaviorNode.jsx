@@ -43,6 +43,7 @@ export default function BehaviorNode({ id, data, type, selected }) {
       <Handle type="source" position={Position.Right} id={branch.id} className="node-handle branch-handle" />
     </div>)}</div>}
     {type === 'loop' && <LoopNodeStages id={id} data={data}/>}
-    {type !== 'judge' && type !== 'end' && type !== 'loop' && <Handle type="source" position={Position.Right} className="node-handle" />}
+    {type === 'move' && <div className="node-branches"><div className="node-branch">目的地可达<Handle type="source" position={Position.Right} className="node-handle branch-handle" /></div><div className="node-branch">目的地不可达<Handle type="source" position={Position.Right} id="unreachable" className="node-handle branch-handle" /></div></div>}
+    {type !== 'move' && type !== 'judge' && type !== 'end' && type !== 'loop' && <Handle type="source" position={Position.Right} className="node-handle" />}
   </div>
 }

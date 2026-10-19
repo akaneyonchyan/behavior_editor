@@ -61,7 +61,7 @@ export default function Canvas() {
     {fileHover&&<div className="canvas-file-drop-hint" role="status">松开以打开行为图 JSON（替换当前画布，未保存时会先提示）</div>}
     <ReactFlow nodes={s.nodes} edges={s.edges.filter(e=>!(e.sourceHandle==='rest'&&s.nodes.some(n=>n.id===e.source&&n.type==='loop'&&n.data.restEnabled===false)))} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
       onNodesChange={s.changeNodes} onEdgesChange={s.changeEdges} onConnect={s.connect}
-      isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return !s.nodes.some(n=>n.id===connection.target&&n.type==='start')&&(source?.type!=='loop'||(isLoopOutput(connection.sourceHandle)&&connection.target!==connection.source&&(connection.sourceHandle!=='rest'||source.data.restEnabled!==false)))}}
+      isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return !(source?.type==='move'&&connection.sourceHandle==='unreachable'&&s.nodes.find(n=>n.id===connection.target)?.type!=='end')&&!s.nodes.some(n=>n.id===connection.target&&n.type==='start')&&(source?.type!=='loop'||(isLoopOutput(connection.sourceHandle)&&connection.target!==connection.source&&(connection.sourceHandle!=='rest'||source.data.restEnabled!==false)))}}
       onNodeDragStart={s.checkpoint} onNodeClick={(_, node) => s.selectNode(node)} onPaneClick={() => s.selectNode(null)}
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = Array.from(e.dataTransfer.types).includes('Files')?'copy':'move' }}
       onDrop={e => {
