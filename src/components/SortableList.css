@@ -1,0 +1,8 @@
+.sort-handle { flex:none; width:24px; height:26px; padding:0; border:1px solid var(--border); border-radius:4px; background:var(--surface-2); color:var(--text-secondary); cursor:grab; touch-action:none; font-size:18px; line-height:1; }
+.sort-handle:active { cursor:grabbing; }
+.sort-handle:disabled { opacity:.25; cursor:default; }
+.sort-handle:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.sortable-row { position:relative; }
+.sortable-row.sorting { opacity:.3; }
+.sortable-row.sort-over::before { content:''; position:absolute; top:-3px; left:0; right:0; border-top:2px solid var(--accent); pointer-events:none; }
+.sort-preview { padding:8px 12px; border:1px solid var(--accent); border-radius:5px; background:var(--surface-2); color:var(--text-primary); font-size:12px; box-shadow:0 3px 12px #0004; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }

@@ -145,3 +145,12 @@ App 中 behavior-sidebar 包含 NodePalette 和 BehaviorFiles，文件区位于�
 BehaviorFiles 对异步扫描使用 generation 丢弃过时结果；自动扫描只 queryPermission，主动按钮才请求权限。目录改变、保存结束、文件改变和窗口重新获得焦点时刷新。openDirectoryFile 校验并读取当前磁盘文件，通过 fingerprint 防止读取期间编辑被覆盖；复用 canReplace/replace 的未保存确认、恢复草稿归档、句柄和磁盘文本基线。错误/取消不替换原图。
 
 回归 behavior-files.cjs、behavior-files.spec.cjs 覆盖直接子目录过滤、空目录、BOM、坏文件、权限、身份、取消、过期目录、读取期间修改、原句柄保存、冲突保护，以及列表搜索/刷新/切换及紧凑单行布局。
+
+
+## 配置排序组件
+
+SortableList 使用 dnd-kit PointerSensor/KeyboardSensor，仅 handle 启动拖动；同列表内碰撞检测，紧凑 DragOverlay，滚动面板边缘自动滚动。键盘按当前索引选择相邻条目，避免长卡片几何和紧凑预览的高度差导致跳项。输入期间不提交状态，onDragEnd 校验节点/文档作用域与列表内容快照后一次提交，空落点/未改变位置不记录历史。节点、文档或列表变化时取消拖动。
+
+规则与分支保留持久ID；旧产物使用临时UI身份而不修改JSON格式。同长度纯文字编辑沿用当前位置身份，拖动提交前先同步临时身份顺序，避免同名产物编辑串焦点。执行分组排序只替换 effectRules 中该组所占位置，保留另一组和兼容字段。判断共享属性沿用 setJudgeAttributes，分支排序保留分支ID和原边。
+
+第一批接入 LibraryRules、JudgeFields、ResultFields。tests/sorting.spec.cjs 覆盖键盘/鼠标/触摸、取消、单次撤销、分支边、属性影响、分组隔离、重复/空产物、JSON往返、节点切换和长列表滚动。后续接入其他列表时复用组件，不另建排序或自动保存逻辑。

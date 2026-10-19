@@ -1,4 +1,5 @@
 import React from 'react'
+import SortableList from './SortableList'
 import TextChoice from './TextChoice'
 import ObjectNameInput, {ObjectNameText} from './ObjectNameInput'
 import {sourceType} from '../store/contentLibrary'
@@ -20,6 +21,6 @@ export default function LibraryRules({title,value=[],onChange,mode='condition',s
   return <div className="weight-factors"><div className="section-header"><label>{title}</label><button className="btn-small" onClick={()=>onChange([...value,{id:crypto.randomUUID(),source:'',attribute:'',influence:''}])}>+ 添加规则</button></div>
     {showEmptyRow&&!value.length&&<div className="weight-factor"><RuleInputs rule={{source:'',attribute:'',influence:''}} influences={influences} onChange={patch=>onChange([{id:crypto.randomUUID(),source:'',attribute:'',influence:'',...patch}])}/><p className="form-hint">直接选择上面的选项即可添加规则；留空不计入配置。</p></div>}
     {mode==='condition'&&value.length>1&&<p className="form-hint">以下规则需要同时满足。</p>}
-    {value.map((r,i)=><div className="weight-factor" key={r.id}><div className="factor-actions"><strong>规则 {i+1}</strong><button className="btn-small" onClick={()=>onChange(value.filter((_,j)=>j!==i))}>删除</button></div><RuleInputs rule={r} influences={influences} onChange={patch=>onChange(value.map((row,j)=>j===i?{...row,...patch}:row))}/></div>)}
+    <SortableList items={value} onChange={onChange} label={title}>{(r,i,handle)=><div className="weight-factor"><div className="factor-actions">{handle}<strong>规则 {i+1}</strong><button className="btn-small" onClick={()=>onChange(value.filter((_,j)=>j!==i))}>删除</button></div><RuleInputs rule={r} influences={influences} onChange={patch=>onChange(value.map((row,j)=>j===i?{...row,...patch}:row))}/></div>}</SortableList>
   </div>
 }
