@@ -8,7 +8,7 @@ import { NODE_CONFIG } from '../constants/behaviorTypes'
 import BehaviorNode from './BehaviorNode'
 import StartNode from './StartNode'
 import FlowingEdge from './FlowingEdge'
-import { isLoopOutput } from '../utils/loopFlow'
+import { isLoopOutput, isLoopOutputEnabled } from '../utils/loopFlow'
 import './Canvas.css'
 const nodeTypes = {...Object.fromEntries(Object.keys(NODE_CONFIG).map(type => [type, BehaviorNode])),start:StartNode}
 const edgeTypes = { default: FlowingEdge, smoothstep: FlowingEdge, routed: FlowingEdge }
@@ -59,9 +59,9 @@ export default function Canvas() {
     onDragEnter={e=>{if(Array.from(e.dataTransfer.types).includes('Files')){e.preventDefault();dragDepth.current++;setFileHover(true)}}}
     onDragLeave={()=>{dragDepth.current=Math.max(0,dragDepth.current-1);if(!dragDepth.current)setFileHover(false)}}>
     {fileHover&&<div className="canvas-file-drop-hint" role="status">松开以打开行为图 JSON（替换当前画布，未保存时会先提示）</div>}
-    <ReactFlow nodes={s.nodes} edges={s.edges.filter(e=>!(e.sourceHandle==='rest'&&s.nodes.some(n=>n.id===e.source&&n.type==='loop'&&n.data.restEnabled===false)))} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
+    <ReactFlow nodes={s.nodes} edges={s.edges.filter(e=>!(e.sourceHandle&&s.nodes.some(n=>n.id===e.source&&n.type==='loop'&&!isLoopOutputEnabled(n.data,e.sourceHandle))))} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
       onNodesChange={s.changeNodes} onEdgesChange={s.changeEdges} onConnect={s.connect}
-      isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return !(source?.type==='move'&&connection.sourceHandle==='unreachable'&&s.nodes.find(n=>n.id===connection.target)?.type!=='end')&&!s.nodes.some(n=>n.id===connection.target&&n.type==='start')&&(source?.type!=='loop'||(isLoopOutput(connection.sourceHandle)&&connection.target!==connection.source&&(connection.sourceHandle!=='rest'||source.data.restEnabled!==false)))}}
+      isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return !(source?.type==='move'&&connection.sourceHandle==='unreachable'&&s.nodes.find(n=>n.id===connection.target)?.type!=='end')&&!s.nodes.some(n=>n.id===connection.target&&n.type==='start')&&(source?.type!=='loop'||(isLoopOutputEnabled(source.data,connection.sourceHandle)&&connection.target!==connection.source))}}
       onNodeDragStart={s.checkpoint} onNodeClick={(_, node) => s.selectNode(node)} onPaneClick={() => s.selectNode(null)}
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = Array.from(e.dataTransfer.types).includes('Files')?'copy':'move' }}
       onDrop={e => {

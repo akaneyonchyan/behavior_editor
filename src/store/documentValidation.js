@@ -38,6 +38,7 @@ export function validateConfig(config, types) {
     if (!strings(n.data.attributeChanges) || !strings(n.data.releaseResources)) fail('属性变化和释放资源必须是文字列表')
     for(const key of ['effectRules','loopRules','completionRules','resourceRules','restRules'])rules(n.data[key])
     for(const key of ['completionCondition','failureReason','restExpectation','restCondition'])if(n.data[key]!==undefined&&typeof n.data[key]!=='string')fail(key+' 必须是文字')
+    if(n.data.admissionEnabled!==undefined&&typeof n.data.admissionEnabled!=='boolean')fail('准入检查启用状态必须为布尔值')
     if(n.data.restEnabled!==undefined&&typeof n.data.restEnabled!=='boolean')fail('稍息启用状态必须为布尔值')
     if(n.data.loopVersion!==undefined&&n.data.loopVersion!==2)fail('不支持的循环节点版本')
     if(n.data.objectType!==undefined&&typeof n.data.objectType!=='string')fail('对象类型必须是文字标识')

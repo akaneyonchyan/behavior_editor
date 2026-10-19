@@ -70,7 +70,7 @@ export const NODE_CONFIG = {
     label: '循环',
     color: '#F472B6',
     icon: '↻',
-    description: '依次判定目标、资源与稍息',
+    description: '依次判定目标、准入与稍息',
     defaultData: {
       loopVersion: 2,
       completionCondition: '',
@@ -78,6 +78,7 @@ export const NODE_CONFIG = {
       resourceCheck: '',
       resourceRules: [],
       failureReason: '',
+      admissionEnabled: true,
       restEnabled: true,
       restExpectation: '待定',
       restCondition: '',

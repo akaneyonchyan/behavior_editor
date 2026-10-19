@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
 import { validateConfig } from './documentValidation'
-import { isLoopOutput } from '../utils/loopFlow'
+import { isLoopOutput, isLoopOutputEnabled } from '../utils/loopFlow'
 import {splitLegacyEnd} from '../utils/endings'
 import {emptyBehavior,normalizeMetadata,ensureStart} from '../utils/behaviorMetadata'
 const clone = value => JSON.parse(JSON.stringify(value))
@@ -57,7 +57,7 @@ export const useBehaviorStore = create((set, get) => {
     },
     setLoopTarget: (id,handle,target) => {
       const s=get(),node=s.nodes.find(n=>n.id===id)
-      if(node?.type!=='loop'||!isLoopOutput(handle)||(handle==='rest'&&node.data.restEnabled===false)||target===id||(target&&!s.nodes.some(n=>n.id===target&&n.type!=='start')))return
+      if(node?.type!=='loop'||!isLoopOutputEnabled(node.data,handle)||target===id||(target&&!s.nodes.some(n=>n.id===target&&n.type!=='start')))return
       const existing=s.edges.find(e=>e.source===id&&e.sourceHandle===handle)
       if((existing?.target||'')===target)return
       const edges=s.edges.filter(e=>!(e.source===id&&e.sourceHandle===handle))
@@ -66,7 +66,7 @@ export const useBehaviorStore = create((set, get) => {
     },
     assignLoopEdge: (edgeId,handle) => {
       const s=get(),edge=s.edges.find(e=>e.id===edgeId)
-      if(!edge||edge.sourceHandle||!isLoopOutput(handle)||s.nodes.find(n=>n.id===edge.source)?.type!=='loop'||s.edges.some(e=>e.source===edge.source&&e.sourceHandle===handle))return
+      if(!edge||edge.sourceHandle||!isLoopOutputEnabled(s.nodes.find(n=>n.id===edge.source)?.data||{},handle)||s.nodes.find(n=>n.id===edge.source)?.type!=='loop'||s.edges.some(e=>e.source===edge.source&&e.sourceHandle===handle))return
       commit({edges:s.edges.map(e=>e.id===edgeId?{...e,sourceHandle:handle}:e)})
     },
     splitEnd: (id,assignments) => {const s=get(),patch=splitLegacyEnd(s.nodes,s.edges,id,assignments);commit({...patch,selectedNode:patch.nodes.find(n=>n.id===id),documentRevision:s.documentRevision+1})},

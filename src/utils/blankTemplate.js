@@ -10,7 +10,7 @@ export function blankTemplate(){
     node('template_judge','judge',720,180,{judgeAttributes:[],branches:[{id:'branch_1',name:'',weightExpectation:'',weightFactors:[]},{id:'branch_2',name:'',weightExpectation:'',weightFactors:[]}]}),
     node('template_result_1','result',1080,0,{animation:'',playMode:'',effectRules:[],outputs:[]}),
     node('template_result_2','result',1080,380,{animation:'',playMode:'',effectRules:[],outputs:[]}),
-    node('template_loop','loop',1440,180,{loopVersion:2,completionCondition:'',completionRules:[],resourceCheck:'',resourceRules:[],failureReason:'',restEnabled:true,restExpectation:'',restCondition:'',restRules:[]}),
+    node('template_loop','loop',1440,180,{loopVersion:2,completionCondition:'',completionRules:[],resourceCheck:'',resourceRules:[],failureReason:'',admissionEnabled:true,restEnabled:true,restExpectation:'',restCondition:'',restRules:[]}),
     node('template_wait','wait',1800,560),
     node('template_end','end',1800,0,{animation:'',playMode:'单次',playExpectation:''}),
     node('template_interrupted','end',2200,380,{animation:'',playMode:'单次',playExpectation:''})

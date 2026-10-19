@@ -154,3 +154,9 @@ SortableList 使用 dnd-kit PointerSensor/KeyboardSensor，仅 handle 启动拖�
 规则与分支保留持久ID；旧产物使用临时UI身份而不修改JSON格式。同长度纯文字编辑沿用当前位置身份，拖动提交前先同步临时身份顺序，避免同名产物编辑串焦点。执行分组排序只替换 effectRules 中该组所占位置，保留另一组和兼容字段。判断共享属性沿用 setJudgeAttributes，分支排序保留分支ID和原边。
 
 第一批接入 LibraryRules、JudgeFields、ResultFields。tests/sorting.spec.cjs 覆盖键盘/鼠标/触摸、取消、单次撤销、分支边、属性影响、分组隔离、重复/空产物、JSON往返、节点切换和长列表滚动。后续接入其他列表时复用组件，不另建排序或自动保存逻辑。
+
+## 循环准入检查开关
+
+循环第二步改为“准入检查”，填写“准入条件检查”，分为满足和不满足。默认启用；关闭时隐藏第二步及不满足连线，跳转至已启用的稍息判定，若稍息也关闭则直接继续执行。原配置和连线保留，重新开启恢复。
+
+兼容旧文件：admissionEnabled 缺省视为 true；resourceCheck、resourceRules 与 insufficient 出口标识保持不变。禁用出口不参与结束节点占用追溯；禁用规则不计入需求汇总。

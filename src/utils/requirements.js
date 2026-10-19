@@ -70,7 +70,7 @@ export function collectRequirements(info,nodes,lib){
    ;(d.outputs||[]).forEach((v,i)=>add('objects','产物',v,'产物尚未绑定对象类型及名录，待核对',at('产物 '+(i+1))))
   }
   if(node.type==='loop'){
-   for(const [key,label] of [['completionRules','目标达成条件'],['resourceRules','资源条件'],['loopRules','旧循环条件'],...(d.restEnabled!==false?[['restRules','稍息条件']]:[])])(d[key]||[]).forEach((r,i)=>rule(r,at(label+' '+(i+1)),CONDITIONS))
+   for(const [key,label] of [['completionRules','目标达成条件'],...(d.admissionEnabled!==false?[['resourceRules','准入条件']]:[]),['loopRules','旧循环条件'],...(d.restEnabled!==false?[['restRules','稍息条件']]:[])])(d[key]||[]).forEach((r,i)=>rule(r,at(label+' '+(i+1)),CONDITIONS))
    if(d.restEnabled!==false)choice('attributes','稍息发生倾向',d.restExpectation,EXPECTATIONS,at('稍息发生倾向'))
   }
   if(['result','end'].includes(node.type)){

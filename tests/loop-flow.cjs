@@ -33,6 +33,22 @@ assert.equal(graph.getState().edges.filter(e=>e.source===loop.id&&ids.has(e.targ
 validateConfig(graph.getState().exportConfig(),NODE_CONFIG)
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server')
 const html=renderToStaticMarkup(React.createElement(m.exports.LoopFields,{node:loop}))
-for(const label of ['① 目标达成判定','② 资源检查','③ 稍息判定','达成 → 成功结算节点','不足 → 失败结算节点','触发 → 待机节点','不触发 → 继续执行节点'])assert.ok(html.includes(label),label)
+for(const label of ['① 目标达成判定','② 准入检查','③ 稍息判定','达成 → 成功结算节点','不满足 → 结束收尾节点','触发 → 待机节点','不触发 → 继续执行节点'])assert.ok(html.includes(label),label)
 assert.ok(!html.includes('type="number"'))
 console.log('PASS: ordered loop decisions, four outputs, rest bypass, single destination, undo, copy, JSON validation, explicit legacy mapping and qualitative editor')
+
+for(const admission of [false,true])for(const rest of [false,true])for(const satisfied of [false,true]){
+ assert.equal(resolveLoopOutput({complete:false,admissionSatisfied:satisfied,restTriggered:true},rest,admission),admission&&!satisfied?'insufficient':rest?'rest':'continue')
+}
+graph.getState().importConfig(example)
+const shape=()=>JSON.stringify(outs().map(e=>[e.source,e.sourceHandle,e.target]));const before=shape()
+graph.getState().updateNode('loop_1',{admissionEnabled:false})
+graph.getState().setLoopTarget('loop_1','insufficient','end_1')
+assert.equal(shape(),before)
+const saved=graph.getState().exportConfig();validateConfig(saved,NODE_CONFIG);graph.getState().importConfig(saved)
+assert.equal(graph.getState().nodes.find(n=>n.id==='loop_1').data.admissionEnabled,false)
+const bad=structuredClone(saved);bad.graph.nodes.find(n=>n.id==='loop_1').data.admissionEnabled='false'
+assert.throws(()=>validateConfig(bad,NODE_CONFIG),/准入检查/)
+graph.getState().updateNode('loop_1',{admissionEnabled:true})
+assert.equal(shape(),before)
+console.log('PASS: admission bypass combinations, disabled target guard, preserved edges and JSON switch validation')
