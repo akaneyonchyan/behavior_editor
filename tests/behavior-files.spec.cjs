@@ -11,7 +11,7 @@ test('directory strip lists, searches, refreshes and safely switches local graph
   window.showDirectoryPicker=async()=>window.testDir
   indexedDB.open=()=>{const req={error:Error('mock directory persistence')};setTimeout(()=>req.onerror?.(),0);return req}
  })
- await panel.getByRole('button',{name:'选择目录',exact:true}).click();await expect(panel.locator('.behavior-file')).toHaveCount(3);await expect(panel.getByRole('button',{name:/坏文件/})).toBeDisabled()
+ await page.getByRole('button',{name:'保存目录',exact:true}).click();await expect(panel.locator('.behavior-file')).toHaveCount(3);await expect(panel.getByRole('button',{name:/坏文件/})).toBeDisabled()
  for(const viewport of [{width:1280,height:900},{width:1280,height:720}]){
   await page.setViewportSize(viewport)
   const sidebar=await page.locator('.behavior-sidebar').boundingBox(),canvas=await page.locator('.canvas').boundingBox(),palette=await page.locator('.node-palette').boundingBox(),files=await panel.boundingBox()
@@ -20,10 +20,15 @@ test('directory strip lists, searches, refreshes and safely switches local graph
   expect(files.y).toBeGreaterThanOrEqual(palette.y+palette.height-1);expect(files.height).toBeGreaterThan(100)
  }
  await panel.getByLabel('搜索本地行为文件').fill('行为乙');await expect(panel.locator('.behavior-file')).toHaveCount(1);await panel.getByLabel('搜索本地行为文件').fill('')
- await panel.getByRole('button',{name:/行为甲/}).click();await expect(panel.locator('.current')).toContainText('甲.json');await expect(page.getByLabel('行为名称',{exact:true})).toHaveValue('行为甲')
- await page.getByLabel('行为名称',{exact:true}).fill('尚未保存');page.once('dialog',d=>d.dismiss());await panel.getByRole('button',{name:/行为乙/}).click();await expect(page.getByLabel('行为名称',{exact:true})).toHaveValue('尚未保存')
- page.once('dialog',d=>d.accept());await panel.getByRole('button',{name:/行为乙/}).click();await expect(page.getByLabel('行为名称',{exact:true})).toHaveValue('行为乙');await expect(panel.locator('.current')).toContainText('乙.json')
+ await panel.getByRole('button',{name:'甲.json',exact:true}).click();await expect(panel.locator('.current')).toContainText('甲.json');await expect(page.getByLabel('行为名称',{exact:true})).toHaveValue('行为甲')
+ await page.getByLabel('行为名称',{exact:true}).fill('尚未保存');page.once('dialog',d=>d.dismiss());await panel.getByRole('button',{name:'乙.json',exact:true}).click();await expect(page.getByLabel('行为名称',{exact:true})).toHaveValue('尚未保存')
+ page.once('dialog',d=>d.accept());await panel.getByRole('button',{name:'乙.json',exact:true}).click();await expect(page.getByLabel('行为名称',{exact:true})).toHaveValue('行为乙');await expect(panel.locator('.current')).toContainText('乙.json')
  await page.evaluate(()=>{window.testFiles=window.testFiles.filter(f=>f.name!=='甲.json')});await panel.getByRole('button',{name:'刷新文件',exact:true}).click();await expect(panel.locator('.behavior-file')).toHaveCount(2)
  await page.evaluate(()=>{window.testRead=false});await panel.getByRole('button',{name:'刷新文件',exact:true}).click();await panel.getByRole('button',{name:'授权读取目录'}).click();await expect(panel.locator('.behavior-file')).toHaveCount(2)
- await panel.getByRole('button',{name:/本地行为文件/}).click();await expect(panel.locator('.behavior-files-list')).toHaveCount(0)
+ await expect(panel.getByRole('button',{name:'选择目录',exact:true})).toHaveCount(0)
+ await expect(panel.getByRole('button',{name:/本地行为文件/})).toHaveCount(0)
+ await expect(panel.locator('.behavior-file.current')).toHaveText('乙.json')
+ const path=await panel.locator('.behavior-files-directory').boundingBox(),refresh=await panel.getByRole('button',{name:'刷新文件'}).boundingBox()
+ expect(refresh.x).toBeGreaterThanOrEqual(path.x+path.width);expect(Math.abs((refresh.y+refresh.height/2)-(path.y+path.height/2))).toBeLessThan(2)
+ expect((await panel.locator('.behavior-file').first().boundingBox()).height).toBeLessThan(36)
 })

@@ -140,8 +140,8 @@ PNG 保存目录（2026-10-19）：PngExport 先同步校验画布大小，再�
 
 ## 保存目录中的行为切换（2026-10-19）
 
-App 中 behavior-sidebar 包含 NodePalette 和 BehaviorFiles，文件区位于左侧节点列表下方，复用原有 240px 侧栏，Canvas 保持完整高度，不改变 .canvas > .react-flow 的 PNG 导出选择器。behaviorFiles.js 遍历目录直接子文件，校验 JSON 后提供名称、节点数及时间；不递归缓存目录。文件身份通过句柄 isSameEntry 比较，不能只按同名高亮。
+App 中 behavior-sidebar 包含 NodePalette 和 BehaviorFiles，文件区位于左侧节点列表下方，复用原有 240px 侧栏，Canvas 保持完整高度，不改变 .canvas > .react-flow 的 PNG 导出选择器。behaviorFiles.js 遍历目录直接子文件，校验 JSON 后提供文件信息，界面仅展示文件名；目录选择统一使用顶部“保存目录”，侧栏只保留路径及同行刷新按钮；不递归缓存目录。文件身份通过句柄 isSameEntry 比较，不能只按同名高亮。
 
 BehaviorFiles 对异步扫描使用 generation 丢弃过时结果；自动扫描只 queryPermission，主动按钮才请求权限。目录改变、保存结束、文件改变和窗口重新获得焦点时刷新。openDirectoryFile 校验并读取当前磁盘文件，通过 fingerprint 防止读取期间编辑被覆盖；复用 canReplace/replace 的未保存确认、恢复草稿归档、句柄和磁盘文本基线。错误/取消不替换原图。
 
-回归 behavior-files.cjs、behavior-files.spec.cjs 覆盖直接子目录过滤、空目录、BOM、坏文件、权限、身份、取消、过期目录、读取期间修改、原句柄保存、冲突保护，以及列表搜索/刷新/折叠/切换。
+回归 behavior-files.cjs、behavior-files.spec.cjs 覆盖直接子目录过滤、空目录、BOM、坏文件、权限、身份、取消、过期目录、读取期间修改、原句柄保存、冲突保护，以及列表搜索/刷新/切换及紧凑单行布局。
