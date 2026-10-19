@@ -15,7 +15,7 @@ export class FeishuRepository {
     if(!response.ok||data.code!==0){this.token=null;throw new Error('飞书接口调用失败（'+(data.code||response.status)+'），请检查表格协作权限、字段和应用权限')}
     return data.data
   }
-  path(table) {return '/bitable/v1/apps/'+encodeURIComponent(this.app)+'/tables/'+encodeURIComponent(this.tables[table])+'/records'}
+  path(table) {return '/bitable/v1/apps/'+encodeURIComponent(this.app)+'/tables/'+encodeURIComponent(this.tables[table]||table)+'/records'}
   async records(table) {
     const result=[];let token='';const seen=new Set()
     do {const data=await this.request(this.path(table)+'?page_size=500'+(token?'&page_token='+encodeURIComponent(token):''));result.push(...(data.items||[]));if(result.length>10000)throw new Error('公共库条目超过同步上限');token=data.has_more?data.page_token:'';if(data.has_more&&(!token||seen.has(token)))throw new Error('飞书分页异常');seen.add(token)}while(token)
@@ -41,6 +41,19 @@ export class FeishuRepository {
         })
         return {id,name:text(f['名称']),description:text(f['说明']),enabled:f['启用']===true,...(table==='attributes'?{kind:text(f['数据类型'])}:{}),...(table!=='objects'?{objectTypes:[...new Set(refs.map(id=>{const mapped=objectIds.get(id);if(!mapped)throw new Error('适用对象关联已失效，请修复飞书表格');return mapped}))]}:{})}
       })
+    }
+    library.items=[]
+    const mapped=new Set()
+    for(const object of raw.objects){
+      const tableId=text(object.fields['对象表ID']).trim()
+      if(!tableId)continue // Older libraries have no catalogs yet.
+      if(!/^tbl[a-zA-Z0-9]+$/.test(tableId)||mapped.has(tableId)||Object.values(this.tables).includes(tableId))throw new Error('对象表ID无效或重复：'+text(object.fields['名称']))
+      mapped.add(tableId)
+      const objectType=objectIds.get(object.record_id)
+      for(const row of await this.records(tableId)){
+        const f=row.fields,localId=text(f['标识'])||row.record_id
+        library.items.push({id:encodeURIComponent(objectType)+'/'+encodeURIComponent(localId),objectType,name:text(f['名称']),description:text(f['说明']),enabled:f['启用']===true})
+      }
     }
     validateLibrary(library);return {library,handles}
   }

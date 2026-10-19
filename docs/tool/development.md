@@ -118,3 +118,12 @@ PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `np
 2026-10-19：界面“结果节点”更名为“执行节点”。JSON 类型继续使用 result，保持旧图、连线及配置兼容；用户填写的节点名称保留。
 
 术语统一：界面和产品说明使用“行为准入数据”“行为设计节点”；内部 BehaviorMetadata、behaviorMetadata.js、behavior/graph 键和既有测试文件名保留，不涉及 JSON 格式迁移。
+
+## 对象名联动（2026-10-19）
+
+ObjectNameInput.jsx 复用 TextChoice，objectChoices/objectName 负责按类型筛选及稳定引用显示。可选 objectName 为 item:<ID> 或自定义字符串，覆盖准入规则、位移、共享判断属性、分支、执行属性/Buff、循环和占用声明；节点摘要同步显示。位移旧 destination 在交互对象模式无 objectName 时兼容展示，坐标模式仍用 destination。未知字符串保留，不根据名称重写引用。
+
+公共库新增可选 items；canonicalLibrary 比较该数组，避免基础三表不变时丢掉名录刷新。FeishuRepository 从对象类型行“对象表ID”读各类型目录、分页拉取并校验整库；保留旧三表无映射兼容。线上只读查询支持目录分表筛选。旧后台不支持名录写入，维护在飞书进行。
+
+新增回归 object-catalog.cjs、catalog-sync.mjs、object-catalog.spec.cjs，覆盖筛选、同名跨类型、停用改名、旧快照、分页与错误阻断、共享属性继承、JSON/撤销及浏览器交互。已有下拉计数增加对象名一栏。
+

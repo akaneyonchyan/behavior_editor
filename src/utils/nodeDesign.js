@@ -9,14 +9,14 @@ export function judgeAttributes(data) {
   const result=[]
   for(const b of data.branches||[])for(const original of b.weightFactors||[]){
     const f=designFactor(original)
-    if(!result.some(a=>a.source===f.source&&a.attribute===f.attribute))result.push({id:`shared_${result.length}`,source:f.source,attribute:f.attribute})
+    if(!result.some(a=>a.source===f.source&&(a.objectName||'')===(f.objectName||'')&&a.attribute===f.attribute))result.push({id:`shared_${result.length}`,source:f.source,attribute:f.attribute,...(f.objectName!==undefined?{objectName:f.objectName}:{})})
   }
   return result
 }
 export function branchFactors(branch,attributes) {
   return attributes.map(a=>{
-    const old=(branch.weightFactors||[]).map(designFactor).find(f=>f.attributeId===a.id||(!f.attributeId&&f.source===a.source&&f.attribute===a.attribute))
-    return {...old,version:2,id:old?.id||a.id,attributeId:a.id,source:a.source,attribute:a.attribute,influence:old?.influence||'不影响'}
+    const old=(branch.weightFactors||[]).map(designFactor).find(f=>f.attributeId===a.id||(!f.attributeId&&f.source===a.source&&(f.objectName||'')===(a.objectName||'')&&f.attribute===a.attribute))
+    return {...old,version:2,id:old?.id||a.id,attributeId:a.id,source:a.source,attribute:a.attribute,...(a.objectName!==undefined?{objectName:a.objectName}:{}),influence:old?.influence||'不影响'}
   })
 }
 export function setJudgeAttributes(data,attributes) {

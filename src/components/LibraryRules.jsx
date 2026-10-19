@@ -1,11 +1,14 @@
 import React from 'react'
 import TextChoice from './TextChoice'
+import ObjectNameInput, {ObjectNameText} from './ObjectNameInput'
+import {sourceType} from '../store/contentLibrary'
 import { useContentLibrary, sourceChoices, sourceName, propertyChoices, propertyName } from '../store/contentLibrary'
 export function RuleInputs({rule,onChange,influences,influenceLabel='规则描述'}) {
   const lib=useContentLibrary(s=>s.library), sources=sourceChoices(lib), properties=propertyChoices(lib,rule.source)
   const missing=rule.attribute&&!properties.some(p=>p.id===rule.attribute||p.name===rule.attribute)
   return <>
     <label>属性来源<TextChoice label="属性来源" options={sources.map(s=>s.name)} value={sourceName(lib,rule.source)} placeholder="选择对象类型或填写具体对象" onChange={name=>onChange({source:sources.find(s=>s.name===name)?.id||name})}/></label>
+    <ObjectNameInput type={sourceType(rule.source)} value={rule.objectName} onChange={objectName=>onChange({objectName})}/>
     <label>属性名<TextChoice label="属性名" options={properties.map(p=>p.name)} value={rule.attribute?propertyName(lib,rule.attribute):''} placeholder="选择属性或 Buff" onChange={name=>onChange({attribute:properties.find(p=>p.name===name)?.id||name})}/></label>
     {missing&&<p className="form-hint">当前条目未在该对象的可选库中，已保留原值。可改选或在公共库中补充适用对象。</p>}
     {!properties.length&&<p className="form-hint">该来源暂无候选项，可先填写文字，再到公共库补充。</p>}

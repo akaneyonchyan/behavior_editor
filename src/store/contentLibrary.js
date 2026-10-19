@@ -77,4 +77,9 @@ export function propertyChoices(lib,source) {
   return [...lib.attributes.filter(a=>a.enabled&&a.objectTypes.includes(type)).map(a=>({id:a.id,name:a.name})),...lib.buffs.filter(b=>b.enabled&&b.objectTypes.includes(type)).map(b=>({id:'buff:'+b.id,name:'Buff · '+b.name}))]
 }
 export function propertyName(lib,id) {return id?.startsWith('buff:') ? 'Buff · '+(lib.buffs.find(b=>b.id===id.slice(5))?.name||id.slice(5)) : lib.attributes.find(a=>a.id===id)?.name||id||''}
-export function ruleSummary(lib,r) {return [sourceName(lib,r.source)||'待选对象',propertyName(lib,r.attribute)||'待选属性',r.influence||'待说明'].join(' · ')}
+export function objectChoices(lib,type) {
+  if(!lib.objects.some(o=>o.id===type&&o.enabled))return []
+  return (lib.items||[]).filter(r=>r.enabled&&r.objectType===type).map(r=>({id:'item:'+r.id,name:r.name}))
+}
+export function objectName(lib,value) {return (lib.items||[]).find(r=>'item:'+r.id===value)?.name||value||''}
+export function ruleSummary(lib,r) {return [sourceName(lib,r.source)||'待选对象',...(r.objectName?[objectName(lib,r.objectName)]:[]),propertyName(lib,r.attribute)||'待选属性',r.influence||'待说明'].join(' · ')}

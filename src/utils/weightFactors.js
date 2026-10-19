@@ -13,6 +13,7 @@ export function designFactor(f) {
 }
 export function validateFactor(f) {
   if (!f || typeof f !== 'object' || Array.isArray(f)) return '属性影响规则必须是对象'
+  if(f.objectName!==undefined&&typeof f.objectName!=='string')return '对象名必须是文字'
   if(f.version!==2)return '' // Old numeric configuration is preserved without reinterpreting its calculation.
   if(typeof f.source!=='string'||typeof f.attribute!=='string'||typeof f.influence!=='string')return '属性规则需要来源、属性名、影响方式三项文字'
   return ''

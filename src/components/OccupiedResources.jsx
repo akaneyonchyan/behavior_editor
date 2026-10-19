@@ -1,4 +1,6 @@
 import React from 'react'
+import {ObjectNameText} from './ObjectNameInput'
+import {sourceType} from '../store/contentLibrary'
 import {useBehaviorStore} from '../store/behaviorStore'
 import {PropertyInputs,ChoiceText,choicesFor} from './DesignInputs'
 import {useContentLibrary,sourceName,sourceChoices,propertyName} from '../store/contentLibrary'
@@ -6,7 +8,7 @@ import {upstreamOccupancies} from '../utils/occupiedResources'
 
 function ResourceText({rule}){
  const lib=useContentLibrary(s=>s.library)
- return <><ChoiceText value={sourceName(lib,rule.source)} options={sourceChoices(lib).map(s=>s.name)}/> · <ChoiceText value={propertyName(lib,rule.attribute)} options={choicesFor(lib,rule.source).map(p=>p.name)}/></>
+ return <><ChoiceText value={sourceName(lib,rule.source)} options={sourceChoices(lib).map(s=>s.name)}/>{rule.objectName&&<> · <ObjectNameText type={sourceType(rule.source)} value={rule.objectName}/></>} · <ChoiceText value={propertyName(lib,rule.attribute)} options={choicesFor(lib,rule.source).map(p=>p.name)}/></>
 }
 export function OccupiedResources({node}){
  const update=useBehaviorStore(s=>s.updateNode),rows=node.data.occupiedResources||[]

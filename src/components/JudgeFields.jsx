@@ -1,4 +1,6 @@
 import React from 'react'
+import {ObjectNameText} from './ObjectNameInput'
+import {sourceType} from '../store/contentLibrary'
 import {useBehaviorStore} from '../store/behaviorStore'
 import {sourceName,sourceChoices,propertyName,useContentLibrary} from '../store/contentLibrary'
 import TextChoice from './TextChoice'
@@ -17,7 +19,7 @@ export default function JudgeFields({node}){
     <div className="judge-branches"><div className="section-header"><label>分支设置</label><button className="btn-small" onClick={()=>updateNode(node.id,{judgeAttributes:attrs,branches:[...branches.map(b=>({...b,weightFactors:branchFactors(b,attrs)})),{id:crypto.randomUUID(),name:`分支${branches.length+1}`,weightExpectation:'中',weightFactors:branchFactors({},attrs)}]})}>+ 添加分支</button></div>
       {branches.map((b,i)=><div className="branch-item" key={b.id}><div className="branch-header"><input className="branch-name-input" aria-label="分支名称" value={b.name} onChange={e=>updateBranch(i,{name:e.target.value})}/>{branches.length>2&&<button className="btn-remove" onClick={()=>updateNode(node.id,{branches:branches.filter((_,j)=>i!==j)})}>×</button>}</div>
         <label>默认概率<TextChoice label="默认概率" options={PROBABILITIES} value={b.weightExpectation||''} onChange={weightExpectation=>updateBranch(i,{weightExpectation})}/></label>
-        {branchFactors(b,attrs).map((f,j)=><div className="weight-factor" key={f.attributeId}><strong>{j+1}. <ChoiceText value={sourceName(lib,f.source)} options={sourceChoices(lib).map(s=>s.name)}/> · <ChoiceText value={propertyName(lib,f.attribute)} options={choicesFor(lib,f.source).map(p=>p.name)}/></strong><label>影响方式<TextChoice label="影响方式" options={EFFECTS} value={f.influence} onChange={influence=>updateBranch(i,{weightFactors:branchFactors(b,attrs).map((row,k)=>j===k?{...row,influence}:row)})}/></label></div>)}
+        {branchFactors(b,attrs).map((f,j)=><div className="weight-factor" key={f.attributeId}><strong>{j+1}. <ChoiceText value={sourceName(lib,f.source)} options={sourceChoices(lib).map(s=>s.name)}/>{f.objectName&&<> · <ObjectNameText type={sourceType(f.source)} value={f.objectName}/></>} · <ChoiceText value={propertyName(lib,f.attribute)} options={choicesFor(lib,f.source).map(p=>p.name)}/></strong><label>影响方式<TextChoice label="影响方式" options={EFFECTS} value={f.influence} onChange={influence=>updateBranch(i,{weightFactors:branchFactors(b,attrs).map((row,k)=>j===k?{...row,influence}:row)})}/></label></div>)}
       </div>)}
     </div>
   </>

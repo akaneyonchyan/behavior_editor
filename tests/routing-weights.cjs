@@ -1,4 +1,4 @@
-﻿const assert=require('node:assert/strict')
+const assert=require('node:assert/strict')
 const {buildSync}=require('esbuild'), Module=require('node:module'), path=require('node:path')
 const filename=path.join(process.cwd(),'routing-tests.cjs'), m=new Module(filename,module);m.filename=filename;m.paths=module.paths
 const code=buildSync({stdin:{contents:"export { default as WeightFactors } from './src/components/WeightFactors.jsx'; export * from './src/utils/edgeRouting.js'; export * from './src/utils/weightFactors.js'; export {validateConfig} from './src/store/documentValidation.js'; export {NODE_CONFIG} from './src/constants/behaviorTypes.js'; export {default as example} from './examples/eat-snack.json'; export {useBehaviorStore as graph} from './src/store/behaviorStore.js'",resolveDir:process.cwd()},bundle:true,loader:{'.css':'empty'},external:['react','react-dom'],platform:'node',format:'cjs',write:false,logLevel:'silent'}).outputFiles[0].text
@@ -57,9 +57,9 @@ console.log('PASS: obstacle curves, reverse edges, self loop, tall nodes, blocke
 
 const React=require('react'), {renderToStaticMarkup}=require('react-dom/server')
 const html=renderToStaticMarkup(React.createElement(m.exports.WeightFactors,{branch:{weightFactors:[newFactor()]},onChange:()=>{}}))
-assert.equal((html.match(/<input/g)||[]).length,3)
+assert.equal((html.match(/<input/g)||[]).length,4)
 for(const label of ['属性来源','属性名','影响方式'])assert.ok(html.includes(label))
 for(const removed of ['试算','属性上界','属性下界','最大增加权重','倍率'])assert.ok(!html.includes(removed))
-console.log('PASS: rule editor renders exactly three inputs without numerical controls')
+console.log('PASS: rule editor renders source/object/property/rule inputs without numerical controls')
 
 

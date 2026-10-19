@@ -3,6 +3,7 @@ import {Handle,Position,useUpdateNodeInternals} from 'reactflow'
 import {useBehaviorStore} from '../store/behaviorStore'
 import {useContentLibrary} from '../store/contentLibrary'
 import {RuleText,ChoiceText} from './DesignInputs'
+import {ObjectNameText} from './ObjectNameInput'
 import {GOAL_TYPES,CONSUMPTION_TYPES} from '../utils/behaviorMetadata'
 import {NODE_CONFIG} from '../constants/behaviorTypes'
 const CONDITIONS=['较低时','较高时','处于指定状态时','具有指定 Buff 时','不具有指定 Buff 时']
@@ -15,8 +16,8 @@ export default function StartNode({id,selected}){
     <div className="node-header"><span>▶</span><span>开始 · 唯一入口</span></div>
     <div className="node-body"><div className="node-name">{info.name||'未命名行为'}</div><div className="start-summary">
       <Section title="满足目标">{info.targetRules.map(r=><RuleText rule={r} influences={GOAL_TYPES}/>)}</Section>
-      <Section title="交互对象">{(p.interactObjectRules||[]).map(r=>object(r.objectType))}</Section>
-      <Section title="消耗品">{(p.consumableRules||[]).map(r=><>{object(r.objectType)} · <ChoiceText value={r.requirement} options={CONSUMPTION_TYPES}/></>)}</Section>
+      <Section title="交互对象">{(p.interactObjectRules||[]).map(r=><>{object(r.objectType)}{r.objectName&&<> · <ObjectNameText type={r.objectType} value={r.objectName}/></>}</>)}</Section>
+      <Section title="消耗品">{(p.consumableRules||[]).map(r=><>{object(r.objectType)}{r.objectName&&<> · <ObjectNameText type={r.objectType} value={r.objectName}/></>} · <ChoiceText value={r.requirement} options={CONSUMPTION_TYPES}/></>)}</Section>
       <Section title="准入条件">{(p.attributeRules||[]).map(r=><RuleText rule={r} kind={r.attribute?.startsWith('buff:')?'buff':'attribute'} influences={CONDITIONS}/>)}</Section>
       <p className="form-hint">{connected?'点击此节点编辑行为准入数据':'请从右侧出口连接第一个行为节点'}</p>
     </div></div>

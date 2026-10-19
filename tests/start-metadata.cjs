@@ -7,7 +7,7 @@ assert.equal(starts().length,1);assert.equal(s().nodes.length,1);assert.equal(s(
 assert.deepEqual(s().behaviorInfo.preconditions.interactObjectRules,[])
 assert.deepEqual(s().behaviorInfo.preconditions.consumableRules,[])
 assert.deepEqual(s().behaviorInfo.preconditions.attributeRules,[])
-let html=render(React.createElement(Panel));assert.ok(!html.includes('<textarea'));assert.equal((html.match(/role="combobox"/g)||[]).length,3);assert.ok(html.includes('目标规则类型'));assert.ok(!render(React.createElement(Palette)).includes('唯一入口'))
+let html=render(React.createElement(Panel));assert.ok(!html.includes('<textarea'));assert.equal((html.match(/role="combobox"/g)||[]).length,4);assert.ok(html.includes('目标规则类型'));assert.ok(!render(React.createElement(Palette)).includes('唯一入口'))
 const start=starts()[0];s().selectNode(start);assert.ok(render(React.createElement(Panel)).includes('行为准入数据'))
 s().deleteNode(start.id);assert.equal(starts().length,1)
 s().changeNodes([{id:start.id,type:'remove'}]);assert.equal(starts().length,1)

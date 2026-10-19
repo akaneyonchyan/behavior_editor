@@ -2,7 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './TextChoice.css'
 
-export default function TextChoice({ label, value, options, onChange, placeholder }) {
+export default function TextChoice({ label, value, options, onChange, placeholder, invalid=false }) {
   const id=useId(), input=useRef(null), menu=useRef(null)
   const [open,setOpen]=useState(false), [position,setPosition]=useState(null), [query,setQuery]=useState(''), [active,setActive]=useState(-1)
   const choices=options.filter(option=>!query||option.includes(query))
@@ -33,7 +33,7 @@ export default function TextChoice({ label, value, options, onChange, placeholde
   const choose=option=>{onChange(option);setOpen(false);setActive(-1)}
   return <div className="text-choice">
     <input ref={input} aria-label={label} role="combobox" aria-autocomplete="list" aria-expanded={open} aria-controls={open?id:undefined} aria-activedescendant={open&&active>=0?id+'-'+active:undefined}
-      className={value&&!options.includes(value)?'custom-choice':''} title={value&&!options.includes(value)?'自定义内容：尚未匹配标准选项，已保留供后续需求整理':''}
+      className={value&&(invalid||!options.includes(value))?'custom-choice':''} title={value&&(invalid||!options.includes(value))?'自定义内容：尚未匹配标准选项，已保留供后续需求整理':''}
       value={value} placeholder={placeholder} autoComplete="off"
       onFocus={()=>{setQuery('');setOpen(true);setActive(-1)}} onClick={()=>setOpen(true)} onBlur={()=>setOpen(false)}
       onChange={e=>{onChange(e.target.value);setQuery(e.target.value);setActive(-1);setOpen(true)}}

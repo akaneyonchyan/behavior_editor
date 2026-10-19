@@ -7,6 +7,7 @@ import {OccupiedSummary,ReleaseSummary} from './OccupiedResources'
 import {endLabel,isLegacyEnd} from '../utils/endings'
 import { LoopNodeStages } from './LoopEditor'
 import {RuleText,ChoiceText} from './DesignInputs'
+import {ObjectNameText} from './ObjectNameInput'
 import {resultRules,judgeAttributes,branchFactors,PROBABILITIES,EFFECTS,CHANGES,PLAY_MODES} from '../utils/nodeDesign'
 function OutputSection({title,children}){
   if(!children.length&&title!=='属性')return null
@@ -28,7 +29,7 @@ export default function BehaviorNode({ id, data, type, selected }) {
       {data.description && <div className="node-desc">{data.description}</div>}
       <div className="node-summary">
         {['move','result'].includes(type)&&<OccupiedSummary data={data}/>}
-        {type === 'move' && <><Row label="目标类型" value={data.destinationType === 'coordinate' ? '固定坐标' : library.objects.find(o=>o.id===data.objectType)?.name||data.objectType||'交互对象'} /><Row label="目的地" value={data.destination} /></>}
+        {type === 'move' && <><Row label="目标类型" value={data.destinationType === 'coordinate' ? '固定坐标' : library.objects.find(o=>o.id===data.objectType)?.name||data.objectType||'交互对象'} />{data.destinationType==='coordinate'?<Row label="目的地" value={data.destination}/>:<div className="summary-row"><span>对象名</span><div><ObjectNameText type={data.objectType} value={data.objectName??data.destination}/></div></div>}</>}
         {type === 'wait' && <Row label="执行" value="原地稍息，随后进入后续节点" />}
         {type === 'judge' && <Row label="分支" value={(data.branches?.length || 0) + ' 条 · 根据规则选择'} />}
         {type === 'result' && <><Row label="表演" value={data.animation} /><div className="summary-row"><span>播放方式</span><div><ChoiceText value={data.playMode??'单次'} options={PLAY_MODES}/>{data.playMode!=='单次'&&data.playExpectation?' · '+data.playExpectation:''}</div></div><OutputSection title="属性">{[...resultRules(data,'attribute').map(r=><RuleText rule={r} influences={CHANGES}/>),...(data.attributeChanges||[]).map(text=><span className="custom-choice">{text}</span>)]}</OutputSection><OutputSection title="Buff">{resultRules(data,'buff').filter(r=>r.attribute?.trim()).map(r=><RuleText rule={r} kind="buff" influences={CHANGES}/>)}</OutputSection><OutputSection title="产物">{(data.outputs||[]).filter(o=>format(o).trim()).map(o=><ChoiceText value={format(o)} options={[]}/>)}</OutputSection></>}

@@ -2,6 +2,7 @@ import { validateFactor } from '../utils/weightFactors'
 import { isLoopOutput } from '../utils/loopFlow'
 export function validateConfig(config, types) {
   const fail = message => { throw new Error(message) }
+  const objectRef=r=>{if(r?.objectName!==undefined&&typeof r.objectName!=='string')fail('对象名必须是文字标识或自定义文字')}
   const strings = value => value === undefined || (Array.isArray(value) && value.every(v => typeof v === 'string'))
   const rules=value=>{
     if(value===undefined)return
@@ -9,7 +10,7 @@ export function validateConfig(config, types) {
     const ids=new Set()
     for(const r of value){
       if(!r||typeof r.id!=='string'||!r.id||ids.has(r.id)||['source','attribute','influence'].some(k=>typeof r[k]!=='string'))fail('属性规则需包含唯一标识、来源、属性名和规则描述')
-      ids.add(r.id)
+      objectRef(r);ids.add(r.id)
     }
   }
   if (!config || typeof config.behavior?.name !== 'string' || !Array.isArray(config.graph?.nodes) || !Array.isArray(config.graph?.edges)) fail('文件需包含行为名称、节点和连线列表')
@@ -20,13 +21,13 @@ export function validateConfig(config, types) {
   if(p?.consumableRules!==undefined){
     if(!Array.isArray(p.consumableRules))fail('消耗品规则必须是列表')
     const seen=new Set()
-    for(const r of p.consumableRules){if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.objectType!=='string'||typeof r.requirement!=='string')fail('消耗品规则需包含唯一标识、对象类型和要求');seen.add(r.id)}
+    for(const r of p.consumableRules){if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.objectType!=='string'||typeof r.requirement!=='string')fail('消耗品规则需包含唯一标识、对象类型和要求');objectRef(r);seen.add(r.id)}
   }
   rules(p?.attributeRules)
   if(p?.interactObjectRules!==undefined){
     if(!Array.isArray(p.interactObjectRules))fail('交互对象规则必须是列表')
     const seen=new Set()
-    for(const r of p.interactObjectRules){if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.objectType!=='string')fail('交互对象规则需要唯一标识和对象类型');seen.add(r.id)}
+    for(const r of p.interactObjectRules){if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.objectType!=='string')fail('交互对象规则需要唯一标识和对象类型');objectRef(r);seen.add(r.id)}
   }
   if (p && (typeof p !== 'object' || !strings(p.consumables) || !strings(p.attributes) || (p.interactObject !== undefined && typeof p.interactObject !== 'string'))) fail('行为准入配置格式错误')
   const ids = new Map()
@@ -47,7 +48,7 @@ export function validateConfig(config, types) {
       const seen=new Set()
       for(const r of n.data.occupiedResources){
         if(!r||typeof r.id!=='string'||!r.id||seen.has(r.id)||typeof r.source!=='string'||typeof r.attribute!=='string')fail('占用资源需要唯一标识、来源和属性名')
-        seen.add(r.id)
+        objectRef(r);seen.add(r.id)
       }
     }
     if(n.data.judgeAttributes!==undefined){
@@ -55,7 +56,7 @@ export function validateConfig(config, types) {
       const selected=new Set()
       for(const a of n.data.judgeAttributes){
         if(!a||typeof a.id!=='string'||!a.id||selected.has(a.id)||typeof a.source!=='string'||typeof a.attribute!=='string')fail('参与判断的属性需要唯一标识、来源和属性名')
-        selected.add(a.id)
+        objectRef(a);selected.add(a.id)
       }
     }
     if (n.data.restProbability !== undefined && (!Number.isFinite(n.data.restProbability) || n.data.restProbability < 0 || n.data.restProbability > 100)) fail('稍息概率必须在 0 到 100 之间')
@@ -73,7 +74,7 @@ export function validateConfig(config, types) {
         branches.add(b.id)
       }
     }
-    ids.set(n.id, n)
+    objectRef(n.data);ids.set(n.id, n)
   }
   const loopPorts=new Set()
   const starts=config.graph.nodes.filter(n=>n.type==='start')

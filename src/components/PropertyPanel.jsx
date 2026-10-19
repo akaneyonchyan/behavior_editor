@@ -3,6 +3,7 @@ import { useBehaviorStore } from '../store/behaviorStore'
 import { NODE_CONFIG, NODE_TYPES } from '../constants/behaviorTypes'
 import './PropertyPanel.css'
 import TextChoice from './TextChoice'
+import ObjectNameInput from './ObjectNameInput'
 import { useContentLibrary } from '../store/contentLibrary'
 import LoopFields from './LoopEditor'
 import BehaviorMetadata from './BehaviorMetadata'
@@ -91,19 +92,11 @@ function MoveFields({ node }) {
         </select>
       </div>
 
-      <div className="form-group">
+      {node.data.destinationType!=='coordinate'&&<><div className="form-group">
         <label>交互对象类型</label>
-        <TextChoice label="交互对象类型" options={objects.filter(o=>o.enabled).map(o=>o.name)} value={objects.find(o=>o.id===node.data.objectType)?.name||node.data.objectType||''} onChange={name=>updateNode(node.id,{objectType:objects.find(o=>o.name===name)?.id||name})} placeholder="从公共库选择对象类型"/>
-      </div>
-      <div className="form-group">
-        <label>目的地</label>
-        <input
-          type="text"
-          value={node.data.destination || ''}
-          onChange={(e) => updateNode(node.id, { destination: e.target.value })}
-          placeholder={node.data.destinationType === 'coordinate' ? 'x, y, z' : '对象名称'}
-        />
-      </div>
+        <TextChoice label="交互对象类型" options={objects.filter(o=>o.enabled).map(o=>o.name)} value={objects.find(o=>o.id===node.data.objectType)?.name||node.data.objectType||''} onChange={name=>updateNode(node.id,{objectType:objects.find(o=>o.enabled&&o.name===name)?.id||name})} placeholder="从公共库选择对象类型"/>
+      </div><div className="form-group"><ObjectNameInput type={node.data.objectType} value={node.data.objectName??node.data.destination??''} onChange={objectName=>updateNode(node.id,{objectName})}/></div></>}
+      {node.data.destinationType==='coordinate'&&<div className="form-group"><label>目的地</label><input aria-label="目的地坐标" value={node.data.destination||''} onChange={e=>updateNode(node.id,{destination:e.target.value})} placeholder="x, y, z"/></div>}
     </>
   )
 }

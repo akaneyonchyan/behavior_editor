@@ -3,6 +3,7 @@ import { useBehaviorStore } from '../store/behaviorStore'
 import { useContentLibrary, ruleSummary } from '../store/contentLibrary'
 import { Handle, Position, useUpdateNodeInternals } from 'reactflow'
 import LibraryRules from './LibraryRules'
+import {RuleText} from './DesignInputs'
 import TextChoice from './TextChoice'
 import { EXPECTATIONS } from '../utils/weightFactors'
 import { LOOP_OUTPUTS } from '../utils/loopFlow'
@@ -12,9 +13,9 @@ export function LoopNodeStages({id,data}) {
   const library=useContentLibrary(s=>s.library)
   const legacy=useBehaviorStore(s=>s.edges.some(e=>e.source===id&&!e.sourceHandle))
   const updateInternals=useUpdateNodeInternals()
-  useEffect(()=>{updateInternals(id)},[id,legacy,data,updateInternals])
+  useEffect(()=>{updateInternals(id)},[id,legacy,data,library,updateInternals])
   const enabled=data.restEnabled!==false
-  const summary=(text,rules)=>[text,...(rules||[]).map(r=>ruleSummary(library,r))].filter(Boolean).join('；')||'待配置规则'
+  const summary=(text,rules)=>!text&&!rules?.length?'待配置规则':<>{text}{(rules||[]).map((r,i)=><React.Fragment key={r.id}>{(text||i>0)?'；':''}<RuleText rule={r} kind={r.attribute?.startsWith('buff:')?'buff':'attribute'} influences={['较低时','较高时','处于指定状态时','具有指定 Buff 时','不具有指定 Buff 时']}/></React.Fragment>)}</>
   const output=(handle,label,disabled=false)=><div className={'loop-output '+(disabled?'inactive':'')}><span>{label}</span><Handle type="source" position={Position.Right} id={handle} isConnectable={!disabled} className="node-handle"/></div>
   return <div className="loop-stages">
     <section><strong>① 目标达成判定</strong><p>{summary(data.completionCondition,data.completionRules)}</p>
