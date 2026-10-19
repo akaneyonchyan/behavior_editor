@@ -57,6 +57,18 @@ function download(blob,name) {
   a.href=url;a.download=name;document.body.append(a);a.click();a.remove()
   setTimeout(()=>URL.revokeObjectURL(url),1000)
 }
+// Called during the export button gesture, before asynchronous rendering loses user activation.
+export async function preparePngDestination(name,directory,picker=globalThis.showSaveFilePicker?.bind(globalThis)){
+  if(!picker)return {saved:false}
+  let handle
+  try{handle=await picker({id:'pps-behavior-png',suggestedName:pngName(name),...(directory?{startIn:directory}:{}),types:[{description:'PNG 图片',accept:{'image/png':['.png']}}],excludeAcceptAllOption:true})}
+  catch(e){if(e.name==='AbortError')return {cancelled:true};throw e}
+  return {saved:true,name:handle.name,download:async blob=>{
+    const stream=await handle.createWritable()
+    try{await stream.write(blob);await stream.close()}
+    catch(e){try{await stream.abort()}catch{}throw e}
+  }}
+}
 export async function exportCanvasPng(source, options={}, services={}) {
   if(exporting)throw new Error('正在导出，请等待当前图片完成')
   exporting=true

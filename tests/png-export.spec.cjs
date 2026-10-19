@@ -6,6 +6,7 @@ async function snapshot(page){return page.evaluate(async()=>{
 })}
 test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',route=>route.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
+ await page.addInitScript(()=>{window.showSaveFilePicker=undefined})
  await page.goto('/')
  await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await expect(page.locator('.react-flow__node')).toHaveCount(9)
@@ -89,4 +90,25 @@ test('render failure and concurrent requests release lock and remove detached sn
  })
  expect(result.concurrent).toContain('正在导出');expect(result.error).toBe('render failed');expect(result.remaining).toBe(0)
  expect(await snapshot(page)).toBe(before)
+})
+
+
+test('PNG save picker starts in the chosen directory and cancellation preserves the graph',async({page})=>{
+ await page.evaluate(async()=>{
+  const session=await import('/src/store/documentSession.js');
+  const dir={name:'测试保存目录',queryPermission:async()=> 'denied'};
+  window.showDirectoryPicker=async()=>dir;const open=indexedDB.open.bind(indexedDB);indexedDB.open=()=>{const request={error:Error('test: handle persistence unavailable')};setTimeout(()=>request.onerror?.(),0);return request};try{await session.chooseDirectory()}finally{indexedDB.open=open};
+  window.pngTest={calls:0,closed:0,bytes:[],cancel:true};
+  window.showSaveFilePicker=async options=>{
+   window.pngTest.calls++;window.pngTest.sameDirectory=options.startIn===session.getSaveDirectory();window.pngTest.active=navigator.userActivation.isActive;
+   if(window.pngTest.cancel)throw new DOMException('cancel','AbortError');
+   return {name:'测试导出.png',createWritable:async()=>({write:async blob=>{window.pngTest.bytes=Array.from(new Uint8Array(await blob.arrayBuffer())).slice(0,8)},close:async()=>{window.pngTest.closed++}})};
+  };
+ })
+ const before=await snapshot(page)
+ await page.getByRole('button',{name:'导出 PNG',exact:true}).click();await expect(page.getByRole('dialog',{name:'导出行为图 PNG'})).toContainText('测试保存目录')
+ await page.getByRole('button',{name:'下载 PNG',exact:true}).click();await expect(page.getByRole('button',{name:'下载 PNG',exact:true})).toBeEnabled();expect(await page.evaluate(()=>window.pngTest.closed)).toBe(0);expect(await snapshot(page)).toBe(before)
+ await page.evaluate(()=>{window.pngTest.cancel=false});await page.getByRole('button',{name:'下载 PNG',exact:true}).click();await expect(page.getByRole('dialog',{name:'导出行为图 PNG'})).toHaveCount(0)
+ const result=await page.evaluate(()=>window.pngTest);expect(result.sameDirectory).toBe(true);expect(result.active).toBe(true);expect(result.closed).toBe(1);expect(result.bytes).toEqual([137,80,78,71,13,10,26,10]);expect(await snapshot(page)).toBe(before)
+ await expect(page.locator('.png-export-notice')).toContainText('PNG 已保存：测试导出.png')
 })

@@ -135,3 +135,5 @@ src/utils/requirements.js 的 collectRequirements 为只读汇总：复用公共
 RequirementsPanel.jsx 随节点/准入/库变更重新计算。公开库未就绪时不运行检查，避免空库误报；已有缓存失败时继续显示快照时间和错误。窗口通过 pps-focus-node 事件让 Canvas 定位和选择节点，不创建撤销记录或修改业务数据。导出为本地 Markdown，包含全分类、快照时间及使用位置，不写正式行为文件。
 
 这不是运行时能力校验器：没有资产库时表演仅标记待核对，不猜测已实现/缺失，也不自动拆解自然语言里的资产名。新增字段或规则选项时同步汇总器及 tests/requirements.cjs、requirements.spec.cjs。浏览器测试验证筛选、四页、库更新、定位、下载、缺库状态和原图不变。
+
+PNG 保存目录（2026-10-19）：PngExport 先同步校验画布大小，再在点击事件的用户激活期调用 preparePngDestination，startIn 取 documentSession.getSaveDirectory() 中选择或恢复的目录句柄。选定文件后才异步渲染，成功生成 Blob 后创建 writable 并写入/close；写入失败尝试 abort。取消返回选项窗，不修改图或 JSON 保存状态；无 File System Access API 时保留下载回退。不要把 showSaveFilePicker 移到图片异步生成之后，否则用户激活过期。测试 png-save.cjs 和 png-export.spec.cjs 覆盖目录传递、取消、写失败、标准 PNG 字节及下载回退。

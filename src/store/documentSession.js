@@ -122,6 +122,7 @@ export function flushDraft() {
     localFingerprint = current; status({ draftTime: time() })
   } catch { status({ error: '浏览器恢复草稿写入失败（空间不足或存储被禁用）。请立即保存 JSON 文件。' }) }
 }
+export function getSaveDirectory(){return directory}
 export async function chooseDirectory() {
   if (!supportsDirectory()) { status({ error: '当前浏览器不能直接写入目录。请用 Chrome／Edge 通过 HTTPS 或 localhost 打开；当前仍可恢复浏览器草稿并下载 JSON。' }); return }
   if (writing || useDocumentSession.getState().busy) return
