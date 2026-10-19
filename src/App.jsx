@@ -34,8 +34,11 @@ export default function App() {
     <div className="app">
       <Toolbar />
       <div className="app-main">
-        <NodePalette onAddNode={handleAddNode} />
-        <div className="behavior-workspace"><BehaviorFiles/><Canvas /></div>
+        <aside className="behavior-sidebar" aria-label="节点与本地文件">
+          <NodePalette onAddNode={handleAddNode} />
+          <BehaviorFiles/>
+        </aside>
+        <Canvas />
         <PropertyPanel />
       </div>
     </div>

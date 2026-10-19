@@ -12,6 +12,13 @@ test('directory strip lists, searches, refreshes and safely switches local graph
   indexedDB.open=()=>{const req={error:Error('mock directory persistence')};setTimeout(()=>req.onerror?.(),0);return req}
  })
  await panel.getByRole('button',{name:'选择目录',exact:true}).click();await expect(panel.locator('.behavior-file')).toHaveCount(3);await expect(panel.getByRole('button',{name:/坏文件/})).toBeDisabled()
+ for(const viewport of [{width:1280,height:900},{width:1280,height:720}]){
+  await page.setViewportSize(viewport)
+  const sidebar=await page.locator('.behavior-sidebar').boundingBox(),canvas=await page.locator('.canvas').boundingBox(),palette=await page.locator('.node-palette').boundingBox(),files=await panel.boundingBox()
+  expect(sidebar.width).toBe(240);expect(canvas.x).toBeGreaterThanOrEqual(sidebar.x+sidebar.width)
+  expect(Math.abs(canvas.y-sidebar.y)).toBeLessThan(2);expect(Math.abs(canvas.height-sidebar.height)).toBeLessThan(2)
+  expect(files.y).toBeGreaterThanOrEqual(palette.y+palette.height-1);expect(files.height).toBeGreaterThan(100)
+ }
  await panel.getByLabel('搜索本地行为文件').fill('行为乙');await expect(panel.locator('.behavior-file')).toHaveCount(1);await panel.getByLabel('搜索本地行为文件').fill('')
  await panel.getByRole('button',{name:/行为甲/}).click();await expect(panel.locator('.current')).toContainText('甲.json');await expect(page.getByLabel('行为名称',{exact:true})).toHaveValue('行为甲')
  await page.getByLabel('行为名称',{exact:true}).fill('尚未保存');page.once('dialog',d=>d.dismiss());await panel.getByRole('button',{name:/行为乙/}).click();await expect(page.getByLabel('行为名称',{exact:true})).toHaveValue('尚未保存')
