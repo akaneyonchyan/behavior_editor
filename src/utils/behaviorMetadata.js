@@ -1,6 +1,6 @@
 export const GOAL_TYPES=['增加','减少','改变']
 export const CONSUMPTION_TYPES=['有可用存量','足够完成一次行为','持续消耗直至目标达成']
-export const initialGoal=()=>({id:'goal_initial',source:'actor',attribute:'',influence:'增加'})
+export const initialGoal=()=>({id:'goal_initial',source:'',attribute:'',influence:'增加'})
 export function normalizeMetadata(info){
   const p=info.preconditions||{}
   const goals=[...(info.targetRules||[]),...(info.matchTargets||[]).filter(t=>t.trim()).map((t,i)=>({id:`legacy_goal_${i}`,source:'',attribute:'',influence:t}))]

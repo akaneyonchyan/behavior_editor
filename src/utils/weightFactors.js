@@ -1,10 +1,10 @@
-﻿export const SOURCES = [
+export const SOURCES = [
   ['actor','执行伙伴'], ['partner','互动伙伴'], ['interactObject','交互对象'],
   ['handheld','手持物'], ['consumable','消耗品'], ['custom','指定对象']
 ]
 export const INFLUENCES = ['越高，越容易触发', '越高，越不容易触发', '处于指定状态时，更容易触发', '处于指定状态时，更不容易触发']
 export const EXPECTATIONS = ['待定','很少发生','较少发生','通常发生','较容易发生','优先发生']
-export const newFactor = () => ({ version:2, id:crypto.randomUUID(), source:'actor', attribute:'energy', influence:INFLUENCES[0] })
+export const newFactor = () => ({ version:2, id:crypto.randomUUID(), source:'', attribute:'', influence:INFLUENCES[0] })
 export function designFactor(f) {
   if(f.version===2)return f
   const source = (SOURCES.find(([v])=>v===f.source)?.[1] || f.source || '待指定来源') + (f.objectRef ? ' · '+f.objectRef : '')

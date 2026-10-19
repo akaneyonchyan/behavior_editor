@@ -10,10 +10,11 @@ export const DEFAULT_LIBRARY = {
   buffs: []
 }
 function load() {
+  if(import.meta.env?.VITE_LIBRARY_MODE==='published')return {library:{version:1,objects:[],attributes:[],buffs:[]},error:''}
   try { const raw=globalThis.localStorage?.getItem(KEY);return {library:raw?validateLibrary(JSON.parse(raw)):structuredClone(DEFAULT_LIBRARY),error:''} }
   catch {return {library:structuredClone(DEFAULT_LIBRARY),error:'本地公共库读取失败，已显示示例库；原始存储未覆盖，请先恢复备份。'}}
 }
-function loadTeamCache(){try{if(globalThis.localStorage?.getItem('pps-team-library-active')!=='true')return {};const data=JSON.parse(localStorage.getItem('pps-team-library-cache'));validateLibrary(data.library);return {library:data.library,teamMode:true,teamStatus:'正在连接团队库；当前显示上次同步副本'}}catch{return {}}}
+function loadTeamCache(){if(import.meta.env?.VITE_LIBRARY_MODE==='published')return {};try{if(globalThis.localStorage?.getItem('pps-team-library-active')!=='true')return {};const data=JSON.parse(localStorage.getItem('pps-team-library-cache'));validateLibrary(data.library);return {library:data.library,teamMode:true,teamStatus:'正在连接团队库；当前显示上次同步副本'}}catch{return {}}}
 export const useContentLibrary=create((set,get)=>({...load(),teamMode:false,teamStatus:'本机公共库',teamReady:false,teamAuthenticated:false,teamConfigured:false,checkedAt:0,...loadTeamCache(),save:library=>{
   if(get().readOnly){set({error:'公共库只读，请在飞书中修改'});return false}
   if(get().teamMode){set({error:'团队模式请使用同步保存'});return false}
@@ -62,7 +63,6 @@ export async function saveTeamLibrary(base,library) {
 export function sourceChoices(lib) {
   const active=lib.objects.filter(o=>o.enabled)
   return [
-    ...(active.some(o=>o.id==='partner')?[{id:'actor',name:'执行伙伴',type:'partner'},{id:'partner',name:'互动伙伴',type:'partner'}]:[]),
     ...active.map(o=>({id:'object:'+o.id,name:o.name,type:o.id}))
   ]
 }

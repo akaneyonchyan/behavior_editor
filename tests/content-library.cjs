@@ -2,8 +2,13 @@ const assert=require('node:assert/strict'),{buildSync}=require('esbuild'),Module
 const values=new Map();global.localStorage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)}
 const filename=path.join(process.cwd(),'library-tests.cjs'),m=new Module(filename,module);m.filename=filename;m.paths=module.paths
 const code=buildSync({stdin:{contents:"export * from './src/store/contentLibrary.js'; export {useBehaviorStore} from './src/store/behaviorStore.js'; export {validateConfig} from './src/store/documentValidation.js'; export {NODE_CONFIG} from './src/constants/behaviorTypes.js'; export {default as example} from './examples/eat-snack.json'",resolveDir:process.cwd()},bundle:true,external:['react','react-dom'],platform:'node',format:'cjs',write:false,logLevel:'silent'}).outputFiles[0].text;m._compile(code,filename)
-const {DEFAULT_LIBRARY,validateLibrary,propertyChoices,propertyName,ruleSummary,useContentLibrary:store,useBehaviorStore:graph,validateConfig,NODE_CONFIG,example}=m.exports
+const {sourceChoices,DEFAULT_LIBRARY,validateLibrary,propertyChoices,propertyName,ruleSummary,useContentLibrary:store,useBehaviorStore:graph,validateConfig,NODE_CONFIG,example}=m.exports
 let lib=structuredClone(DEFAULT_LIBRARY)
+assert.deepEqual(sourceChoices(lib),lib.objects.filter(o=>o.enabled).map(o=>({id:'object:'+o.id,name:o.name,type:o.id})))
+assert.deepEqual(sourceChoices({objects:[]}),[])
+const changed=structuredClone(lib);changed.objects[0].name='伙伴角色';changed.objects[1].enabled=false
+assert.equal(sourceChoices(changed)[0].name,'伙伴角色');assert.ok(!sourceChoices(changed).some(o=>['actor','partner','object:handheld'].includes(o.id)))
+assert.ok(propertyChoices(changed,'object:partner').some(a=>a.id==='energy'))
 assert.ok(propertyChoices(lib,'actor').some(a=>a.id==='energy'))
 assert.ok(!propertyChoices(lib,'actor').some(a=>a.id==='freshness'))
 assert.deepEqual(propertyChoices(lib,'object:food').map(a=>a.id),['freshness'])
