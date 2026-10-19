@@ -47,10 +47,12 @@ export class FeishuRepository {
     for(const object of raw.objects){
       const tableId=text(object.fields['对象表ID']).trim()
       if(!tableId)continue // Older libraries have no catalogs yet.
-      if(!/^tbl[a-zA-Z0-9]+$/.test(tableId)||mapped.has(tableId)||Object.values(this.tables).includes(tableId))throw new Error('对象表ID无效或重复：'+text(object.fields['名称']))
-      mapped.add(tableId)
       const objectType=objectIds.get(object.record_id)
-      for(const row of await this.records(tableId)){
+      const reuseBuffs=objectType==='buff'&&tableId===this.tables.buffs
+      if(!/^tbl[a-zA-Z0-9]+$/.test(tableId)||mapped.has(tableId)||(Object.values(this.tables).includes(tableId)&&!reuseBuffs))throw new Error('对象表ID无效或重复：'+text(object.fields['名称']))
+      mapped.add(tableId)
+      // Reuse the same read so effects and object names cannot disagree within a snapshot.
+      for(const row of reuseBuffs?raw.buffs:await this.records(tableId)){
         const f=row.fields,localId=text(f['标识'])||row.record_id
         library.items.push({id:encodeURIComponent(objectType)+'/'+encodeURIComponent(localId),objectType,name:text(f['名称']),description:text(f['说明']),enabled:f['启用']===true})
       }

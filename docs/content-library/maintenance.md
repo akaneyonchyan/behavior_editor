@@ -99,3 +99,5 @@ node --input-type=module -e "import {readFileSync} from 'node:fs'; import {valid
 
 Agent 写入前的完整候选快照现在还需包含 items（旧库缺少时视为空）；字段定义、稳定ID、引用和停用行一并检查。只创建空对象表时先验证原三表与空 items，再创建字段和表，核对空表及映射，发布后检查快照。不要把各表内部ID、原始记录备份或密钥提交到公开源码。
 
+
+Buff 对象复用例外：将稳定标识 buff 的对象类型的“对象表ID”设为现有 Buff 类型表 ID。同步复用已经读取的同一批 Buff 行生成 items，不重复建表、不改 Buff 适用对象。新建、改名、停用 Buff 同时影响效果候选与 Buff 对象名候选；已有无标识的记录继续用 record_id，不能补标识造成引用变化。
