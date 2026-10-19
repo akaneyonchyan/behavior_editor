@@ -4,6 +4,7 @@ import { publishedMode, startPublishedLibrary } from './store/publishedLibrary'
 import Toolbar from './components/Toolbar'
 import NodePalette from './components/NodePalette'
 import Canvas from './components/Canvas'
+import BehaviorFiles from './components/BehaviorFiles'
 import PropertyPanel from './components/PropertyPanel'
 import { useBehaviorStore } from './store/behaviorStore'
 import { NODE_CONFIG } from './constants/behaviorTypes'
@@ -34,7 +35,7 @@ export default function App() {
       <Toolbar />
       <div className="app-main">
         <NodePalette onAddNode={handleAddNode} />
-        <Canvas />
+        <div className="behavior-workspace"><BehaviorFiles/><Canvas /></div>
         <PropertyPanel />
       </div>
     </div>

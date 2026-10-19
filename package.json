@@ -15,7 +15,7 @@
     "vite": "^5.0.0"
   },
   "scripts": {
-    "test": "node tests/persistence.cjs && node tests/routing-weights.cjs && node tests/content-library.cjs && node tests/team-sync.mjs && node tests/loop-flow.cjs && node tests/published-library.cjs && node tests/metadata.cjs && node tests/node-design.cjs && node tests/start-metadata.cjs && node tests/startup-files.cjs && node tests/png-export.cjs && node tests/drop-files.cjs && node tests/endings.cjs && node tests/occupied-resources.cjs && node tests/library-publish-validation.mjs && node tests/object-catalog.cjs && node tests/catalog-sync.mjs && node tests/requirements.cjs && node tests/png-save.cjs",
+    "test": "node tests/persistence.cjs && node tests/routing-weights.cjs && node tests/content-library.cjs && node tests/team-sync.mjs && node tests/loop-flow.cjs && node tests/published-library.cjs && node tests/metadata.cjs && node tests/node-design.cjs && node tests/start-metadata.cjs && node tests/startup-files.cjs && node tests/png-export.cjs && node tests/drop-files.cjs && node tests/endings.cjs && node tests/occupied-resources.cjs && node tests/library-publish-validation.mjs && node tests/object-catalog.cjs && node tests/catalog-sync.mjs && node tests/requirements.cjs && node tests/png-save.cjs && node tests/behavior-files.cjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

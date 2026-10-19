@@ -123,6 +123,7 @@ export function flushDraft() {
   } catch { status({ error: '浏览器恢复草稿写入失败（空间不足或存储被禁用）。请立即保存 JSON 文件。' }) }
 }
 export function getSaveDirectory(){return directory}
+export function getCurrentFileHandle(){return fileHandle}
 export async function chooseDirectory() {
   if (!supportsDirectory()) { status({ error: '当前浏览器不能直接写入目录。请用 Chrome／Edge 通过 HTTPS 或 localhost 打开；当前仍可恢复浏览器草稿并下载 JSON。' }); return }
   if (writing || useDocumentSession.getState().busy) return
@@ -219,6 +220,24 @@ export async function openFallback(file) {
   try { replace(parse(await file.text()), { name: file.name, saved: true }) }
   catch (e) { status({ error: '打开失败：' + e.message + '。原行为未替换。' }) }
   finally { status({ busy: false }) }
+}
+export async function openDirectoryFile(handle,expectedDirectory){
+  const state=useDocumentSession.getState()
+  if(!state.ready||state.busy||writing){status({notice:'正在加载或保存，请稍后再切换文件。'});return false}
+  if(!expectedDirectory||expectedDirectory!==directory){status({notice:'保存目录已变化，请刷新文件列表后再打开。'});return false}
+  const capture=fingerprint(content())
+  status({busy:true,error:'',notice:''})
+  try{
+    const file=await handle.getFile(),text=await file.text(),config=parse(text)
+    validateConfig(config,NODE_CONFIG)
+    if(expectedDirectory!==directory||fingerprint(content())!==capture){status({notice:'读取期间目录或当前行为发生变化，已保留当前内容，请重新打开。'});return false}
+    status({busy:false})
+    if(!canReplace())return false
+    replace(config,{name:file.name,handle,text,saved:true})
+    status({notice:'已载入：'+file.name})
+    return true
+  }catch(e){status({error:'打开目录文件失败：'+e.message+'。原行为未替换，请刷新列表或恢复目录授权。'});return false}
+  finally{status({busy:false})}
 }
 export async function openDroppedFiles(transfer) {
   const state=useDocumentSession.getState()
