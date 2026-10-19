@@ -127,3 +127,11 @@ ObjectNameInput.jsx 复用 TextChoice，objectChoices/objectName 负责按类型
 
 新增回归 object-catalog.cjs、catalog-sync.mjs、object-catalog.spec.cjs，覆盖筛选、同名跨类型、停用改名、旧快照、分页与错误阻断、共享属性继承、JSON/撤销及浏览器交互。已有下拉计数增加对象名一栏。
 
+
+## 需求汇总（2026-10-19）
+
+src/utils/requirements.js 的 collectRequirements 为只读汇总：复用公共库候选筛选、节点规则常量、准入迁移及判断共享属性派生逻辑，返回 attributes/objects/buffs/performances 四组。按分类、字段、原值、原因、上下文去重，locations 保存节点ID和字段位置。判断共享属性只统计一次，分支自定义影响分别保留使用位置；自动释放引用不重复统计。已关闭的稍息配置和兼容存档不参与当前需求统计。
+
+RequirementsPanel.jsx 随节点/准入/库变更重新计算。公开库未就绪时不运行检查，避免空库误报；已有缓存失败时继续显示快照时间和错误。窗口通过 pps-focus-node 事件让 Canvas 定位和选择节点，不创建撤销记录或修改业务数据。导出为本地 Markdown，包含全分类、快照时间及使用位置，不写正式行为文件。
+
+这不是运行时能力校验器：没有资产库时表演仅标记待核对，不猜测已实现/缺失，也不自动拆解自然语言里的资产名。新增字段或规则选项时同步汇总器及 tests/requirements.cjs、requirements.spec.cjs。浏览器测试验证筛选、四页、库更新、定位、下载、缺库状态和原图不变。

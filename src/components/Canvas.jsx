@@ -31,6 +31,14 @@ export default function Canvas() {
   const flow = useRef(null)
   const dragDepth=useRef(0),[fileHover,setFileHover]=useState(false)
   const s = useBehaviorStore()
+  useEffect(()=>{
+    const focus=e=>{
+      const state=useBehaviorStore.getState(),node=state.nodes.find(n=>n.id===e.detail)
+      state.selectNode(node||null)
+      if(node){state.changeNodes(state.nodes.map(n=>({id:n.id,type:'select',selected:n.id===node.id})));flow.current?.fitView({nodes:[{id:node.id}],padding:.5,maxZoom:1,duration:250})}
+    }
+    window.addEventListener('pps-focus-node',focus);return()=>window.removeEventListener('pps-focus-node',focus)
+  },[])
   useEffect(() => {
     const onKey = e => {
       if (e.isComposing || e.target.closest('input, textarea, select, [contenteditable="true"]') || document.querySelector('.dialog-overlay')) return

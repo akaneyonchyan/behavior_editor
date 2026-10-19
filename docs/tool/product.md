@@ -62,3 +62,7 @@
 实现：occupiedResources=[{id,source,attribute}] 存在来源节点，utils/occupiedResources.js 按有效边遍历，排除禁用稍息路径、孤立节点和结束节点后的边。派生引用只在展示时计算，不复制写入结束节点。旧 releaseResources 原文放在核对区，需整理为前序声明；旧 targetCondition 仅兼容保留、不展示、不执行。
 
 结束节点不再配置或展示目标判定。目标是否达成及后续调度属于行为之外的目标策略流程；开始节点中行为准入数据的满足目标、循环中的循环判定仍保留。回归见 occupied-resources.cjs 与 occupied-resources.spec.cjs。
+
+## 需求整理
+
+顶部“需求清单”将当前行为的未匹配属性、对象、Buff、自定义规则和待核对表演分组汇总，提供使用位置与 Markdown 导出，帮助策划整理版本需求。检查以当前公共库快照及编辑器规则选项为依据，不承诺判断游戏工程支持情况。表演未接资产库，全部按待核对资产处理。

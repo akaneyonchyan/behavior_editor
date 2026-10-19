@@ -1,0 +1,6 @@
+.requirements-dialog .library-intro,.requirements-dialog .library-tools { font-size:12px; }
+.requirements-dialog .library-table td { white-space:pre-wrap; overflow-wrap:anywhere; }
+.requirements-dialog .library-table td:first-child { width:25%; }
+.requirements-dialog .library-table td:last-child { width:30%; }
+.requirement-location { display:block; background:transparent; border:0; color:var(--accent); font:inherit; text-align:left; cursor:pointer; padding:3px 0; }
+.requirement-location:hover { text-decoration:underline; }
