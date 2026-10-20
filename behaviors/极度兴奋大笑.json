@@ -1,0 +1,451 @@
+{
+  "behavior": {
+    "name": "极度兴奋大笑",
+    "description": "目标消除行为伙伴的极度兴奋Buff。原地摇头笑起手，欢叫跳起并穿插大笑动作，随后汇入循环判断是否再笑一次。继续则再播放默认欢笑及穿插动作；本次大笑段结束后才判断兴奋是否缓解。缓解清除Buff，仍兴奋保留Buff，分别结束本轮。外部中断独立收尾。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "remove_excitement",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "超开心",
+        "influence": "消除【超开心】Buff"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "has_excitement",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "buff:emotion_super_happy",
+          "influence": "具有指定 Buff 时"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [],
+      "positions": {}
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜具有极度兴奋Buff",
+          "description": "原地表演，不设置位移。当前Buff名称按用户原文；不得自动替换为超级兴奋或兴奋情绪标签。"
+        },
+        "position": {
+          "x": -33,
+          "y": 56
+        }
+      },
+      {
+        "id": "laugh_start",
+        "type": "result",
+        "data": {
+          "name": "忍不住开始笑",
+          "animation": "停在原地，嘴角扬起，肩膀随着笑意轻轻抖动；摇头晃脑地笑，怎么也藏不住高兴。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": "从平静过度到兴奋发泄的情绪转变"
+        },
+        "position": {
+          "x": 287.4862007600134,
+          "y": 76.36487677990169
+        }
+      },
+      {
+        "id": "laugh_default",
+        "type": "result",
+        "data": {
+          "name": "大笑循环",
+          "animation": "笑声越来越响，上身越晃越起劲，双手抬起，忍不住欢叫着原地跳起，落地后仍笑个不停。",
+          "playMode": "计次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "db6bed42-b23c-44bc-bb4b-eec3f5b57bb1",
+              "source": "object:partner",
+              "attribute": "buff:emotion_super_happy",
+              "influence": "概率消除",
+              "kind": "buff",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 615.7381254493534,
+          "y": 68.32243866944947
+        }
+      },
+      {
+        "id": "laugh_variation",
+        "type": "judge",
+        "data": {
+          "name": "穿插本轮大笑动作",
+          "description": "",
+          "judgeAttributes": [
+            {
+              "id": "773e6a09-a399-4a2f-9381-9dab77c835ab",
+              "source": "object:partner",
+              "attribute": "personality_passion",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            },
+            {
+              "id": "2e9102ad-f8db-41e7-b0b1-bdfa09a25c27",
+              "source": "object:partner",
+              "attribute": "personality_rigorous",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "branches": [
+            {
+              "id": "clap",
+              "name": "拍手大笑",
+              "weightExpectation": "中",
+              "condition": "本轮默认欢叫跳起已完成，选择一种穿插动作",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "773e6a09-a399-4a2f-9381-9dab77c835ab",
+                  "attributeId": "773e6a09-a399-4a2f-9381-9dab77c835ab",
+                  "source": "object:partner",
+                  "attribute": "personality_passion",
+                  "influence": "不影响",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                },
+                {
+                  "version": 2,
+                  "id": "2e9102ad-f8db-41e7-b0b1-bdfa09a25c27",
+                  "attributeId": "2e9102ad-f8db-41e7-b0b1-bdfa09a25c27",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "指定值，概率降低",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "laugh_clap"
+            },
+            {
+              "id": "belly",
+              "name": "捧腹大笑",
+              "weightExpectation": "中",
+              "condition": "本轮默认欢叫跳起已完成，选择一种穿插动作",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "773e6a09-a399-4a2f-9381-9dab77c835ab",
+                  "attributeId": "773e6a09-a399-4a2f-9381-9dab77c835ab",
+                  "source": "object:partner",
+                  "attribute": "personality_passion",
+                  "influence": "指定值，概率提高",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                },
+                {
+                  "version": 2,
+                  "id": "2e9102ad-f8db-41e7-b0b1-bdfa09a25c27",
+                  "attributeId": "2e9102ad-f8db-41e7-b0b1-bdfa09a25c27",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "指定值，概率降低",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "laugh_belly"
+            },
+            {
+              "id": "steps",
+              "name": "捂着嘴弯腰笑",
+              "weightExpectation": "中",
+              "condition": "本轮默认欢叫跳起已完成，选择一种穿插动作",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "773e6a09-a399-4a2f-9381-9dab77c835ab",
+                  "attributeId": "773e6a09-a399-4a2f-9381-9dab77c835ab",
+                  "source": "object:partner",
+                  "attribute": "personality_passion",
+                  "influence": "指定值，概率降低",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                },
+                {
+                  "version": 2,
+                  "id": "2e9102ad-f8db-41e7-b0b1-bdfa09a25c27",
+                  "attributeId": "2e9102ad-f8db-41e7-b0b1-bdfa09a25c27",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "指定值，概率提高",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "laugh_steps"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 941.9152287939098,
+          "y": -60.09808221751871
+        }
+      },
+      {
+        "id": "laugh_clap",
+        "type": "result",
+        "data": {
+          "name": "拍手大笑",
+          "animation": "一边大笑一边连连拍手，身体随着拍手轻轻弹动，最后放下双手。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 1315.3017824684673,
+          "y": -76.72843138854842
+        }
+      },
+      {
+        "id": "laugh_belly",
+        "type": "result",
+        "data": {
+          "name": "捧腹大笑",
+          "animation": "双手捧住肚子，笑得弯下腰，肩膀一抖一抖，稍稍直起身体后仍带着笑意。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 1316.8000727886827,
+          "y": 125.39704523377338
+        }
+      },
+      {
+        "id": "laugh_steps",
+        "type": "result",
+        "data": {
+          "name": "捂着嘴弯腰笑",
+          "animation": "在原地小碎步左右蹦跳着笑，最后收住脚步、站稳。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 1317.3851507780691,
+          "y": 331.44105771330646
+        }
+      },
+      {
+        "id": "relief_check",
+        "type": "judge",
+        "data": {
+          "name": "本轮兴奋是否缓解",
+          "description": "",
+          "judgeAttributes": [
+            {
+              "id": "b6f4ad1e-8327-4ec7-b52c-d957c5320351",
+              "source": "object:partner",
+              "attribute": "超开心buff",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "branches": [
+            {
+              "id": "relieved",
+              "name": "兴奋缓解",
+              "condition": "本轮兴奋缓解判定成立，具体规则待配置",
+              "weightExpectation": "极高",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "b6f4ad1e-8327-4ec7-b52c-d957c5320351",
+                  "attributeId": "b6f4ad1e-8327-4ec7-b52c-d957c5320351",
+                  "source": "object:partner",
+                  "attribute": "超开心buff",
+                  "influence": "没有该buff",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "relieve"
+            },
+            {
+              "id": "still_excited",
+              "name": "仍然兴奋",
+              "condition": "本轮兴奋缓解判定不成立",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "b6f4ad1e-8327-4ec7-b52c-d957c5320351",
+                  "attributeId": "b6f4ad1e-8327-4ec7-b52c-d957c5320351",
+                  "source": "object:partner",
+                  "attribute": "超开心buff",
+                  "influence": "有该buff",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "end_still_excited"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 2020.0052336630315,
+          "y": 54.754255460886554
+        }
+      },
+      {
+        "id": "end_complete",
+        "type": "end",
+        "data": {
+          "name": "恢复平静",
+          "animation": "笑着长长呼出一口气，肩膀慢慢放松，激动的动作收住，脸上仍保留高兴的表情，轻轻点头，恢复轻松站姿。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 2354.257220754003,
+          "y": 19.390350995091865
+        }
+      },
+      {
+        "id": "end_still_excited",
+        "type": "end",
+        "data": {
+          "name": "忍住兴奋",
+          "animation": "深吸一口气，抿嘴想把笑压住，肩膀却又抖起来，最终没忍住笑出声，带着笑意站稳。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 2356.604960516846,
+          "y": 247.5693159893848
+        }
+      },
+      {
+        "id": "laugh_loop",
+        "type": "loop",
+        "data": {
+          "name": "循环判断是否到循环上限",
+          "loopVersion": 2,
+          "completionCondition": "本次连续大笑段可以结束，不再追加一次欢笑；具体结束条件待配置，与极度兴奋Buff是否缓解分开判断",
+          "completionRules": [
+            {
+              "id": "fd783733-f264-46a4-8528-fdbf03a44ec3",
+              "source": "",
+              "attribute": "",
+              "influence": ""
+            }
+          ],
+          "resourceCheck": "当前允许继续欢笑；不额外新增精力阈值或资源消耗门槛。",
+          "resourceRules": [],
+          "failureReason": "",
+          "restEnabled": false,
+          "restExpectation": "",
+          "restCondition": "",
+          "restRules": [],
+          "description": "",
+          "admissionEnabled": false
+        },
+        "position": {
+          "x": 1687.3338605053016,
+          "y": -4.546410620423956
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "603bbfe0-26fe-477a-97ad-5ae1ee14402f",
+        "source": "start",
+        "target": "laugh_start"
+      },
+      {
+        "id": "6ce49a22-a0cb-4161-9103-092f07aa297b",
+        "source": "laugh_start",
+        "target": "laugh_default"
+      },
+      {
+        "id": "4b326370-4985-4319-abe6-6cdeef3d2677",
+        "source": "laugh_default",
+        "target": "laugh_variation"
+      },
+      {
+        "id": "c92a0caa-6dad-4484-bdaf-1215ee362489",
+        "source": "laugh_variation",
+        "target": "laugh_clap",
+        "sourceHandle": "clap"
+      },
+      {
+        "id": "7a7c751d-f29b-4c89-b69b-fd06684283f6",
+        "source": "laugh_clap",
+        "target": "laugh_loop"
+      },
+      {
+        "id": "8ab93ee9-2506-4670-be24-ddcd212fb2f5",
+        "source": "laugh_variation",
+        "target": "laugh_belly",
+        "sourceHandle": "belly"
+      },
+      {
+        "id": "ce96273a-9da2-4e9d-a446-3a0c1cbac6de",
+        "source": "laugh_belly",
+        "target": "laugh_loop"
+      },
+      {
+        "id": "cfc8af6a-e25d-4f59-8fb4-f6d47750549b",
+        "source": "laugh_variation",
+        "target": "laugh_steps",
+        "sourceHandle": "steps"
+      },
+      {
+        "id": "5524e6de-22a9-45f2-9339-b72263c6d509",
+        "source": "laugh_steps",
+        "target": "laugh_loop"
+      },
+      {
+        "id": "9c066f1b-df22-4016-bcc9-2711d2b61132",
+        "source": "relief_check",
+        "target": "end_still_excited",
+        "sourceHandle": "still_excited"
+      },
+      {
+        "id": "639ba122-8027-401d-8076-39542890e3ab",
+        "source": "laugh_loop",
+        "target": "laugh_default",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "6de19071-d6ff-4d89-b407-f9150a88c844",
+        "source": "laugh_loop",
+        "target": "relief_check",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "0a28a9c3-70b4-43fe-9a34-07d70c774e1e",
+        "source": "relief_check",
+        "target": "end_complete",
+        "sourceHandle": "relieved"
+      }
+    ]
+  }
+}
