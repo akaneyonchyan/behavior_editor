@@ -11,3 +11,18 @@
 .loop-editor h4 { color: #f9a8d4; margin-bottom: 12px; font-size: 13px; }
 .loop-editor .loop-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 12px; }
 .loop-editor .loop-legacy textarea { width: 100%; background: var(--surface-1); color: var(--text-primary); margin-top: 8px; }
+
+.loop-condition-summary {display:block;}
+.loop-condition-summary>div {margin-top:5px;}
+.loop-condition-row {border:1px solid #5b4054;border-radius:5px;padding:8px;margin:6px 0;font-size:12px;}
+.loop-condition-heading {display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.loop-condition-heading strong {white-space:nowrap;font-size:12px;}
+.loop-condition-heading select {min-width:0;flex:1;}
+.loop-condition-heading button {background:transparent;color:#c9b5c4;border:0;cursor:pointer;}
+.loop-conditions-editor label {font-size:12px;}
+.loop-conditions-editor select,.loop-conditions-editor input {font-size:12px;max-width:100%;background:#20252d;color:#e5e7eb;border:1px solid #5b4054;border-radius:4px;padding:5px;}
+.loop-conditions-editor.compact {max-width:420px;}
+.loop-conditions-editor.compact p {padding:0;margin:6px 0;font-size:11px;}
+.loop-conditions-editor.compact .section-header {margin-top:8px;}
+.loop-conditions-editor.compact input {width:110px;margin-left:8px;}
+.loop-conditions-editor.compact .loop-condition-row {padding:5px;}

@@ -45,6 +45,17 @@ export function validateConfig(config, types) {
     if(n.data.loopVersion!==undefined&&![2,3].includes(n.data.loopVersion))fail('不支持的循环节点版本')
     if(n.data.loopMode!==undefined&&!['count','goal'].includes(n.data.loopMode))fail('循环执行条件只支持最大次数或目标满足情况')
     if(n.data.maxIterations!==undefined&&typeof n.data.maxIterations!=='string')fail('最大次数必须是文字')
+    if(n.data.loopConditions!==undefined){
+      if(!Array.isArray(n.data.loopConditions))fail('循环结束条件必须是列表')
+      const seen=new Set()
+      for(const c of n.data.loopConditions){
+        if(!c||typeof c.id!=='string'||!c.id||seen.has(c.id)||!['goal','count'].includes(c.kind))fail('循环结束条件需要唯一标识和有效类型')
+        seen.add(c.id)
+        if(c.maxIterations!==undefined&&typeof c.maxIterations!=='string')fail('最大次数必须是文字')
+        if(c.condition!==undefined&&typeof c.condition!=='string')fail('目标满足条件必须是文字')
+        rules(c.rules)
+      }
+    }
     if(n.data.objectType!==undefined&&typeof n.data.objectType!=='string')fail('对象类型必须是文字标识')
     if (n.data.outputs !== undefined && !Array.isArray(n.data.outputs)) fail('产出必须是列表')
     for(const key of ['playMode','playExpectation','endReason','targetCondition'])if(n.data[key]!==undefined&&typeof n.data[key]!=='string')fail(key+' 必须是文字')

@@ -69,7 +69,9 @@ export function collectRequirements(info,nodes,lib){
    ;(d.attributeChanges||[]).forEach((v,i)=>add('attributes','旧版属性变化',v,'旧版自由文字，待整理为结构化规则',at('旧版属性变化 '+(i+1))))
    ;(d.outputs||[]).forEach((v,i)=>add('objects','产物',v,'产物尚未绑定对象类型及名录，待核对',at('产物 '+(i+1))))
   }
-   if(node.type==='loop'&&!(d.loopVersion===3&&d.loopMode==='count')){
+   if(node.type==='loop'&&Array.isArray(d.loopConditions)){
+    d.loopConditions.forEach((c,i)=>{if(c.kind==='goal')(c.rules||[]).forEach((r,j)=>rule(r,at('循环结束条件 '+(i+1)+' · 属性 '+(j+1)),CONDITIONS))})
+   }else if(node.type==='loop'&&!(d.loopVersion===3&&d.loopMode==='count')){
    for(const [key,label] of [['completionRules','目标达成条件'],...(d.admissionEnabled!==false?[['resourceRules','准入条件']]:[]),['loopRules','旧循环条件'],...(d.restEnabled!==false?[['restRules','稍息条件']]:[])])(d[key]||[]).forEach((r,i)=>rule(r,at(label+' '+(i+1)),CONDITIONS))
    if(d.restEnabled!==false)choice('attributes','稍息发生倾向',d.restExpectation,EXPECTATIONS,at('稍息发生倾向'))
   }

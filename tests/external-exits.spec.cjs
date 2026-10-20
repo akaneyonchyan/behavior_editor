@@ -24,7 +24,7 @@ test('external branch labels, no ports, undo, loop toggles, PNG snapshot and rel
  await select(page,'template_result_1')
  await page.getByLabel('后续去向类型',{exact:true}).selectOption('external')
  await expect(page.locator('[data-id=template_result_1] .external-exit')).toContainText('跳出行为')
- await select(page,'template_loop');await expect(page.getByLabel('循环执行条件',{exact:true})).toBeVisible()
+ await select(page,'template_loop');await expect(page.locator('.property-panel').getByLabel('结束条件 1 类型',{exact:true})).toBeVisible()
  const snapshot=await page.evaluate(async()=>{const {captureCanvas}=await import('/src/utils/pngExport.js');const {clone}=captureCanvas(document.querySelector('.canvas > .react-flow'),{scale:1});return {labels:[...clone.querySelectorAll('.external-exit')].map(e=>e.textContent),ports:clone.querySelectorAll('.react-flow__handle').length}})
  expect(snapshot.labels).toHaveLength(3);expect(snapshot.labels.join('')).toContain('交回外部通用流程');expect(snapshot.ports).toBe(0)
  await page.evaluate(async()=>{const {flushDraft}=await import('/src/store/documentSession.js');flushDraft()})

@@ -1,3 +1,4 @@
+import {defaultLoopConditions} from '../utils/loopConditions'
 // 节点类型定义
 export const NODE_TYPES = {
   START: 'start',
@@ -73,6 +74,7 @@ export const NODE_CONFIG = {
     description: '按最大次数或目标满足情况重复执行内部节点',
     defaultData: {
       loopVersion: 3,
+      loopConditions: defaultLoopConditions(),
       loopMode: 'goal',
       maxIterations: '',
       checkTiming: 'before',
