@@ -35,7 +35,7 @@ function ScopeNode({id,data}){
 }
 function LoopPortal({data}){
  return <div className={'loop-portal '+data.kind} title={data.kind==='entry'?'本轮开始':data.kind==='repeat'?'本轮结束，重新检查循环条件':data.label} aria-label={data.kind==='entry'?'循环内部起点':data.kind==='repeat'?'继续循环':'循环内部出口'}>
-  {data.kind==='entry'?<><span>▶</span><Handle type="source" position={Position.Right} id="out"/></>:<><Handle type="target" position={Position.Left} id="in"/><span>{data.kind==='repeat'?'↻':'↗'}</span>{data.kind==='repeat'&&<small className="repeat-label">继续循环</small>}</>}
+  {data.kind==='entry'?<><span>▶</span><Handle type="source" position={Position.Right} id="out"/></>:<><Handle type="target" position={Position.Left} id="in"/><span>{data.kind==='repeat'?'↻':'↗'}</span></>}
  </div>
 }
 const nodeTypes={loopPortal:LoopPortal,...Object.fromEntries(Object.keys(NODE_CONFIG).map(t=>[t,BehaviorNode])),start:StartNode,loopScope:ScopeNode}
