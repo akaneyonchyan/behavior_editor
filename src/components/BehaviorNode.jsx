@@ -34,7 +34,7 @@ export default function BehaviorNode({ id, data, type, selected }) {
         {type === 'wait' && <Row label="执行" value="原地稍息，随后进入后续节点" />}
         {type === 'judge' && <Row label="分支" value={(data.branches?.length || 0) + ' 条 · 根据规则选择'} />}
         {type === 'result' && <><Row label="表演" value={data.animation} /><div className="summary-row"><span>播放方式</span><div><ChoiceText value={data.playMode??'单次'} options={PLAY_MODES}/>{data.playMode!=='单次'&&data.playExpectation?' · '+data.playExpectation:''}</div></div><OutputSection title="属性">{[...resultRules(data,'attribute').filter(r=>r.attribute?.trim()).map(r=><RuleText rule={r} influences={CHANGES}/>),...(data.attributeChanges||[]).filter(text=>text.trim()).map(text=><span className="custom-choice">{text}</span>)]}</OutputSection><OutputSection title="Buff">{resultRules(data,'buff').filter(r=>r.attribute?.trim()).map(r=><RuleText rule={r} kind="buff" influences={CHANGES}/>)}</OutputSection><OutputSection title="产物">{(data.outputs||[]).filter(o=>format(o).trim()).map(o=><ChoiceText value={format(o)} options={[]}/>)}</OutputSection></>}
-        {type === 'loop' && <Row label="判定顺序" value={['目标达成',...(data.admissionEnabled!==false?['准入']:[]),...(data.restEnabled!==false?['稍息']:[])].join(' → ')} />}
+        {type === 'loop' && data.loopVersion!==3 && <Row label="旧版判定" value={['目标达成',...(data.admissionEnabled!==false?['准入']:[]),...(data.restEnabled!==false?['稍息']:[])].join(' → ')} />}
         {type === 'end' && (isLegacyEnd(data)?<><Row label="旧完成表演" value={data.successAnimation}/><Row label="旧中断表演" value={data.failAnimation}/><Row label="待处理" value="选中后拆分为两个结束节点并确认入线"/></>:<><Row label="表演" value={data.animation} /><div className="summary-row"><span>播放方式</span><div><ChoiceText value={data.playMode??'单次'} options={PLAY_MODES}/>{data.playMode!=='单次'&&data.playExpectation?' · '+data.playExpectation:''}</div></div><ReleaseSummary id={id}/></>)}
       </div>
     </div>
@@ -43,7 +43,7 @@ export default function BehaviorNode({ id, data, type, selected }) {
       {branchFactors(branch,judgeAttributes(data)).map((factor,i) => <small key={factor.id||i} className="factor-summary">{i+1}. <RuleText rule={factor} influences={EFFECTS}/></small>)}
       <BranchPort data={data} handle={branch.id} className="node-handle branch-handle"/>
     </div>)}</div>}
-    {type === 'result' && <div className="node-branch"><BranchPort data={data} className="node-handle branch-handle"/></div>}
+    {type === 'result' && (data.externalExits?.some(e=>!e.handle)?<div className="execution-exit"><BranchPort data={data}/></div>:<BranchPort data={data}/>)}
     {type === 'loop' && <LoopNodeStages id={id} data={data}/>}
     {type === 'move' && <div className="node-branches"><div className="node-branch">目的地可达<Handle type="source" position={Position.Right} className="node-handle branch-handle" /></div><div className="node-branch">目的地不可达<Handle type="source" position={Position.Right} id="unreachable" className="node-handle branch-handle" /></div></div>}
     {type !== 'result' && type !== 'move' && type !== 'judge' && type !== 'end' && type !== 'loop' && <Handle type="source" position={Position.Right} className="node-handle" />}

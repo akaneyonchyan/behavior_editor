@@ -1,4 +1,4 @@
-﻿.behavior-node { width: 280px; background: #20252d; border: 1px solid #404752; border-radius: 14px; color: #e5e7eb; box-shadow: 0 5px 18px #0003; }
+.behavior-node { width: 280px; background: #20252d; border: 1px solid #404752; border-radius: 14px; color: #e5e7eb; box-shadow: 0 5px 18px #0003; }
 .behavior-node:hover { border-color: var(--node-color); }
 .behavior-node.selected { border-color: var(--node-color); box-shadow: 0 0 0 3px color-mix(in srgb, var(--node-color) 25%, transparent); }
 .node-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: var(--node-color); border-bottom: 1px solid #ffffff0d; font-size: 12px; }
@@ -30,3 +30,5 @@
 .external-exit { display:block; color:var(--node-color); font-size:12px; font-weight:600; padding:3px 0; overflow-wrap:anywhere; }
 .external-exit small { display:block; font-weight:400; white-space:pre-wrap; }
 .branch-destination select, .branch-destination input { margin-bottom:6px; }
+.behavior-node { position:relative; }
+.execution-exit { padding:0 14px 12px; }

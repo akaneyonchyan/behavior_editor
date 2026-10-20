@@ -70,20 +70,14 @@ export const NODE_CONFIG = {
     label: '循环',
     color: '#F472B6',
     icon: '↻',
-    description: '先判定目标、准入与稍息，再进入循环体',
+    description: '按最大次数或目标满足情况重复执行内部节点',
     defaultData: {
-      loopVersion: 2,
+      loopVersion: 3,
+      loopMode: 'goal',
+      maxIterations: '',
       checkTiming: 'before',
       completionCondition: '',
       completionRules: [],
-      resourceCheck: '',
-      resourceRules: [],
-      failureReason: '',
-      admissionEnabled: true,
-      restEnabled: true,
-      restExpectation: '待定',
-      restCondition: '',
-      restRules: []
     }
   },
   [NODE_TYPES.END]: {
