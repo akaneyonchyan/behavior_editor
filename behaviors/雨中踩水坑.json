@@ -213,7 +213,7 @@
         "type": "loop",
         "data": {
           "name": "玩够了吗",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "娱乐需求已满足（玩够了）",
           "completionRules": [
             {
@@ -223,20 +223,93 @@
               "influence": "较高时"
             }
           ],
-          "resourceCheck": "仍在下雨，水坑还在",
-          "resourceRules": [
-            {
-              "id": "loop_res_weather",
-              "source": "object:environmen",
-              "attribute": "weather",
-              "influence": "处于指定状态时：小雨或大雨"
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "玩够了吗",
+              "loopVersion": 2,
+              "completionCondition": "娱乐需求已满足（玩够了）",
+              "completionRules": [
+                {
+                  "id": "loop_done_leisure",
+                  "source": "object:partner",
+                  "attribute": "leisure",
+                  "influence": "较高时"
+                }
+              ],
+              "resourceCheck": "仍在下雨，水坑还在",
+              "resourceRules": [
+                {
+                  "id": "loop_res_weather",
+                  "source": "object:environmen",
+                  "attribute": "weather",
+                  "influence": "处于指定状态时：小雨或大雨"
+                }
+              ],
+              "failureReason": "雨停了，或水坑消失",
+              "restEnabled": false,
+              "restExpectation": "",
+              "restCondition": "",
+              "restRules": []
+            },
+            "edges": [
+              {
+                "id": "4a8eba47-f409-4da4-8253-f4e9a22fc554",
+                "source": "result_splash_face",
+                "target": "loop_play"
+              },
+              {
+                "id": "979e94f3-c248-4fe5-a249-82db15c66fd4",
+                "source": "result_stomp",
+                "target": "loop_play"
+              },
+              {
+                "id": "50085c49-4479-4b9c-990d-bce1dd7d98b9",
+                "source": "loop_play",
+                "target": "end_satisfied",
+                "sourceHandle": "complete"
+              },
+              {
+                "id": "c478e19e-e89b-48ad-b5dd-696e9bd0a06c",
+                "source": "loop_play",
+                "target": "end_rain_stopped",
+                "sourceHandle": "insufficient"
+              },
+              {
+                "id": "d8763a38-a9e6-46dd-8f1d-18ec0f33964a",
+                "source": "loop_play",
+                "target": "judge_stomp",
+                "sourceHandle": "continue"
+              }
+            ],
+            "scope": {
+              "loopId": "loop_play",
+              "entry": "judge_stomp",
+              "members": [
+                "judge_stomp",
+                "result_splash_face",
+                "result_stomp"
+              ]
             }
-          ],
-          "failureReason": "雨停了，或水坑消失",
-          "restEnabled": false,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": []
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "娱乐需求已满足（玩够了）",
+              "rules": [
+                {
+                  "id": "loop_done_leisure",
+                  "source": "object:partner",
+                  "attribute": "leisure",
+                  "influence": "较高时"
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 1746.5091523973788,
@@ -270,6 +343,68 @@
           "x": 2091.705584505878,
           "y": 531.1085090467927
         }
+      },
+      {
+        "id": "loop_play_admission",
+        "type": "judge",
+        "position": {
+          "x": 2106.509152397379,
+          "y": 151.19727038874998
+        },
+        "data": {
+          "name": "准入判断",
+          "description": "仍在下雨，水坑还在\n不满足原因：雨停了，或水坑消失",
+          "judgeAttributes": [
+            {
+              "id": "admission_0",
+              "source": "object:environmen",
+              "attribute": "weather"
+            }
+          ],
+          "branches": [
+            {
+              "id": "admission_0",
+              "name": "满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": [
+                {
+                  "id": "admission_0",
+                  "source": "object:environmen",
+                  "attribute": "weather",
+                  "influence": "满足条件：处于指定状态时：小雨或大雨",
+                  "attributeId": "admission_0"
+                }
+              ]
+            },
+            {
+              "id": "admission_1",
+              "name": "不满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": [
+                {
+                  "id": "admission_0",
+                  "source": "object:environmen",
+                  "attribute": "weather",
+                  "influence": "不满足条件：处于指定状态时：小雨或大雨",
+                  "attributeId": "admission_0"
+                }
+              ]
+            }
+          ],
+          "legacyGate": {
+            "kind": "admission",
+            "condition": "仍在下雨，水坑还在\n不满足原因：雨停了，或水坑消失",
+            "rules": [
+              {
+                "id": "loop_res_weather",
+                "source": "object:environmen",
+                "attribute": "weather",
+                "influence": "处于指定状态时：小雨或大雨"
+              }
+            ],
+            "failureReason": "雨停了，或水坑消失"
+          }
+        }
       }
     ],
     "edges": [
@@ -286,7 +421,7 @@
       {
         "id": "d6ba0b9d-e104-4e0a-b746-78a6f06e1777",
         "source": "result_jump_in",
-        "target": "judge_stomp"
+        "target": "loop_play"
       },
       {
         "id": "ab5902e4-b6b4-44e9-abcb-b944d81d2d27",
@@ -317,15 +452,9 @@
         "sourceHandle": "complete"
       },
       {
-        "id": "c478e19e-e89b-48ad-b5dd-696e9bd0a06c",
-        "source": "loop_play",
-        "target": "end_rain_stopped",
-        "sourceHandle": "insufficient"
-      },
-      {
         "id": "d8763a38-a9e6-46dd-8f1d-18ec0f33964a",
         "source": "loop_play",
-        "target": "judge_stomp",
+        "target": "loop_play_admission",
         "sourceHandle": "continue"
       },
       {
@@ -334,8 +463,36 @@
         "target": "end_rain_stopped",
         "sourceHandle": "unreachable",
         "targetHandle": null
+      },
+      {
+        "id": "loop_play_admission:admission_0",
+        "source": "loop_play_admission",
+        "sourceHandle": "admission_0",
+        "target": "judge_stomp"
+      },
+      {
+        "id": "loop_play_admission:admission_1",
+        "source": "loop_play_admission",
+        "sourceHandle": "admission_1",
+        "target": "end_rain_stopped"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "loop_play",
+          "entry": "loop_play_admission",
+          "members": [
+            "judge_stomp",
+            "result_splash_face",
+            "result_stomp",
+            "loop_play_admission"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
 
