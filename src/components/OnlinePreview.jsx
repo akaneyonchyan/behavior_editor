@@ -1,6 +1,7 @@
 import StructuredCanvas from './StructuredCanvas'
 import CanvasViewTabs from './CanvasViewTabs'
 import {useCanvasView} from '../store/canvasView'
+import {normalizeBehavior} from '../utils/normalizeBehavior'
 import React,{useEffect,useMemo,useState} from 'react'
 import ReactFlow,{Background,Controls,MiniMap,MarkerType,applyNodeChanges} from 'reactflow'
 import {GraphDisplayContext} from '../store/graphDisplay'
@@ -21,7 +22,7 @@ export default function OnlinePreview({file}){
   window.addEventListener('keydown',key,true);return()=>window.removeEventListener('keydown',key,true)
  },[])
  const initial=useMemo(()=>{
-  const c=structuredClone(file.config)
+  const c=normalizeBehavior(file.config)
   return {...ensureStart(c.graph.nodes.map((n,i)=>({...n,position:n.position||{x:i*380,y:0},selected:false})),c.graph.edges.map((e,i)=>({...e,id:'preview_'+i,type:'default'}))),layout:c.graph.layout,behaviorInfo:normalizeMetadata(c.behavior)}
  },[file])
  const [nodes,setNodes]=useState(initial.nodes),setSelected=useFileView(s=>s.selectOnline)

@@ -1,22 +1,16 @@
-
 const {test,expect}=require('@playwright/test')
-test('admission and rest switches retain edges and show exactly one continue output',async({page})=>{
+test('admission and rest are ordinary internal judgments, including disabled-stage preservation',async({page})=>{
  await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
- await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const {blankTemplate}=await import('/tests/fixtures/legacyTemplate.js');g.getState().importConfig(blankTemplate());g.getState().setBranchDestination('template_loop','insufficient','node','template_end');g.getState().selectNode(g.getState().nodes.find(n=>n.id==='template_loop'))})
- await page.getByText('旧版兼容配置（迁移前核对）',{exact:true}).click()
- const node=page.locator('[data-id=template_loop]')
- const edges=()=>page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return g.getState().edges})
- const before=await edges()
- await page.getByLabel('准入条件检查',{exact:true}).fill('自定义准入条件')
  for(const admission of [false,true])for(const rest of [false,true]){
-  await page.getByRole('checkbox',{name:'启用准入检查'}).setChecked(admission)
-  await page.getByRole('checkbox',{name:'启用稍息判定'}).setChecked(rest)
-  await expect(node.locator('[data-handleid=insufficient]')).toHaveCount(admission?1:0)
-  await expect(node.locator('[data-handleid=rest]')).toHaveCount(rest?1:0)
-  await expect(node.locator('[data-handleid=continue]')).toHaveCount(1)
-  expect(await edges()).toEqual(before)
-  const failure=before.find(e=>e.source==='template_loop'&&e.sourceHandle==='insufficient')
-  await expect(page.getByTestId('rf__edge-'+failure.id)).toHaveCount(admission?1:0)
+  await page.evaluate(async({admission,rest})=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const {blankTemplate}=await import('/tests/fixtures/legacyTemplate.js');const f=blankTemplate(),d=f.graph.nodes.find(n=>n.type==='loop').data;Object.assign(d,{admissionEnabled:admission,restEnabled:rest,resourceCheck:'自定义准入条件',restCondition:'自定义稍息条件'});g.getState().importConfig(f);g.getState().selectNode(g.getState().nodes.find(n=>n.id==='template_loop'))},{admission,rest})
+  await expect(page.getByLabel('循环执行条件',{exact:true})).toBeVisible()
+  await expect(page.getByLabel('启用准入检查')).toHaveCount(0)
+  await expect(page.getByLabel('启用稍息判定')).toHaveCount(0)
+  await expect(page.locator('[data-id=template_loop_admission]')).toHaveCount(admission?1:0)
+  await expect(page.locator('[data-id=template_loop_rest]')).toHaveCount(rest?1:0)
+  if(admission)await expect(page.locator('[data-id=template_loop_admission]')).toContainText('自定义准入条件')
+  if(rest)await expect(page.locator('[data-id=template_loop_rest]')).toContainText('自定义稍息条件')
+  const data=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return g.getState().nodes.find(n=>n.type==='loop').data})
+  expect(data.legacyLoopLogic.data.resourceCheck).toBe('自定义准入条件')
  }
- await expect(page.getByLabel('准入条件检查',{exact:true})).toHaveValue('自定义准入条件')
 })

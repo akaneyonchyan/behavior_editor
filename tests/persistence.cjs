@@ -33,9 +33,9 @@ async function main() {
   assert.equal(s().dirty, true)
   a.flushDraft()
   const key = localStorage.getItem('pps-behavior-v2:latest')
-  assert.equal(JSON.parse(localStorage.getItem(key)).config.graph.nodes.length, a.example.graph.nodes.length+1)
+  assert.equal(JSON.parse(localStorage.getItem(key)).config.graph.nodes.length, a.example.graph.nodes.length+3)
   const leave = new Event('beforeunload', {cancelable:true}); window.dispatchEvent(leave); assert.equal(leave.defaultPrevented,true)
-  window.confirm = () => false; a.newDocument(); assert.equal(a.graph.getState().nodes.length,a.example.graph.nodes.length+1)
+  window.confirm = () => false; a.newDocument(); assert.equal(a.graph.getState().nodes.length,a.example.graph.nodes.length+3)
   window.confirm = () => true
   const formal = handle('formal.json'); window.showSaveFilePicker = async () => formal
   assert.equal(await a.saveDocument(), true); assert.equal(s().dirty,false)
@@ -71,8 +71,8 @@ async function main() {
   assert.equal(b.useDocumentSession.getState().firstRun,false)
   const restoredKey = localStorage.getItem('pps-behavior-v2:latest'); assert.notEqual(restoredKey,key)
   b.newDocument(); assert.equal(b.graph.getState().nodes.length,7); assert.equal(b.graph.getState().edges.length,8); assert.equal(b.useDocumentSession.getState().dirty,false)
-  const previous = b.recoveryDrafts().find(d=>d.config.graph.nodes.length===a.example.graph.nodes.length+1)
-  assert.ok(previous); b.recoverDraft(previous); assert.equal(b.graph.getState().nodes.length,a.example.graph.nodes.length+1)
+  const previous = b.recoveryDrafts().find(d=>d.config.graph.nodes.length===a.example.graph.nodes.length+3)
+  assert.ok(previous); b.recoverDraft(previous); assert.equal(b.graph.getState().nodes.length,a.example.graph.nodes.length+3)
   await b.openFallback({name:'bom.json',text:async()=>String.fromCharCode(0xfeff)+JSON.stringify(b.example)})
   assert.equal(b.useDocumentSession.getState().dirty,false)
   b.graph.getState().updateNode('move_1',{destination:'quota test'})

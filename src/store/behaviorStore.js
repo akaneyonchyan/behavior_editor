@@ -1,5 +1,6 @@
 import {checkScope,convertToPrecheck} from '../utils/loopStructure'
 import {separateLoopLogic} from '../utils/loopMigration'
+import {normalizeBehavior,containerTarget} from '../utils/normalizeBehavior'
 import {externalExit, exitEnabled, clearExit, portKey, bypassLegacyMove} from '../utils/externalExits'
 import { create } from 'zustand'
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow'
@@ -33,6 +34,7 @@ export const useBehaviorStore = create((set, get) => {
     },
     setBranchDestination: (id,handle,mode,target,note) => {
       const s=get(),node=s.nodes.find(n=>n.id===id)
+      if(target)target=containerTarget(s.layout?.scopes,id,target,handle)
       if(!exitEnabled(node,handle)||!['external','node'].includes(mode))return
       if(mode==='node'&&target&&(!s.nodes.some(n=>n.id===target&&n.type!=='start')||(node.type==='loop'&&target===id)))return
       const data=clearExit(node.data,handle)
@@ -54,8 +56,10 @@ export const useBehaviorStore = create((set, get) => {
       commit({...patch,selectedNode:patch.nodes.find(n=>n.id===id),documentRevision:s.documentRevision+1})
     },
     confirmLoopScope: (scope,precheck=true) => {
-      const s=get();checkScope(s.nodes,s.edges,scope)
-      const patch=precheck?convertToPrecheck(s.nodes,s.edges,scope):{nodes:s.nodes,edges:s.edges}
+      const s=get(),scopes=[...(s.layout?.scopes||[]).filter(x=>x.loopId!==scope.loopId),scope]
+      const edges=s.edges.map(e=>({...e,target:containerTarget(scopes,e.source,e.target,e.sourceHandle)}))
+      checkScope(s.nodes,edges,scope)
+      const patch=precheck?convertToPrecheck(s.nodes,edges,scope):{nodes:s.nodes,edges}
       const layout={version:1,scopes:[...(s.layout?.scopes||[]).filter(x=>x.loopId!==scope.loopId),clone(scope)],positions:{}}
       commit({...patch,layout,selectedNode:patch.nodes.find(n=>n.id===scope.loopId)||null,documentRevision:s.documentRevision+1})
     },
@@ -65,6 +69,7 @@ export const useBehaviorStore = create((set, get) => {
     }),
     changeEdges: changes => set(s => ({ edges: applyEdgeChanges(changes, s.edges) })),
     connect: params => {
+      params={...params,target:containerTarget(get().layout?.scopes,params.source,params.target,params.sourceHandle)}
       const source=get().nodes.find(n=>n.id===params.source)
       if(!source||source.type==='end'||get().nodes.some(n=>n.id===params.target&&n.type==='start'))return
       if(source.type==='start'){
@@ -89,6 +94,7 @@ export const useBehaviorStore = create((set, get) => {
     },
     setLoopTarget: (id,handle,target) => {
       const s=get(),node=s.nodes.find(n=>n.id===id)
+      target=containerTarget(s.layout?.scopes,id,target,handle)
       if(node?.type!=='loop'||!isLoopOutputEnabled(node.data,handle)||target===id||(target&&!s.nodes.some(n=>n.id===target&&n.type!=='start')))return
       if(externalExit(node.data,handle))return
       const existing=s.edges.find(e=>e.source===id&&e.sourceHandle===handle)
@@ -137,6 +143,8 @@ export const useBehaviorStore = create((set, get) => {
       return clone({ behavior: s.behaviorInfo, graph: { ...(s.layout?{layout:s.layout}:{}), nodes: s.nodes.map(({ id, type, data, position }) => ({ id, type, data, position })), edges: s.edges.map(({ id, source, target, sourceHandle, targetHandle }) => ({ id, source, target, sourceHandle, targetHandle })) } })
     },
     importConfig: config => {
+      validateConfig(config, NODE_CONFIG)
+      config=normalizeBehavior(config)
       validateConfig(config, NODE_CONFIG)
       if (!config?.behavior || !Array.isArray(config?.graph?.nodes) || !Array.isArray(config?.graph?.edges)) throw new Error('缺少行为或行为设计节点数据')
       const ids = new Set()
