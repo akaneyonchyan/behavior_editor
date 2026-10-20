@@ -11,7 +11,7 @@ import CanvasViewTabs from './CanvasViewTabs'
 import {GraphDisplayContext} from '../store/graphDisplay'
 import {openDroppedFiles} from '../store/documentSession'
 import './StructuredCanvas.css'
-import {LoopConditionSummary,LoopConditionsEditor} from './LoopEditor'
+import {LoopConditionSummary} from './LoopEditor'
 import {externalExit} from '../utils/externalExits'
 
 
@@ -22,7 +22,7 @@ function ScopeNode({id,data}){
  return <div className={'loop-scope '+(collapsed?'collapsed':'')} style={{'--node-color':NODE_CONFIG.loop.color}}>
   <header ref={header}><button className="nodrag scope-title" onClick={()=>data.select(node)}>{node.data.name||'循环'} · 先判定，再执行</button>
    <button className="nodrag scope-toggle" data-export-ignore="true" aria-label={(collapsed?'展开':'折叠')+'循环 '+scope.loopId} onClick={()=>data.toggle(scope.loopId)}>{collapsed?'展开':'折叠'}</button>
-   {data.readOnly?<LoopConditionSummary data={node.data}/>:<LoopConditionsEditor node={node} compact onUpdate={data.update}/>}
+   <LoopConditionSummary data={node.data}/>
    <small>{data.count} 个内部节点{data.exits?' · 含 '+data.exits+' 处跳出行为':''}</small>
    <div className="scope-flow-note">{collapsed?'内部节点已折叠':'内部流程完成一轮后自动重新判定，无需回线'}</div>
   </header>

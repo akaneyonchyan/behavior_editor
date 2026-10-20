@@ -37,7 +37,7 @@ test('ordered OR conditions can be edited in sidebar, reordered and reflected on
  await page.locator('.scope-title').click();const panel=page.locator('.property-panel'),header=page.locator('.loop-scope')
  await expect(panel.getByLabel('结束条件 1 类型',{exact:true})).toHaveValue('goal');await expect(panel.getByLabel('结束条件 2 类型',{exact:true})).toHaveValue('count')
  await panel.getByLabel('结束条件 2 最大次数',{exact:true}).fill('最多三轮')
- await expect(header.getByLabel('结束条件 2 最大次数',{exact:true})).toHaveValue('最多三轮')
+ await expect(header).toContainText('达到最大次数 · 最多三轮');await expect(header.locator('input,select,textarea')).toHaveCount(0)
  await panel.getByRole('button',{name:'+ 添加规则',exact:true}).click()
  await panel.getByRole('combobox',{name:'属性来源',exact:true}).fill('自定义来源')
  await panel.getByRole('combobox',{name:'属性名',exact:true}).fill('自定义属性')
