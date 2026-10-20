@@ -1,0 +1,388 @@
+{
+  "behavior": {
+    "name": "用扳手维修不可移动交互物",
+    "description": "要求扳手已装备、目标为支持扳手维修且不可移动的交互物；目标提升交互物耐久度。普通维修提高耐久，循环至本次目标达成。意外仅在本轮维修前耐久度为0时可能发生：错误维修使耐久保持0且伙伴清洁度归零。本稿建议该意外结束本次维修，进入中断收尾。完成与中断分别配置普通结束节点；外部监听可调用中断收尾，不设外部中断判断分支。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "repair_goal",
+        "source": "object:interactObject",
+        "objectName": "目标交互物",
+        "attribute": "durability",
+        "influence": "增加"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "fixed_target",
+          "objectType": "interactObject",
+          "objectName": "不可移动的目标交互物"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "equipped_wrench",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot",
+          "influence": "有扳手"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜持扳手原地维修",
+          "description": "目标必须为不可移动且支持扳手维修的交互物，由上游选定并校验；不新增可移动属性。目标值来自上游，不默认修满。"
+        },
+        "position": {
+          "x": 292.2057981271506,
+          "y": 2.664001374382565
+        }
+      },
+      {
+        "id": "move_target",
+        "type": "move",
+        "data": {
+          "name": "位移到交互物交互点位",
+          "destinationType": "interactObject",
+          "objectType": "interactObject",
+          "objectName": "不可移动的目标交互物",
+          "destination": "目标交互物的维修交互点",
+          "description": "伙伴前往现场维修，交互物不搬运。",
+          "occupiedResources": [
+            {
+              "id": "repair_point",
+              "source": "object:interactObject",
+              "objectName": "目标交互物",
+              "attribute": "interaction_point_occupied"
+            }
+          ]
+        },
+        "position": {
+          "x": 602.7498718229629,
+          "y": 28.183637673944702
+        }
+      },
+      {
+        "id": "repair_attempt",
+        "type": "result",
+        "data": {
+          "name": "开始维修",
+          "animation": "俯身观察连接处，将已装备的扳手卡住可维修部件，另一只手扶稳，用扳手拧动一轮；具体正误由随后结果表现。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 925.3742723166499,
+          "y": 17.87204773770884
+        }
+      },
+      {
+        "id": "repair_outcome",
+        "type": "judge",
+        "data": {
+          "name": "本轮维修判定",
+          "description": "先判断意外是否可发生，再选择结果。意外只在本轮开始耐久为0且资产支持污物喷溅/崩散表现时可选；正耐久目标排除该分支。概率为定性建议。",
+          "judgeAttributes": [
+            {
+              "id": "bc803cce-fde6-4018-a62e-c4a7faa4aea1",
+              "source": "object:partner",
+              "attribute": "trait_ability_dexterous",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            },
+            {
+              "id": "e2914795-a03b-4d16-a91d-a7aea67d3d73",
+              "source": "object:partner",
+              "attribute": "personality_rigorous",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "branches": [
+            {
+              "id": "normal",
+              "name": "正确维修",
+              "condition": "符合维修条件；若意外不适用则走此分支",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "bc803cce-fde6-4018-a62e-c4a7faa4aea1",
+                  "attributeId": "bc803cce-fde6-4018-a62e-c4a7faa4aea1",
+                  "source": "object:partner",
+                  "attribute": "trait_ability_dexterous",
+                  "influence": "指定值，概率提高",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                },
+                {
+                  "version": 2,
+                  "id": "e2914795-a03b-4d16-a91d-a7aea67d3d73",
+                  "attributeId": "e2914795-a03b-4d16-a91d-a7aea67d3d73",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "指定值，概率提高",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "repair_normal"
+            },
+            {
+              "id": "mistake",
+              "name": "错误维修｜仍为0耐久且伙伴清洁度归零",
+              "condition": "本轮尝试前目标耐久度=0，且资产支持维修污物喷溅表现；否则排除",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "bc803cce-fde6-4018-a62e-c4a7faa4aea1",
+                  "attributeId": "bc803cce-fde6-4018-a62e-c4a7faa4aea1",
+                  "source": "object:partner",
+                  "attribute": "trait_ability_dexterous",
+                  "influence": "指定值，概率降低",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                },
+                {
+                  "version": 2,
+                  "id": "e2914795-a03b-4d16-a91d-a7aea67d3d73",
+                  "attributeId": "e2914795-a03b-4d16-a91d-a7aea67d3d73",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "指定值，概率降低",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "repair_mistake"
+            }
+          ]
+        },
+        "position": {
+          "x": 1256.1360310941036,
+          "y": -93.08205126600834
+        }
+      },
+      {
+        "id": "repair_normal",
+        "type": "result",
+        "data": {
+          "name": "修好一部分",
+          "animation": "拧一拧扳手，将部件拧到正确位置，轻轻检查连接处，确认固定后收起扳手，摸摸交互物检查状态。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "durability_up",
+              "kind": "attribute",
+              "source": "object:interactObject",
+              "objectName": "目标交互物",
+              "attribute": "durability",
+              "influence": "增"
+            }
+          ],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 1635.3703340379013,
+          "y": -170.4304360795508
+        }
+      },
+      {
+        "id": "repair_mistake",
+        "type": "result",
+        "data": {
+          "name": "拧错位置｜污物喷了一身",
+          "animation": "扳手拧错位置，维修处积存的污物突然喷溅或崩散，沾满伙伴脸部和身体；伙伴缩肩闭眼、吓一大跳。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "durability_stays_zero",
+              "kind": "attribute",
+              "source": "object:interactObject",
+              "objectName": "目标交互物",
+              "attribute": "durability",
+              "influence": "减"
+            },
+            {
+              "id": "partner_cleanliness_zero",
+              "kind": "attribute",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "cleanliness",
+              "influence": "归零"
+            },
+            {
+              "id": "904aa593-1176-4794-9692-ff5ae92c64bf",
+              "source": "object:partner",
+              "attribute": "buff:emotion_anger",
+              "influence": "增",
+              "kind": "buff"
+            }
+          ],
+          "outputs": [],
+          "description": "错误分支整轮不结算正常维修收益。保持0和归零是自定义精确结果语义，不等同普通减值；不得假称编辑器提供运行时赋值实现。"
+        },
+        "position": {
+          "x": 1636.3825721250828,
+          "y": 148.6724813447234
+        }
+      },
+      {
+        "id": "repair_loop",
+        "type": "loop",
+        "data": {
+          "name": "是否完成本次维修目标",
+          "loopVersion": 2,
+          "completionCondition": "目标交互物耐久度满足本次上游目标期望",
+          "completionRules": [
+            {
+              "id": "durability_met",
+              "source": "object:interactObject",
+              "objectName": "目标交互物",
+              "attribute": "durability",
+              "influence": "达到本次目标期望"
+            }
+          ],
+          "resourceCheck": "本稿未新增材料消耗，工具与目标可用性由准入及外部监听维护。",
+          "resourceRules": [],
+          "failureReason": "",
+          "restEnabled": true,
+          "restExpectation": "",
+          "restCondition": "",
+          "restRules": [],
+          "description": "正常维修后汇入；目标未达成继续检查和拧紧。暂不启用稍息。"
+        },
+        "position": {
+          "x": 2018.7178526372668,
+          "y": -165.44665996359169
+        }
+      },
+      {
+        "id": "end_complete",
+        "type": "end",
+        "data": {
+          "name": "完成｜检查后满意收尾",
+          "animation": "扫视修好的部件，轻轻点头，放松身体并垂下持扳手的手。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "目标已达成，扳手继续装备；不重复结算耐久。"
+        },
+        "position": {
+          "x": 2355.640317178736,
+          "y": -166.24056250346405
+        }
+      },
+      {
+        "id": "end_interrupted",
+        "type": "end",
+        "data": {
+          "name": "中断本次维修",
+          "animation": "停止拧动，垂下持扳手的手，后退一步，泄气地看向交互物。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 2356.9580437902428,
+          "y": 148.8274845679748
+        }
+      },
+      {
+        "id": "wait_1792401413597",
+        "type": "wait",
+        "data": {
+          "name": "待机节点"
+        },
+        "position": {
+          "x": 2358.8401617119516,
+          "y": 399.97015726035283
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "1ac875c1-a390-40ca-9dd5-675b80c1df8a",
+        "source": "start",
+        "target": "move_target"
+      },
+      {
+        "id": "3b1036aa-40b3-4276-b1c8-e6edf16308a7",
+        "source": "move_target",
+        "target": "repair_attempt"
+      },
+      {
+        "id": "de633f75-d552-4b6c-a330-cc9bb57c79bd",
+        "source": "repair_attempt",
+        "target": "repair_outcome"
+      },
+      {
+        "id": "3fca0dba-2596-4b68-bc33-488ab0e80ac6",
+        "source": "repair_outcome",
+        "target": "repair_normal",
+        "sourceHandle": "normal"
+      },
+      {
+        "id": "088ee262-9981-41b9-bea6-6bc0838539a8",
+        "source": "repair_outcome",
+        "target": "repair_mistake",
+        "sourceHandle": "mistake"
+      },
+      {
+        "id": "6ee59318-133e-4cac-b063-979f9dbc1e9b",
+        "source": "repair_normal",
+        "target": "repair_loop"
+      },
+      {
+        "id": "9abb45de-0fbc-4f12-9c41-8e40c1d29b58",
+        "source": "repair_loop",
+        "target": "end_complete",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "fc49f951-f99d-47cd-9722-b995625f21e8",
+        "source": "repair_loop",
+        "target": "end_interrupted",
+        "sourceHandle": "insufficient"
+      },
+      {
+        "id": "eaf56cb6-33a7-4857-a13c-c207f485f517",
+        "source": "repair_mistake",
+        "target": "repair_loop",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "7b0b9f42-9ead-4414-bac5-eaa9b930161a",
+        "source": "repair_loop",
+        "target": "wait_1792401413597",
+        "sourceHandle": "rest"
+      },
+      {
+        "id": "043520df-e894-429b-83b1-5270a9725ea2",
+        "source": "repair_loop",
+        "target": "repair_outcome",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "07bb7c63-c46b-43b5-86c7-0ae80aaa5764",
+        "source": "move_target",
+        "target": "end_interrupted",
+        "sourceHandle": "unreachable",
+        "targetHandle": null
+      }
+    ]
+  }
+}

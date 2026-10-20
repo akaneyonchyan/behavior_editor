@@ -1,0 +1,323 @@
+{
+  "behavior": {
+    "name": "向任意伙伴炫耀装备物",
+    "description": "监听到本行为伙伴拥有炫耀Buff时触发，目标消除该伙伴的炫耀Buff。每轮重新找视野内任意其他伙伴，展示本次装备物，完整炫耀后高概率移除Buff、低概率保留。Buff仍在则重选伙伴继续，直到Buff消除或无人可选。外部行为打断由监听直接调用中断收尾，不设置外部中断判断分支。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "remove_showoff_goal",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "buff:buff_showoff",
+        "influence": "消除【炫耀】Buff"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "audience",
+          "objectType": "partner",
+          "objectName": "视野内任意其他伙伴（每轮重新选取）"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "has_showoff",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "buff:buff_showoff",
+          "influence": "具有指定 Buff 时"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜监听到炫耀Buff",
+          "description": "炫耀本次上下文指定的装备物，循环只重新选择听众，不更换装备物；不设炫耀对象类型分支。"
+        },
+        "position": {
+          "x": 786.0061208280313,
+          "y": 553.9310377387205
+        }
+      },
+      {
+        "id": "showoff_loop",
+        "type": "loop",
+        "data": {
+          "name": "检查Buff与下一名伙伴",
+          "loopVersion": 2,
+          "completionCondition": "本行为伙伴已没有【炫耀】Buff",
+          "completionRules": [
+            {
+              "id": "buff_absent",
+              "source": "object:partner",
+              "objectName": "本行为伙伴",
+              "attribute": "buff:buff_showoff",
+              "influence": "不具有指定 Buff 时"
+            }
+          ],
+          "resourceCheck": "Buff仍存在时，每轮重新查找视野内任意其他伙伴，不沿用旧锁定。排除自身；优先不同于上一轮，不增加全程去重名单。找到并锁定可进行展示的伙伴则继续；视野内找不到可选伙伴则中断。",
+          "resourceRules": [],
+          "failureReason": "本行为伙伴仍有炫耀Buff，但视野内找不到可选伙伴",
+          "restEnabled": false,
+          "restExpectation": "",
+          "restCondition": "",
+          "restRules": [],
+          "description": "首次进入也做此检查。严格先判断Buff已消除，再判断有没有下一名伙伴。无听众时保留Buff并结束本次行为，不无限原地搜索。重选听众属于本行为循环的必要差异。"
+        },
+        "position": {
+          "x": 2461.8851729880057,
+          "y": 453.5337453027254
+        }
+      },
+      {
+        "id": "move_audience",
+        "type": "move",
+        "data": {
+          "name": "靠近本轮选中的伙伴",
+          "destinationType": "interactObject",
+          "objectType": "partner",
+          "objectName": "本轮选中的伙伴",
+          "destination": "本轮伙伴身旁适合展示的位置",
+          "description": "目标已由本轮循环查找锁定，靠近听众并面向对方站稳，准备展示装备物。",
+          "occupiedResources": [
+            {
+              "id": "1b8bc171-370c-4f64-9c3c-60c28ba1a888",
+              "source": "object:partner",
+              "attribute": "",
+              "objectName": "item:partner/reczz28PAw0ujgFF"
+            }
+          ]
+        },
+        "position": {
+          "x": 1114.1845062374232,
+          "y": 598.076641642111
+        }
+      },
+      {
+        "id": "show_equipment",
+        "type": "result",
+        "data": {
+          "name": "炫耀手中的装备物",
+          "animation": "挺起胸膛，朝听众高高举起装备物；摆出得意姿势，调整展示角度，再抬下巴等待对方注意，完成一轮炫耀。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": "此节点仅表演，不移除Buff。"
+        },
+        "position": {
+          "x": 1454.7928172728095,
+          "y": 573.8200205924719
+        }
+      },
+      {
+        "id": "satisfaction",
+        "type": "judge",
+        "data": {
+          "name": "炫耀后是否满足",
+          "description": "仅完整完成本轮炫耀后判定一次。高/低为定性概率，无听众反应条件。",
+          "judgeAttributes": [
+            {
+              "id": "ac947710-c4d5-4e7f-bb62-cccd34467742",
+              "source": "object:partner",
+              "attribute": "personality_passion",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "branches": [
+            {
+              "id": "satisfied",
+              "name": "满足｜消除炫耀Buff",
+              "condition": "本轮炫耀已完整结束",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "ac947710-c4d5-4e7f-bb62-cccd34467742",
+                  "attributeId": "ac947710-c4d5-4e7f-bb62-cccd34467742",
+                  "source": "object:partner",
+                  "attribute": "personality_passion",
+                  "influence": "指定值，概率降低",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "remove_buff"
+            },
+            {
+              "id": "unsatisfied",
+              "name": "还没过瘾｜保留炫耀Buff",
+              "condition": "本轮炫耀已完整结束",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "ac947710-c4d5-4e7f-bb62-cccd34467742",
+                  "attributeId": "ac947710-c4d5-4e7f-bb62-cccd34467742",
+                  "source": "object:partner",
+                  "attribute": "personality_passion",
+                  "influence": "不影响",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "nextNode": "keep_buff"
+            }
+          ]
+        },
+        "position": {
+          "x": 1776.6746333188753,
+          "y": 543.9749328474161
+        }
+      },
+      {
+        "id": "remove_buff",
+        "type": "result",
+        "data": {
+          "name": "心满意足",
+          "animation": "得意地轻轻点头，收住夸张的展示姿势。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "remove_actor_showoff",
+              "kind": "buff",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:buff_showoff",
+              "influence": "减"
+            }
+          ],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 2116.566667327736,
+          "y": 487.16028560429083
+        }
+      },
+      {
+        "id": "keep_buff",
+        "type": "result",
+        "data": {
+          "name": "还想再炫耀",
+          "animation": "展示结束仍意犹未尽，收回展示动作，转头张望周围。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 2118.8854250082986,
+          "y": 811.0985177334613
+        }
+      },
+      {
+        "id": "end_complete",
+        "type": "end",
+        "data": {
+          "name": "完成｜满足收尾",
+          "animation": "舒展肩膀，露出满足的笑容，恢复放松站姿。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "确认本行为伙伴已无炫耀Buff后进入；不重复结算Buff。"
+        },
+        "position": {
+          "x": 2795.790134930027,
+          "y": 646.9783773307619
+        }
+      },
+      {
+        "id": "end_interrupted",
+        "type": "end",
+        "data": {
+          "name": "中断｜收住炫耀动作",
+          "animation": "停止展示，收回指示或炫耀的动作，回正身体，恢复站姿。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "视野内无人可选时进入；外部监听也可在其他行为打断时调用。不额外移除炫耀Buff，保持中断时实际状态。"
+        },
+        "position": {
+          "x": 2798.7917550396037,
+          "y": 982.2274049472736
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "03ba69db-bfc3-44a8-b490-0c1390ef2afc",
+        "source": "showoff_loop",
+        "target": "end_complete",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "e0d5f2fd-efb5-4dc3-9bcb-136fc72b5158",
+        "source": "showoff_loop",
+        "target": "end_interrupted",
+        "sourceHandle": "insufficient"
+      },
+      {
+        "id": "5417555c-7b29-4e03-9e74-f8de097bedda",
+        "source": "showoff_loop",
+        "target": "move_audience",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "661d86c7-4a60-4227-b88c-1fe686472e04",
+        "source": "show_equipment",
+        "target": "satisfaction"
+      },
+      {
+        "id": "e5497951-15d8-43d9-9b0c-b186291a95c6",
+        "source": "satisfaction",
+        "target": "remove_buff",
+        "sourceHandle": "satisfied"
+      },
+      {
+        "id": "ae3611b8-24df-41ff-baca-8e2b6c1f29ee",
+        "source": "satisfaction",
+        "target": "keep_buff",
+        "sourceHandle": "unsatisfied"
+      },
+      {
+        "id": "61256d93-cbea-4f66-8125-850f97d75d76",
+        "source": "remove_buff",
+        "target": "showoff_loop"
+      },
+      {
+        "id": "612c7b72-c96f-4b71-aa36-3be48556513b",
+        "source": "keep_buff",
+        "target": "showoff_loop"
+      },
+      {
+        "id": "22129dca-e938-4bf5-ab1f-9189153718c8",
+        "source": "move_audience",
+        "target": "show_equipment"
+      },
+      {
+        "id": "6f6dc810-c85c-4a54-a05a-ab24cdfedaa7",
+        "source": "start",
+        "target": "move_audience",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "c339456f-b93a-4fc6-aa63-58c121d8a266",
+        "source": "move_audience",
+        "target": "end_interrupted",
+        "sourceHandle": "unreachable",
+        "targetHandle": null
+      }
+    ]
+  }
+}

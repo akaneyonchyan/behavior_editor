@@ -1,0 +1,358 @@
+{
+  "behavior": {
+    "name": "洗手池清洗自己",
+    "description": "位移至已选洗手池，打开水阀，再选择洗手、洗脸或毛巾擦拭。三种动作每完成一轮均增加本行为伙伴清洁度并汇入循环。目标未达成则重新选择清洗动作，不重复位移或开阀；不启用稍息，不展示外部监听中断。完成后关阀收尾。毛巾由洗手池提供为本稿资产假设。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "goal_cleanliness",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "cleanliness",
+        "influence": "增加"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "wash_sink",
+          "objectType": "interactObject",
+          "objectName": "洗手池"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": []
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜清洗自己",
+          "description": "目标期望来自上游目标；不写死清洁度阈值，也不默认洗至上限。准入和选址沿用通用机制。"
+        },
+        "position": {
+          "x": 122.81441388796969,
+          "y": 21.88670714154614
+        }
+      },
+      {
+        "id": "move_sink",
+        "type": "move",
+        "data": {
+          "name": "位移到洗手池",
+          "destinationType": "interactObject",
+          "objectType": "interactObject",
+          "objectName": "洗手池",
+          "destination": "洗手池的清洗交互点",
+          "description": "使用已选洗手池的交互点；占用检查与监听沿用位移通用机制。",
+          "occupiedResources": [
+            {
+              "id": "sink_point",
+              "source": "object:interactObject",
+              "objectName": "洗手池",
+              "attribute": "interaction_point_occupied"
+            }
+          ]
+        },
+        "position": {
+          "x": 443.88013800463216,
+          "y": 18.238922617955097
+        }
+      },
+      {
+        "id": "open_valve",
+        "type": "result",
+        "data": {
+          "name": "打开水阀",
+          "animation": "面向洗手池站稳，伸手握住水阀并转开，确认水流后收手。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 765.5594944689653,
+          "y": 26.151487414528958
+        }
+      },
+      {
+        "id": "choose_wash",
+        "type": "judge",
+        "data": {
+          "name": "选择本轮清洗动作",
+          "description": "每轮重新选择一种动作。三种默认倾向暂均为中，可连续选到相同动作。",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "hands",
+              "name": "洗手",
+              "weightExpectation": "中",
+              "condition": "本版三种动作均可用；等倾向为建议，不绑定个性或其他属性。",
+              "weightFactors": [],
+              "nextNode": "wash_hands"
+            },
+            {
+              "id": "face",
+              "name": "洗脸",
+              "weightExpectation": "中",
+              "condition": "本版三种动作均可用；等倾向为建议，不绑定个性或其他属性。",
+              "weightFactors": [],
+              "nextNode": "wash_face"
+            },
+            {
+              "id": "towel",
+              "name": "毛巾擦拭自己",
+              "weightExpectation": "中",
+              "condition": "本版三种动作均可用；等倾向为建议，不绑定个性或其他属性。",
+              "weightFactors": [],
+              "nextNode": "wash_towel"
+            }
+          ]
+        },
+        "position": {
+          "x": 1100.7722448979591,
+          "y": -79.61387755102032
+        }
+      },
+      {
+        "id": "wash_hands",
+        "type": "result",
+        "data": {
+          "name": "洗手",
+          "animation": "将双手伸到水流下打湿，掌心相对搓洗，再交替揉搓手背，最后冲净并收回双手。完整做完算一轮。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "hands_cleanliness",
+              "kind": "attribute",
+              "source": "object:partner",
+              "objectName": "本行为伙伴",
+              "attribute": "cleanliness",
+              "influence": "增"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 1457.161224489796,
+          "y": -146.65714285714284
+        }
+      },
+      {
+        "id": "wash_face",
+        "type": "result",
+        "data": {
+          "name": "洗脸",
+          "animation": "双手在水流下掬水，低头将水送到脸上，轻轻揉洗脸颊与额头，再掬水冲净，抬头收手。完整做完算一轮。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "face_cleanliness",
+              "kind": "attribute",
+              "source": "object:partner",
+              "objectName": "本行为伙伴",
+              "attribute": "cleanliness",
+              "influence": "增"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 1455.0661224489795,
+          "y": 170.89020408163265
+        }
+      },
+      {
+        "id": "wash_towel",
+        "type": "result",
+        "data": {
+          "name": "毛巾擦拭自己",
+          "animation": "从洗手池配套位置取毛巾，在水流下浸湿并拧至不滴水，依次擦拭脸颊、颈部和手臂，最后将毛巾放回配套位置。完整做完算一轮。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "towel_cleanliness",
+              "kind": "attribute",
+              "source": "object:partner",
+              "objectName": "本行为伙伴",
+              "attribute": "cleanliness",
+              "influence": "增"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 1459.2563265306121,
+          "y": 496.81795918367345
+        }
+      },
+      {
+        "id": "wash_loop",
+        "type": "loop",
+        "data": {
+          "name": "判断是否继续清洗",
+          "loopVersion": 2,
+          "completionCondition": "伙伴清洁度已满足本次上游目标的期望",
+          "completionRules": [
+            {
+              "id": "clean_goal_met",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "cleanliness",
+              "influence": "处于指定状态时"
+            }
+          ],
+          "resourceCheck": "当前流程允许继续使用洗手池清洗；可用性由准入及外部监听维护，本图不新增资源不足分支。",
+          "resourceRules": [
+            {
+              "id": "a540d0e1-98c7-430f-bf84-5874f568ae46",
+              "source": "object:interactObject",
+              "attribute": "durability",
+              "influence": "归零",
+              "objectName": "洗手池"
+            }
+          ],
+          "failureReason": "洗手池损坏",
+          "restEnabled": false,
+          "restExpectation": "",
+          "restCondition": "",
+          "restRules": [],
+          "description": "三种清洗动作均汇入这里。达到目标后关阀；未达到就回到动作选择。不启用稍息，未使用出口不连线。"
+        },
+        "position": {
+          "x": 1901.7375510204083,
+          "y": -39.688979591836755
+        }
+      },
+      {
+        "id": "close_valve",
+        "type": "result",
+        "data": {
+          "name": "关闭水阀",
+          "animation": "伸手将水阀转回关闭位置，确认水流停止后收回手。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 2247.779832471409,
+          "y": 165.1469814154268
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "data": {
+          "name": "完成｜清爽收尾",
+          "animation": "看一眼洗干净的双手，舒展肩膀，露出轻松的表情。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "释放本次实际占用的洗手池交互点，由前序占用声明自动关联；不重复增加清洁度。"
+        },
+        "position": {
+          "x": 2561.7877727689693,
+          "y": 137.52916173285973
+        }
+      },
+      {
+        "id": "a30edeff-ec0a-49ee-926b-406ffb8d7fb0",
+        "type": "end",
+        "data": {
+          "animation": "跺跺脚，叉腰叹气",
+          "playMode": "单次",
+          "playExpectation": "",
+          "name": "洗手中断",
+          "description": ""
+        },
+        "position": {
+          "x": 2243.7468252701865,
+          "y": 453.141317806752
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "4f3e262e-eb8a-448b-8028-618b3f2cbcc7",
+        "source": "start",
+        "target": "move_sink"
+      },
+      {
+        "id": "4d50d4c0-e68c-41c5-8434-aa1aed6e8ee0",
+        "source": "move_sink",
+        "target": "open_valve"
+      },
+      {
+        "id": "ff814276-e799-4ddd-881b-4e18a434f356",
+        "source": "open_valve",
+        "target": "choose_wash"
+      },
+      {
+        "id": "58f1ec0a-7a4c-400f-9f38-050cc36f84da",
+        "source": "choose_wash",
+        "target": "wash_hands",
+        "sourceHandle": "hands"
+      },
+      {
+        "id": "ef2d1106-5b05-4595-b520-b118cfbe09f4",
+        "source": "wash_hands",
+        "target": "wash_loop"
+      },
+      {
+        "id": "fbb7a246-5e7b-4971-915c-b6f7097f3364",
+        "source": "choose_wash",
+        "target": "wash_face",
+        "sourceHandle": "face"
+      },
+      {
+        "id": "e5cb7f64-a579-40e8-9838-af7dac5ed968",
+        "source": "wash_face",
+        "target": "wash_loop"
+      },
+      {
+        "id": "9fd6f887-1e84-4b2d-913c-5e645216e4a8",
+        "source": "choose_wash",
+        "target": "wash_towel",
+        "sourceHandle": "towel"
+      },
+      {
+        "id": "b721a9f9-1431-4df2-9ed0-22bdf25632f9",
+        "source": "wash_towel",
+        "target": "wash_loop"
+      },
+      {
+        "id": "db52e62b-fc79-40c4-9604-d6ac5ac2a79b",
+        "source": "wash_loop",
+        "target": "close_valve",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "e720622b-78c9-4726-86ec-a0168778471f",
+        "source": "wash_loop",
+        "target": "choose_wash",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "f8023d27-2146-4a22-adc5-46ea53e99223",
+        "source": "close_valve",
+        "target": "end"
+      },
+      {
+        "id": "1bc94c95-124e-470f-9637-af93b8fad5e1",
+        "source": "wash_loop",
+        "target": "a30edeff-ec0a-49ee-926b-406ffb8d7fb0",
+        "sourceHandle": "insufficient"
+      }
+    ]
+  }
+}

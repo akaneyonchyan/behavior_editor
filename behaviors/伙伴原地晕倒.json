@@ -1,0 +1,413 @@
+{
+  "behavior": {
+    "name": "晕眩｜原地晕倒并等待恢复",
+    "description": "监听到晕眩Buff触发，目标解除本行为伙伴的晕眩Buff。固定从站姿起手，身体摇摇晃晃后晕倒趴地；之后所有默认呼吸、虚弱动作及恢复表演都从趴地姿态衔接。未恢复持续趴地等待救援，不再站起或重新跌倒；恢复后解除Buff并原地接续独立睡觉行为。 各表现分支汇入循环节点，再判断恢复结算或继续趴地；不使用普通判断节点替代循环。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "remove_dizzy_goal",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "buff:design_dizzy",
+        "influence": "消除"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "has_dizzy",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "buff:design_dizzy",
+          "influence": "具有指定 Buff 时"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜监听到晕眩",
+          "description": "固定站姿入口，无姿态判断或已倒地直达分支；行为原地进行，无位移节点。"
+        },
+        "position": {
+          "x": 84.14532216888415,
+          "y": 14.093228448616685
+        }
+      },
+      {
+        "id": "fall_upright",
+        "type": "result",
+        "data": {
+          "name": "站姿摇晃→晕倒趴地",
+          "animation": "从站姿开始，上身摇摇晃晃，脚下不稳，试图稳住身体；随后膝盖发软，手臂向地面支撑，身体向前倒下，最终趴在地上。",
+          "description": "",
+          "effectRules": [],
+          "playMode": "单次",
+          "playExpectation": "",
+          "outputs": [],
+          "occupiedResources": [
+            {
+              "id": "b98e7764-6da1-4f9d-9e0b-8a3644629fa4",
+              "source": "object:environmen",
+              "attribute": "",
+              "objectName": "空地"
+            }
+          ]
+        },
+        "position": {
+          "x": 425.0218756575457,
+          "y": 11.667705202666639
+        }
+      },
+      {
+        "id": "ground_base",
+        "type": "result",
+        "data": {
+          "name": "趴地虚弱呼吸loop",
+          "animation": "保持趴地姿态，头偏向一侧，眉头微皱，身体随着呼吸轻微起伏。",
+          "description": "承接晕倒趴地的末帧；头部、双手与接地位置连续，不自行切换坐姿或侧卧。",
+          "effectRules": [
+            {
+              "id": "23345f9e-0279-4d65-bfe6-09fc3ab351c5",
+              "source": "object:partner",
+              "attribute": "energy",
+              "influence": "增",
+              "kind": "attribute",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "playMode": "计时",
+          "playExpectation": "持续一小段时间，具体时长由动画设计确定",
+          "outputs": []
+        },
+        "position": {
+          "x": 763.9072407020053,
+          "y": -26.374613007127437
+        }
+      },
+      {
+        "id": "weak_variation",
+        "type": "judge",
+        "data": {
+          "name": "默认表现中穿插虚弱动作",
+          "description": "趴地呼吸为主，穿插三个虚弱动作；每个动作从趴地开始，并回到趴地，不自动改变属性或Buff。",
+          "judgeAttributes": [
+            {
+              "id": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+              "source": "object:partner",
+              "attribute": "energy",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "branches": [
+            {
+              "id": "none",
+              "name": "继续默认呼吸",
+              "condition": "本段不插入额外动作",
+              "nextNode": "recovery",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "attributeId": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "越低，概率越大",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ]
+            },
+            {
+              "id": "hand",
+              "name": "无力地招呼",
+              "condition": "从趴地姿态发起，结束后回到趴地",
+              "nextNode": "weak_hand",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "attributeId": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "越高，概率越大",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ]
+            },
+            {
+              "id": "push",
+              "name": "撑起失败",
+              "condition": "从趴地姿态发起，结束后回到趴地",
+              "nextNode": "weak_push",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "attributeId": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "越高，概率越大",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ]
+            },
+            {
+              "id": "look",
+              "name": "虚弱地张望",
+              "condition": "从趴地姿态发起，结束后回到趴地",
+              "nextNode": "weak_look",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "attributeId": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "越高，概率越大",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ]
+            },
+            {
+              "id": "bd2839cb-9d89-42a7-b155-3d8464b05b0c",
+              "name": "缓缓苏醒",
+              "weightExpectation": "极低",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "attributeId": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "大于指定值才允许被触发",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ]
+            }
+          ]
+        },
+        "position": {
+          "x": 1113.4304705688196,
+          "y": -150.56873658897632
+        }
+      },
+      {
+        "id": "weak_hand",
+        "type": "result",
+        "data": {
+          "name": "抬手求助却无力垂下",
+          "animation": "趴在地上，勉强抬起一只手想招呼别人；手抬到一半又无力垂下，落回原来的趴地位置。",
+          "description": "",
+          "effectRules": [],
+          "playMode": "单次",
+          "playExpectation": "",
+          "outputs": []
+        },
+        "position": {
+          "x": 1502.3874500281863,
+          "y": -115.5901942256815
+        }
+      },
+      {
+        "id": "weak_push",
+        "type": "result",
+        "data": {
+          "name": "撑起失败又趴回去",
+          "animation": "从趴地姿态将双手撑在身侧，尝试抬起上半身；手臂发软没撑住，又趴回地面。",
+          "description": "",
+          "effectRules": [],
+          "playMode": "单次",
+          "playExpectation": "",
+          "outputs": []
+        },
+        "position": {
+          "x": 1505.8551919877045,
+          "y": 110.40798856133864
+        }
+      },
+      {
+        "id": "weak_look",
+        "type": "result",
+        "data": {
+          "name": "动动脑袋看四周",
+          "animation": "保持趴地，略微抬头转动脑袋看四周，冒出虚弱的状态气泡，然后无力地将头放回地面。",
+          "description": "",
+          "effectRules": [],
+          "playMode": "单次",
+          "playExpectation": "",
+          "outputs": []
+        },
+        "position": {
+          "x": 1507.5365933081773,
+          "y": 337.2845199895047
+        }
+      },
+      {
+        "id": "recovery",
+        "type": "loop",
+        "data": {
+          "name": "循环判断｜恢复或继续趴地",
+          "loopVersion": 2,
+          "completionCondition": "",
+          "completionRules": [
+            {
+              "id": "e5eca5bb-786c-4a65-a309-231a2ee71217",
+              "source": "object:partner",
+              "attribute": "dizzy",
+              "influence": "为0时",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "resourceCheck": "未恢复时继续原地趴地表现并等待救援；本行为无额外消耗资源门槛。",
+          "resourceRules": [],
+          "failureReason": "",
+          "restEnabled": false,
+          "restExpectation": "",
+          "restCondition": "",
+          "restRules": [],
+          "description": "",
+          "admissionEnabled": false
+        },
+        "position": {
+          "x": 1889.2989079786544,
+          "y": -35.53335819074664
+        }
+      },
+      {
+        "id": "recover",
+        "type": "result",
+        "data": {
+          "name": "呼吸平稳｜解除晕眩",
+          "animation": "仍趴在原地，呼吸逐渐平稳，紧皱的眉头慢慢舒展开，身体放松。",
+          "description": "",
+          "effectRules": [
+            {
+              "id": "remove_dizzy",
+              "kind": "buff",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:design_dizzy",
+              "influence": "减"
+            }
+          ],
+          "playMode": "单次",
+          "playExpectation": "",
+          "outputs": []
+        },
+        "position": {
+          "x": 1510.6969163372987,
+          "y": 590.9020363584563
+        }
+      },
+      {
+        "id": "end_complete",
+        "type": "end",
+        "data": {
+          "name": "缓缓醒来",
+          "animation": "保持趴地，放松双手，头偏向一侧，轻轻闭眼，接续原地睡眠。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "慢慢醒过来，揉揉眼睛，站起来"
+        },
+        "position": {
+          "x": 1901.4413568867353,
+          "y": 590.8988496529068
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "103ef615-0c5d-4f1e-8ad4-a21eee478f21",
+        "source": "start",
+        "target": "fall_upright"
+      },
+      {
+        "id": "16107bf8-cc91-4e60-b826-3d4c68790331",
+        "source": "fall_upright",
+        "target": "ground_base"
+      },
+      {
+        "id": "f5f8838e-fdef-4560-807c-5794c1cf23d7",
+        "source": "ground_base",
+        "target": "weak_variation"
+      },
+      {
+        "id": "13478bc6-985b-4451-905b-0226c7803c16",
+        "source": "weak_variation",
+        "target": "recovery",
+        "sourceHandle": "none"
+      },
+      {
+        "id": "1b8fe4a3-33d3-4aaf-8a90-0f1171070551",
+        "source": "weak_variation",
+        "target": "weak_hand",
+        "sourceHandle": "hand"
+      },
+      {
+        "id": "002f8efd-5e56-4694-b3c0-651c8570fdf3",
+        "source": "weak_variation",
+        "target": "weak_push",
+        "sourceHandle": "push"
+      },
+      {
+        "id": "bc4e7f88-a44e-449a-af80-4a3a05171af2",
+        "source": "weak_variation",
+        "target": "weak_look",
+        "sourceHandle": "look"
+      },
+      {
+        "id": "c7b05a8d-d66e-4290-b4ee-77e72db088be",
+        "source": "weak_hand",
+        "target": "recovery"
+      },
+      {
+        "id": "cde87175-c04f-409e-af5d-12a71b3cc4c4",
+        "source": "weak_push",
+        "target": "recovery"
+      },
+      {
+        "id": "ec75661e-34fe-484c-a94c-260d450b3c05",
+        "source": "weak_look",
+        "target": "recovery"
+      },
+      {
+        "id": "9cfa50f2-74a5-4572-b36d-88a8430fc290",
+        "source": "recovery",
+        "target": "ground_base",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "b28dc7e2-c60a-42e1-bd35-6d1209119887",
+        "source": "recover",
+        "target": "end_complete"
+      },
+      {
+        "id": "63e9af45-e2c6-4809-9e99-9d495ead7b1c",
+        "source": "weak_variation",
+        "target": "recover",
+        "sourceHandle": "bd2839cb-9d89-42a7-b155-3d8464b05b0c",
+        "targetHandle": null
+      },
+      {
+        "id": "794af158-94f5-48f6-915e-c5f70290c8bd",
+        "source": "recovery",
+        "target": "recover",
+        "sourceHandle": "complete"
+      }
+    ]
+  }
+}

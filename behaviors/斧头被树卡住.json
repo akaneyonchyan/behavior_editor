@@ -1,0 +1,406 @@
+{
+  "behavior": {
+    "name": "斧头被树卡住｜稍息后反复解卡",
+    "description": "仅斧头＋树。前置行为已造成卡住，从待机开始解除监听到的树上的【卡住】Buff。未解卡可以继续，每轮稍息后再试。仅保留解卡成功、尚未解卡两种结果；外部监听控制不在行为图中展开。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "goal_remove_stuck",
+        "source": "object:environmentItem",
+        "objectName": "item:environmentItem/reczz28PAurCbpZn",
+        "attribute": "reczz28PBpzFKg4B",
+        "influence": "改变"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "target_object",
+          "objectType": "environmentItem",
+          "objectName": "item:environmentItem/reczz28PAurCbpZn"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "already_stuck",
+          "source": "object:environmentItem",
+          "objectName": "item:environmentItem/reczz28PAurCbpZn",
+          "attribute": "reczz28PBpzFKg4B",
+          "influence": "处于指定状态时"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜从待机进入",
+          "description": "前置行为已使斧头卡在树中；从待机开始，不重演卡住瞬间。"
+        },
+        "position": {
+          "x": -269.7551226813759,
+          "y": -3.2217584873611713
+        }
+      },
+      {
+        "id": "notice",
+        "type": "result",
+        "data": {
+          "name": "惊奇与迷茫",
+          "animation": "从待机看向已经嵌入树中的斧头，睁大眼睛、歪头；看看斧柄，再看树上的卡点。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 355.9716326530612,
+          "y": 43.59597888892915
+        }
+      },
+      {
+        "id": "axe_try",
+        "type": "result",
+        "data": {
+          "name": "握柄尝试解卡",
+          "animation": "握稳斧柄轻拉，再屈膝后仰用力；未松动时松劲换握法，左右轻晃，再抵住树干向外拔。斧刃保持在卡点。",
+          "playMode": "计次",
+          "playExpectation": "1~3",
+          "effectRules": [],
+          "outputs": [],
+          "description": "每轮一次用力尝试；"
+        },
+        "position": {
+          "x": 683.6557995752632,
+          "y": 11.417014922818908
+        }
+      },
+      {
+        "id": "axe_outcome",
+        "type": "judge",
+        "data": {
+          "name": "本轮解卡结果",
+          "description": "仅判断解卡成功或尚未解卡；精力影响结果倾向，不作为本版停止重试的阈值。",
+          "judgeAttributes": [
+            {
+              "id": "axe_energy",
+              "source": "object:partner",
+              "objectName": "",
+              "attribute": "energy"
+            },
+            {
+              "id": "00d79f27-cb05-4c72-b664-bd9bc5d88793",
+              "source": "object:partner",
+              "attribute": "body_size"
+            }
+          ],
+          "branches": [
+            {
+              "id": "normal",
+              "name": "顺利解卡",
+              "condition": "本轮斧头拔出，解除树上的【卡住】Buff",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "id": "normal_axe_energy",
+                  "source": "object:partner",
+                  "objectName": "",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "axe_energy",
+                  "influence": "越高，概率越大"
+                },
+                {
+                  "version": 2,
+                  "id": "00d79f27-cb05-4c72-b664-bd9bc5d88793",
+                  "attributeId": "00d79f27-cb05-4c72-b664-bd9bc5d88793",
+                  "source": "object:partner",
+                  "attribute": "body_size",
+                  "influence": "越高，概率越大"
+                }
+              ],
+              "nextNode": "axe_normal"
+            },
+            {
+              "id": "tired",
+              "name": "解卡失败",
+              "condition": "本轮尚未拔出斧头；保留树上的【卡住】Buff，进入循环，稍息后再试",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "id": "tired_axe_energy",
+                  "source": "object:partner",
+                  "objectName": "",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "axe_energy",
+                  "influence": "越低，概率越大"
+                },
+                {
+                  "version": 2,
+                  "id": "00d79f27-cb05-4c72-b664-bd9bc5d88793",
+                  "attributeId": "00d79f27-cb05-4c72-b664-bd9bc5d88793",
+                  "source": "object:partner",
+                  "attribute": "body_size",
+                  "influence": "越低，概率越大"
+                }
+              ],
+              "nextNode": "axe_tired"
+            }
+          ]
+        },
+        "position": {
+          "x": 1009.0400944317905,
+          "y": -259.5852862762293
+        }
+      },
+      {
+        "id": "axe_normal",
+        "type": "result",
+        "data": {
+          "name": "顺利解卡",
+          "animation": "斧刃脱离卡点，伙伴抱着斧柄向后踉跄一步并站稳。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "b7e92a63-67cf-4a29-a244-4276dca73539",
+              "source": "object:environmentItem",
+              "attribute": "reczz28PBpzFKg4B",
+              "influence": "减",
+              "kind": "attribute",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn"
+            }
+          ],
+          "outputs": [],
+          "description": "移除监听到的树上的【卡住】Buff，只处理本次目标。"
+        },
+        "position": {
+          "x": 1330.4165093183813,
+          "y": -365.6581540660186
+        }
+      },
+      {
+        "id": "axe_tired",
+        "type": "result",
+        "data": {
+          "name": "尚未拔出｜暂时松劲",
+          "animation": "斧头没有松开，伙伴停止这一次拉扯，略微回正身体，斧刃仍嵌在树中。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "85432cec-4eba-49c9-b0b6-662ed14b8798",
+              "source": "object:partner",
+              "attribute": "buff:emotion_embarrassment",
+              "influence": "增",
+              "kind": "buff",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "outputs": [],
+          "description": "本轮未解卡，不结束行为；保留树上的【卡住】Buff，交给循环判断。"
+        },
+        "position": {
+          "x": 1334.4572830001366,
+          "y": 85.85688704554161
+        }
+      },
+      {
+        "id": "end_normal",
+        "type": "end",
+        "data": {
+          "name": "解卡完成｜松口气",
+          "animation": "肩膀放松，长舒一口气。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "前序结果已结算。"
+        },
+        "position": {
+          "x": 2056.329688613941,
+          "y": -214.04536917849512
+        }
+      },
+      {
+        "id": "retry_loop",
+        "type": "loop",
+        "data": {
+          "name": "未解卡就稍息后再试",
+          "description": "未解卡时允许继续，每轮必定稍息。未使用的资源不足出口不连线；不稍息出口同样接稍息节点，确保重试前稍息。",
+          "loopVersion": 2,
+          "completionCondition": "监听到的树上的【卡住】Buff已经移除",
+          "completionRules": [
+            {
+              "id": "buff_removed",
+              "source": "object:interactObject",
+              "objectName": "监听到的树",
+              "attribute": "卡住",
+              "influence": "不具有指定 Buff 时"
+            }
+          ],
+          "resourceCheck": "可以继续尝试；本版不设置额外资源不足分支、精力阈值或次数上限。",
+          "resourceRules": [
+            {
+              "id": "bd574731-4b3a-4dc3-9c5d-ced0f99d3924",
+              "source": "object:partner",
+              "attribute": "energy",
+              "influence": "较低时"
+            }
+          ],
+          "failureReason": "精力过低",
+          "restEnabled": true,
+          "restExpectation": "每次都稍息（必定）",
+          "restCondition": "目标尚未达成且可以继续时，必定稍息后再试。",
+          "restRules": []
+        },
+        "position": {
+          "x": 1709.9687222663201,
+          "y": -329.5990335832249
+        }
+      },
+      {
+        "id": "retry_rest",
+        "type": "wait",
+        "data": {
+          "name": "稍息｜喘气后重新握柄",
+          "description": ""
+        },
+        "position": {
+          "x": 2061.404524764228,
+          "y": 495.3781120380082
+        }
+      },
+      {
+        "id": "ea89f382-7da9-466a-8d53-f4d6540a7d08",
+        "type": "end",
+        "data": {
+          "animation": "跺跺脚，叉腰叹气",
+          "playMode": "单次",
+          "playExpectation": "",
+          "name": "放弃解卡",
+          "description": "交互物状态变化、监听打断等导致的解卡准入条件不满足"
+        },
+        "position": {
+          "x": 2068.7625593648813,
+          "y": 138.32390153238566
+        }
+      },
+      {
+        "id": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
+        "type": "move",
+        "data": {
+          "destination": "",
+          "destinationType": "interactObject",
+          "name": "占用环境物",
+          "objectType": "environmentItem",
+          "objectName": "item:environmentItem/reczz28PAurCbpZn",
+          "occupiedResources": [
+            {
+              "id": "24d5caf1-da9c-47b4-9f4d-a785d360292f",
+              "source": "object:environmentItem",
+              "attribute": "reczz28PBpzFKg4B",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn"
+            }
+          ]
+        },
+        "position": {
+          "x": 43.950646043050256,
+          "y": 75.44533447370503
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "5b65daa2-a07e-4b47-824b-1b2e7b24c83d",
+        "source": "notice",
+        "target": "axe_try"
+      },
+      {
+        "id": "987cbe41-f509-4238-99a5-bf7d8e85c3af",
+        "source": "axe_try",
+        "target": "axe_outcome"
+      },
+      {
+        "id": "e120d66a-79a3-4a50-8a9f-a16fe218c917",
+        "source": "axe_outcome",
+        "target": "axe_normal",
+        "sourceHandle": "normal"
+      },
+      {
+        "id": "77cd68f7-4cd1-44bc-a684-d58192a4c3eb",
+        "source": "axe_outcome",
+        "target": "axe_tired",
+        "sourceHandle": "tired"
+      },
+      {
+        "id": "5db03f3e-f683-4bf5-aa5d-0e58eaca984e",
+        "source": "axe_normal",
+        "target": "retry_loop"
+      },
+      {
+        "id": "5594d32a-0845-4274-b58e-4dff6ce78e49",
+        "source": "axe_tired",
+        "target": "retry_loop"
+      },
+      {
+        "id": "26802960-554a-452b-82c4-281e2f2c60b8",
+        "source": "retry_loop",
+        "target": "end_normal",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "8d4ced60-d0ab-4c72-b504-9540539f21de",
+        "source": "retry_loop",
+        "target": "retry_rest",
+        "sourceHandle": "rest"
+      },
+      {
+        "id": "eb990f7c-c68f-4f76-98c1-a7f4a26b9347",
+        "source": "retry_rest",
+        "target": "axe_try"
+      },
+      {
+        "id": "d130239b-2bc0-4e52-ad19-9584c9b6bdca",
+        "source": "retry_loop",
+        "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08",
+        "sourceHandle": "insufficient"
+      },
+      {
+        "id": "f91cd0f2-5a8f-4b6f-a4d9-63e9dd8c9548",
+        "source": "retry_loop",
+        "target": "axe_try",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "ea5f239b-2229-492a-949a-f4be54e201c6",
+        "source": "start",
+        "target": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "3cbb1f8e-42eb-4847-89ab-e43c2603dafe",
+        "source": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
+        "target": "notice",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "8aa7f470-3744-41ed-af6d-48278ed087a3",
+        "source": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
+        "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08",
+        "sourceHandle": "unreachable",
+        "targetHandle": null
+      }
+    ]
+  }
+}
