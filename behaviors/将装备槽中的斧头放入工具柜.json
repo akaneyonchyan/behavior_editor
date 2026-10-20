@@ -1,0 +1,339 @@
+{
+  "behavior": {
+    "name": "将装备槽中的1把斧头放入工具柜",
+    "description": "行为伙伴将指定的1把斧头放入已绑定工具柜的适配放置点。由性格倾向选择放置表演：严谨与随性更容易使用个性化动作，其他情况使用普通放置。选址、位移、点位等待与外部监听由通用流程处理。",
+    "templateVersion": 4,
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "goal_place_axe",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "equipped_slot_tool",
+        "influence": "为空"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "required_cabinet",
+          "objectType": "interactObject",
+          "objectName": "item:interactObject/reczz28P8xjlDFys"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "required_equipped_axe",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot_tool",
+          "influence": "处于指定状态时"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [],
+      "positions": {
+        "behavior_start": {
+          "x": 0,
+          "y": 0
+        },
+        "judge_personality": {
+          "x": 380,
+          "y": 0
+        },
+        "result_rigorous": {
+          "x": 760,
+          "y": 0
+        },
+        "result_casual": {
+          "x": 757.48,
+          "y": 437.02
+        },
+        "result_normal": {
+          "x": 757.48,
+          "y": 832.26
+        },
+        "finish": {
+          "x": 1140,
+          "y": 0
+        }
+      }
+    },
+    "nodes": [
+      {
+        "id": "behavior_start",
+        "type": "start",
+        "data": {
+          "name": "开始",
+          "description": "准入：指定斧头已装备；策略范围内有可达、可使用且有适配斧头空闲放置点的工具柜。通用流程绑定实例、目标柜和点位。"
+        },
+        "position": {
+          "x": -161.6548106837608,
+          "y": 157.9140420051163
+        }
+      },
+      {
+        "id": "judge_personality",
+        "type": "judge",
+        "data": {
+          "name": "选择放置动作",
+          "description": "根据行为伙伴个性调整表演倾向。严谨和随性分支均保留普通放置的兜底出口。",
+          "judgeAttributes": [
+            {
+              "id": "personality_rigorous",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_rigorous"
+            },
+            {
+              "id": "personality_casual",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_casual"
+            }
+          ],
+          "branches": [
+            {
+              "id": "branch_rigorous",
+              "name": "小心翼翼地放",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "personality_rigorous",
+                  "attributeId": "personality_rigorous",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "1 · 概率越高",
+                  "influenceType": "1",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "personality_casual",
+                  "attributeId": "personality_casual",
+                  "source": "object:partner",
+                  "attribute": "personality_casual",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            },
+            {
+              "id": "branch_casual",
+              "name": "马马虎虎的放",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "personality_rigorous",
+                  "attributeId": "personality_rigorous",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "personality_casual",
+                  "attributeId": "personality_casual",
+                  "source": "object:partner",
+                  "attribute": "personality_casual",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "1 · 概率越高",
+                  "influenceType": "1",
+                  "influenceRule": "概率越高"
+                }
+              ]
+            },
+            {
+              "id": "default",
+              "name": "普通放置",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "personality_rigorous",
+                  "attributeId": "personality_rigorous",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "personality_casual",
+                  "attributeId": "personality_casual",
+                  "source": "object:partner",
+                  "attribute": "personality_casual",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 176.1295620437956,
+          "y": 53.936532846715295
+        }
+      },
+      {
+        "id": "result_rigorous",
+        "type": "result",
+        "data": {
+          "name": "严谨放置斧头",
+          "objectType": "partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "animation": "双手稳稳握住斧柄，先观察工具柜放置点的方向和间距，调整斧头角度与柜内边缘平行，轻轻推入；确认斧头完全落稳后才松手，收回手臂并整理一下柜内位置。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "",
+          "effectRules": [
+            {
+              "id": "2707ebaf-1bf2-47a6-8802-1ccad6b6c935",
+              "source": "object:partner",
+              "attribute": "equipped_slot_tool",
+              "influence": "减",
+              "kind": "attribute",
+              "objectName": ""
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 564.1935218978102,
+          "y": -84.74098851950049
+        }
+      },
+      {
+        "id": "result_casual",
+        "type": "result",
+        "data": {
+          "name": "随性放置斧头",
+          "objectType": "partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "animation": "单手顺势提着斧柄把斧头放入工具柜，动作利落地调整一下位置，确认没有晃动后松手，随手拍了拍柜边。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "",
+          "effectRules": [
+            {
+              "id": "67393242-c78d-4609-9a7f-dc10bf9673e5",
+              "source": "object:partner",
+              "attribute": "equipped_slot_tool",
+              "influence": "减",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 565.3480173413465,
+          "y": 282.1599272624874
+        }
+      },
+      {
+        "id": "result_normal",
+        "type": "result",
+        "data": {
+          "name": "普通放置斧头",
+          "objectType": "partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "animation": "握住斧柄调整角度，将斧头对准工具柜内的适配放置点稳稳放入；落稳后松手，收回手臂。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "",
+          "effectRules": [
+            {
+              "id": "43aa67f4-1d76-42e5-a7a8-34ed48ac7438",
+              "source": "object:partner",
+              "attribute": "equipped_slot_tool",
+              "influence": "减",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 557.9901060204129,
+          "y": 614.1101038021347
+        }
+      },
+      {
+        "id": "finish",
+        "type": "end",
+        "data": {
+          "name": "满意点头结束",
+          "animation": "看一眼工具柜里放好的斧头，满意地点头。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "单次收尾，不再次转移或计数。"
+        },
+        "position": {
+          "x": 935.4989566039917,
+          "y": 311.2175485669532
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "5a9853d2-0ea7-4055-b966-0b0b0bd421ad",
+        "source": "behavior_start",
+        "target": "judge_personality"
+      },
+      {
+        "id": "7f556ebb-be6c-43be-b34e-5e06b7bec412",
+        "source": "judge_personality",
+        "target": "result_rigorous",
+        "sourceHandle": "branch_rigorous"
+      },
+      {
+        "id": "8096e2e5-edc5-43aa-a0fc-1d91a21a134d",
+        "source": "judge_personality",
+        "target": "result_casual",
+        "sourceHandle": "branch_casual"
+      },
+      {
+        "id": "40f52126-a804-4ceb-bb10-68b742c4b53a",
+        "source": "judge_personality",
+        "target": "result_normal",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "089ad86b-54ac-4516-b553-42fc18bad7e9",
+        "source": "result_rigorous",
+        "target": "finish"
+      },
+      {
+        "id": "22723aac-aab5-4599-982d-ae87f904660d",
+        "source": "result_casual",
+        "target": "finish"
+      },
+      {
+        "id": "0c3f8753-6fb8-426d-8756-24473d76240c",
+        "source": "result_normal",
+        "target": "finish"
+      }
+    ]
+  }
+}

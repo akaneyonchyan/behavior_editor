@@ -34,9 +34,69 @@
           "influence": "处于指定状态时"
         }
       ]
-    }
+    },
+    "legacyMovement": [
+      {
+        "node": {
+          "id": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
+          "type": "move",
+          "data": {
+            "destination": "",
+            "destinationType": "interactObject",
+            "name": "占用环境物",
+            "objectType": "environmentItem",
+            "objectName": "item:environmentItem/reczz28PAurCbpZn",
+            "occupiedResources": [
+              {
+                "id": "24d5caf1-da9c-47b4-9f4d-a785d360292f",
+                "source": "object:environmentItem",
+                "attribute": "reczz28PBpzFKg4B",
+                "objectName": "item:environmentItem/reczz28PAurCbpZn"
+              }
+            ]
+          },
+          "position": {
+            "x": 37.64192331440074,
+            "y": 13.935287869371962
+          },
+          "selected": true,
+          "width": 280,
+          "height": 283,
+          "positionAbsolute": {
+            "x": 37.64192331440074,
+            "y": 13.935287869371962
+          },
+          "dragging": false
+        },
+        "edges": [
+          {
+            "id": "becad7f0-c1a9-456b-b639-d9d2954f1785",
+            "source": "start",
+            "target": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
+            "sourceHandle": null,
+            "targetHandle": null,
+            "type": "default",
+            "selected": false
+          },
+          {
+            "id": "455c2fb9-9a8c-4fc6-9de8-72c1538d7d1d",
+            "source": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
+            "target": "notice",
+            "sourceHandle": null,
+            "targetHandle": null,
+            "type": "default",
+            "selected": false
+          }
+        ]
+      }
+    ]
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "start",
@@ -46,8 +106,8 @@
           "description": "前置行为已使斧头卡在树中；从待机开始，不重演卡住瞬间。"
         },
         "position": {
-          "x": -269.7551226813759,
-          "y": -3.2217584873611713
+          "x": -13.079840795279097,
+          "y": 21.61778492097079
         }
       },
       {
@@ -63,8 +123,8 @@
           "description": ""
         },
         "position": {
-          "x": 355.9716326530612,
-          "y": 43.59597888892915
+          "x": 296.35672847306444,
+          "y": 25.22413908033394
         }
       },
       {
@@ -80,8 +140,8 @@
           "description": "每轮一次用力尝试；"
         },
         "position": {
-          "x": 683.6557995752632,
-          "y": 11.417014922818908
+          "x": 952.3158760583001,
+          "y": 31.188766393341837
         }
       },
       {
@@ -167,8 +227,8 @@
           ]
         },
         "position": {
-          "x": 1009.0400944317905,
-          "y": -259.5852862762293
+          "x": 1283.2192667467675,
+          "y": 29.310481477882718
         }
       },
       {
@@ -190,11 +250,12 @@
             }
           ],
           "outputs": [],
-          "description": "移除监听到的树上的【卡住】Buff，只处理本次目标。"
+          "description": "移除监听到的树上的【卡住】Buff，只处理本次目标。",
+          "externalExits": []
         },
         "position": {
-          "x": 1330.4165093183813,
-          "y": -365.6581540660186
+          "x": 1610.1001514370375,
+          "y": 23.347560417342947
         }
       },
       {
@@ -216,11 +277,12 @@
             }
           ],
           "outputs": [],
-          "description": "本轮未解卡，不结束行为；保留树上的【卡住】Buff，交给循环判断。"
+          "description": "本轮未解卡，不结束行为；保留树上的【卡住】Buff，交给循环判断。",
+          "externalExits": []
         },
         "position": {
-          "x": 1334.4572830001366,
-          "y": 85.85688704554161
+          "x": 1609.7541393036888,
+          "y": 367.5222896866951
         }
       },
       {
@@ -234,16 +296,16 @@
           "description": "前序结果已结算。"
         },
         "position": {
-          "x": 2056.329688613941,
-          "y": -214.04536917849512
+          "x": 1284.7479343127725,
+          "y": 502.0196920255888
         }
       },
       {
         "id": "retry_loop",
         "type": "loop",
         "data": {
-          "name": "未解卡就稍息后再试",
-          "description": "未解卡时允许继续，每轮必定稍息。未使用的资源不足出口不连线；不稍息出口同样接稍息节点，确保重试前稍息。",
+          "name": "继续解卡循环",
+          "description": "",
           "loopVersion": 3,
           "completionCondition": "监听到的树上的【卡住】Buff已经移除",
           "completionRules": [
@@ -351,12 +413,19 @@
                   "influence": "不具有指定 Buff 时"
                 }
               ]
+            },
+            {
+              "id": "2902c22d-f354-41f6-b6e6-75d9bdbabd8c",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "5"
             }
           ]
         },
         "position": {
-          "x": 1709.9687222663201,
-          "y": -329.5990335832249
+          "x": 623.4279279588742,
+          "y": 30.777694267201923
         }
       },
       {
@@ -367,8 +436,8 @@
           "description": ""
         },
         "position": {
-          "x": 2061.404524764228,
-          "y": 495.3781120380082
+          "x": 2253.8294106197104,
+          "y": 28.58138899610134
         }
       },
       {
@@ -382,40 +451,13 @@
           "description": "交互物状态变化、监听打断等导致的解卡准入条件不满足"
         },
         "position": {
-          "x": 2068.7625593648813,
-          "y": 138.32390153238566
-        }
-      },
-      {
-        "id": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
-        "type": "move",
-        "data": {
-          "destination": "",
-          "destinationType": "interactObject",
-          "name": "占用环境物",
-          "objectType": "environmentItem",
-          "objectName": "item:environmentItem/reczz28PAurCbpZn",
-          "occupiedResources": [
-            {
-              "id": "24d5caf1-da9c-47b4-9f4d-a785d360292f",
-              "source": "object:environmentItem",
-              "attribute": "reczz28PBpzFKg4B",
-              "objectName": "item:environmentItem/reczz28PAurCbpZn"
-            }
-          ]
-        },
-        "position": {
-          "x": 43.950646043050256,
-          "y": 75.44533447370503
+          "x": 1278.0052290504511,
+          "y": 721.1086630742639
         }
       },
       {
         "id": "retry_loop_rest",
         "type": "judge",
-        "position": {
-          "x": 2069.96872226632,
-          "y": -329.5990335832249
-        },
         "data": {
           "name": "稍息判断",
           "description": "目标尚未达成且可以继续时，必定稍息后再试。",
@@ -440,186 +482,157 @@
             "rules": [],
             "expectation": "每次都稍息（必定）"
           }
+        },
+        "position": {
+          "x": 1939.7682809149833,
+          "y": 25.95499584597394
         }
       },
       {
-        "id": "retry_loop_admission",
+        "id": "7a19525d-711d-44bc-8b9f-57f3fab935ed",
         "type": "judge",
-        "position": {
-          "x": 2069.96872226632,
-          "y": -329.5990335832249
-        },
         "data": {
-          "name": "准入判断",
-          "description": "可以继续尝试；本版不设置额外资源不足分支、精力阈值或次数上限。\n不满足原因：精力过低",
+          "name": "解卡结果",
+          "description": "根据不同的解卡结果，播放不同的收尾动画",
           "judgeAttributes": [
             {
-              "id": "admission_0",
-              "source": "object:partner",
-              "attribute": "energy"
+              "id": "axe_energy",
+              "source": "object:environmentItem",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn",
+              "attribute": "reczz28PBpzFKg4B"
             }
           ],
           "branches": [
             {
-              "id": "admission_0",
-              "name": "满足",
-              "weightExpectation": "按条件判定",
+              "id": "normal",
+              "name": "顺利解卡",
+              "condition": "本轮斧头拔出，解除树上的【卡住】Buff",
+              "weightExpectation": "高",
               "weightFactors": [
                 {
-                  "id": "admission_0",
-                  "source": "object:partner",
-                  "attribute": "energy",
-                  "influence": "满足条件：较低时",
-                  "attributeId": "admission_0"
+                  "id": "normal_axe_energy",
+                  "source": "object:environmentItem",
+                  "objectName": "item:environmentItem/reczz28PAurCbpZn",
+                  "attribute": "reczz28PBpzFKg4B",
+                  "version": 2,
+                  "attributeId": "axe_energy",
+                  "influence": "具体值 · 排除选中",
+                  "influenceType": "具体值",
+                  "influenceRule": "排除选中"
                 }
-              ]
+              ],
+              "nextNode": ""
             },
             {
-              "id": "admission_1",
-              "name": "不满足",
-              "weightExpectation": "按条件判定",
+              "id": "tired",
+              "name": "解卡失败",
+              "condition": "本轮尚未拔出斧头；保留树上的【卡住】Buff，进入循环，稍息后再试",
+              "weightExpectation": "中",
               "weightFactors": [
                 {
-                  "id": "admission_0",
-                  "source": "object:partner",
-                  "attribute": "energy",
-                  "influence": "不满足条件：较低时",
-                  "attributeId": "admission_0"
+                  "id": "tired_axe_energy",
+                  "source": "object:environmentItem",
+                  "objectName": "item:environmentItem/reczz28PAurCbpZn",
+                  "attribute": "reczz28PBpzFKg4B",
+                  "version": 2,
+                  "attributeId": "axe_energy",
+                  "influence": "具体值 · 允许选中",
+                  "influenceType": "具体值",
+                  "influenceRule": "允许选中"
                 }
-              ]
+              ],
+              "nextNode": ""
             }
           ],
-          "legacyGate": {
-            "kind": "admission",
-            "condition": "可以继续尝试；本版不设置额外资源不足分支、精力阈值或次数上限。\n不满足原因：精力过低",
-            "rules": [
-              {
-                "id": "bd574731-4b3a-4dc3-9c5d-ced0f99d3924",
-                "source": "object:partner",
-                "attribute": "energy",
-                "influence": "较低时"
-              }
-            ],
-            "failureReason": "精力过低"
-          }
+          "externalExits": []
+        },
+        "position": {
+          "x": 952.507891304015,
+          "y": 332.88699471695975
         }
       }
     ],
     "edges": [
       {
-        "id": "5b65daa2-a07e-4b47-824b-1b2e7b24c83d",
+        "id": "1e13f49f-7e91-494c-aa6c-0ff624759eb6",
         "source": "notice",
         "target": "retry_loop"
       },
       {
-        "id": "987cbe41-f509-4238-99a5-bf7d8e85c3af",
+        "id": "68e5ac00-f1e4-4074-8f57-8b0e5192791f",
         "source": "axe_try",
         "target": "axe_outcome"
       },
       {
-        "id": "e120d66a-79a3-4a50-8a9f-a16fe218c917",
+        "id": "ca138d87-6eea-4cf1-aca2-8bcf98e3e8ac",
         "source": "axe_outcome",
         "target": "axe_normal",
         "sourceHandle": "normal"
       },
       {
-        "id": "77cd68f7-4cd1-44bc-a684-d58192a4c3eb",
+        "id": "2fc8a4bb-2e1b-4be3-bb77-4cfd50b3aaa8",
         "source": "axe_outcome",
         "target": "axe_tired",
         "sourceHandle": "tired"
       },
       {
-        "id": "5db03f3e-f683-4bf5-aa5d-0e58eaca984e",
-        "source": "axe_normal",
-        "target": "retry_loop"
-      },
-      {
-        "id": "5594d32a-0845-4274-b58e-4dff6ce78e49",
-        "source": "axe_tired",
-        "target": "retry_loop"
-      },
-      {
-        "id": "26802960-554a-452b-82c4-281e2f2c60b8",
-        "source": "retry_loop",
-        "target": "end_normal",
-        "sourceHandle": "complete"
-      },
-      {
-        "id": "eb990f7c-c68f-4f76-98c1-a7f4a26b9347",
+        "id": "4a858f45-8520-40fc-a70d-c60fc8208124",
         "source": "retry_rest",
         "target": "retry_loop"
       },
       {
-        "id": "f91cd0f2-5a8f-4b6f-a4d9-63e9dd8c9548",
-        "source": "retry_loop",
-        "target": "retry_loop_admission",
-        "sourceHandle": "continue"
-      },
-      {
-        "id": "ea5f239b-2229-492a-949a-f4be54e201c6",
+        "id": "becad7f0-c1a9-456b-b639-d9d2954f1785",
         "source": "start",
-        "target": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
-        "sourceHandle": null,
-        "targetHandle": null
-      },
-      {
-        "id": "3cbb1f8e-42eb-4847-89ab-e43c2603dafe",
-        "source": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
         "target": "notice",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "8aa7f470-3744-41ed-af6d-48278ed087a3",
-        "source": "ec825c29-a94a-4998-8544-a00d49e5d8ff",
-        "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08",
-        "sourceHandle": "unreachable",
-        "targetHandle": null
-      },
-      {
-        "id": "retry_loop_rest:rest_0",
+        "id": "0647932a-7495-4bfb-8001-a40daeec6c96",
         "source": "retry_loop_rest",
-        "sourceHandle": "rest_0",
-        "target": "retry_rest"
+        "target": "retry_rest",
+        "sourceHandle": "rest_0"
       },
       {
-        "id": "retry_loop_rest:rest_1",
+        "id": "c8b59efe-5015-44f0-a956-97b879386869",
         "source": "retry_loop_rest",
-        "sourceHandle": "rest_1",
-        "target": "axe_try"
+        "target": "axe_try",
+        "sourceHandle": "rest_1"
       },
       {
-        "id": "retry_loop_admission:admission_0",
-        "source": "retry_loop_admission",
-        "sourceHandle": "admission_0",
+        "id": "6fa3a40c-752a-462a-985b-4e26fcfcafeb",
+        "source": "retry_loop",
+        "target": "axe_try",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "bf3814fe-1481-4d40-a4fb-864a8d54ada4",
+        "source": "axe_tired",
         "target": "retry_loop_rest"
       },
       {
-        "id": "retry_loop_admission:admission_1",
-        "source": "retry_loop_admission",
-        "sourceHandle": "admission_1",
-        "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08"
+        "id": "f70a7294-304c-43dc-ab86-cfa3b2a0e94f",
+        "source": "axe_normal",
+        "target": "retry_loop_rest"
+      },
+      {
+        "id": "37645eab-14bd-4046-ac85-7bf05a7114de",
+        "source": "7a19525d-711d-44bc-8b9f-57f3fab935ed",
+        "target": "end_normal",
+        "sourceHandle": "normal"
+      },
+      {
+        "id": "39fa4ccc-a4cb-4d8c-87a6-ab55d95afbbe",
+        "source": "retry_loop",
+        "target": "7a19525d-711d-44bc-8b9f-57f3fab935ed",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "136abc38-b8f1-4dc1-94ab-8a49ccfec712",
+        "source": "7a19525d-711d-44bc-8b9f-57f3fab935ed",
+        "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08",
+        "sourceHandle": "tired"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "retry_loop",
-          "entry": "retry_loop_admission",
-          "members": [
-            "axe_try",
-            "axe_outcome",
-            "axe_normal",
-            "axe_tired",
-            "retry_rest",
-            "retry_loop_rest",
-            "retry_loop_admission"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-

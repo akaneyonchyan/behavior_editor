@@ -34,9 +34,76 @@
           "influence": "有扳手"
         }
       ]
-    }
+    },
+    "legacyMovement": [
+      {
+        "node": {
+          "id": "move_target",
+          "type": "move",
+          "data": {
+            "name": "位移到交互物交互点位",
+            "destinationType": "interactObject",
+            "objectType": "interactObject",
+            "objectName": "不可移动的目标交互物",
+            "destination": "目标交互物的维修交互点",
+            "description": "伙伴前往现场维修，交互物不搬运。",
+            "occupiedResources": [
+              {
+                "id": "repair_point",
+                "source": "object:interactObject",
+                "objectName": "目标交互物",
+                "attribute": "interaction_point_occupied"
+              }
+            ]
+          },
+          "position": {
+            "x": 604.6409904812865,
+            "y": -140.12592291687633
+          },
+          "selected": true,
+          "width": 280,
+          "height": 351,
+          "positionAbsolute": {
+            "x": 604.6409904812865,
+            "y": -140.12592291687633
+          },
+          "dragging": false
+        },
+        "edges": [
+          {
+            "id": "eab0bf17-1563-4197-aa84-e767206a2f96",
+            "source": "start",
+            "target": "move_target",
+            "type": "default"
+          },
+          {
+            "id": "1e8f50a7-2d01-4358-ba15-49c5ed29c72d",
+            "source": "move_target",
+            "target": "repair_attempt",
+            "type": "default"
+          }
+        ]
+      }
+    ]
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "repair_loop",
+          "entry": "repair_outcome",
+          "members": [
+            "repair_outcome",
+            "repair_normal",
+            "repair_mistake",
+            "wait_1792401413597",
+            "repair_loop_rest"
+          ]
+        }
+      ],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "start",
@@ -46,32 +113,8 @@
           "description": "目标必须为不可移动且支持扳手维修的交互物，由上游选定并校验；不新增可移动属性。目标值来自上游，不默认修满。"
         },
         "position": {
-          "x": 292.2057981271506,
-          "y": 2.664001374382565
-        }
-      },
-      {
-        "id": "move_target",
-        "type": "move",
-        "data": {
-          "name": "位移到交互物交互点位",
-          "destinationType": "interactObject",
-          "objectType": "interactObject",
-          "objectName": "不可移动的目标交互物",
-          "destination": "目标交互物的维修交互点",
-          "description": "伙伴前往现场维修，交互物不搬运。",
-          "occupiedResources": [
-            {
-              "id": "repair_point",
-              "source": "object:interactObject",
-              "objectName": "目标交互物",
-              "attribute": "interaction_point_occupied"
-            }
-          ]
-        },
-        "position": {
-          "x": 602.7498718229629,
-          "y": 28.183637673944702
+          "x": 593.8596106531496,
+          "y": -233.0915124463234
         }
       },
       {
@@ -87,8 +130,8 @@
           "description": ""
         },
         "position": {
-          "x": 925.3742723166499,
-          "y": 17.87204773770884
+          "x": 950.3569684645295,
+          "y": -234.64262487142878
         }
       },
       {
@@ -177,8 +220,8 @@
           ]
         },
         "position": {
-          "x": 1256.1360310941036,
-          "y": -93.08205126600834
+          "x": 1633.0164906723005,
+          "y": -238.86242272420083
         }
       },
       {
@@ -200,11 +243,12 @@
             }
           ],
           "outputs": [],
-          "description": ""
+          "description": "",
+          "externalExits": []
         },
         "position": {
-          "x": 1635.3703340379013,
-          "y": -170.4304360795508
+          "x": 1999.1393063947773,
+          "y": -247.32345795653282
         }
       },
       {
@@ -241,11 +285,12 @@
             }
           ],
           "outputs": [],
-          "description": "错误分支整轮不结算正常维修收益。保持0和归零是自定义精确结果语义，不等同普通减值；不得假称编辑器提供运行时赋值实现。"
+          "description": "错误分支整轮不结算正常维修收益。保持0和归零是自定义精确结果语义，不等同普通减值；不得假称编辑器提供运行时赋值实现。",
+          "externalExits": []
         },
         "position": {
-          "x": 1636.3825721250828,
-          "y": 148.6724813447234
+          "x": 2000.1515444819588,
+          "y": 60.26790526184118
         }
       },
       {
@@ -358,8 +403,8 @@
           ]
         },
         "position": {
-          "x": 2018.7178526372668,
-          "y": -165.44665996359169
+          "x": 1286.0930936815048,
+          "y": -236.22020362932898
         }
       },
       {
@@ -373,23 +418,8 @@
           "description": "目标已达成，扳手继续装备；不重复结算耐久。"
         },
         "position": {
-          "x": 2355.640317178736,
-          "y": -166.24056250346405
-        }
-      },
-      {
-        "id": "end_interrupted",
-        "type": "end",
-        "data": {
-          "name": "中断本次维修",
-          "animation": "停止拧动，垂下持扳手的手，后退一步，泄气地看向交互物。",
-          "playMode": "单次",
-          "playExpectation": "",
-          "description": ""
-        },
-        "position": {
-          "x": 2356.9580437902428,
-          "y": 148.8274845679748
+          "x": 1635.6505602886486,
+          "y": 291.6948519133531
         }
       },
       {
@@ -399,33 +429,30 @@
           "name": "待机节点"
         },
         "position": {
-          "x": 2358.8401617119516,
-          "y": 399.97015726035283
+          "x": 2391.3565417002346,
+          "y": 101.24772518417257
         }
       },
       {
         "id": "repair_loop_rest",
         "type": "judge",
-        "position": {
-          "x": 2378.717852637267,
-          "y": -165.44665996359169
-        },
         "data": {
           "name": "稍息判断",
           "description": "",
           "judgeAttributes": [],
           "branches": [
             {
-              "id": "rest_0",
-              "name": "稍息",
-              "weightExpectation": "待定",
+              "id": "rest_1",
+              "name": "继续执行",
+              "weightExpectation": "低",
               "weightFactors": []
             },
             {
-              "id": "rest_1",
-              "name": "继续执行",
-              "weightExpectation": "其余情况",
-              "weightFactors": []
+              "id": "rest_0",
+              "name": "稍息",
+              "weightExpectation": "高",
+              "weightFactors": [],
+              "nextNode": ""
             }
           ],
           "legacyGate": {
@@ -433,144 +460,77 @@
             "condition": "",
             "rules": [],
             "expectation": ""
-          }
-        }
-      },
-      {
-        "id": "repair_loop_admission",
-        "type": "judge",
-        "position": {
-          "x": 2378.717852637267,
-          "y": -165.44665996359169
+          },
+          "externalExits": []
         },
-        "data": {
-          "name": "准入判断",
-          "description": "本稿未新增材料消耗，工具与目标可用性由准入及外部监听维护。",
-          "judgeAttributes": [],
-          "branches": [
-            {
-              "id": "admission_0",
-              "name": "满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": []
-            },
-            {
-              "id": "admission_1",
-              "name": "不满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": []
-            }
-          ],
-          "legacyGate": {
-            "kind": "admission",
-            "condition": "本稿未新增材料消耗，工具与目标可用性由准入及外部监听维护。",
-            "rules": [],
-            "failureReason": ""
-          }
+        "position": {
+          "x": 2389.1228443651466,
+          "y": -239.73979673464714
         }
       }
     ],
     "edges": [
       {
-        "id": "1ac875c1-a390-40ca-9dd5-675b80c1df8a",
+        "id": "ff95ff83-2bb6-4b32-9810-311caeb190a5",
         "source": "start",
-        "target": "move_target"
-      },
-      {
-        "id": "3b1036aa-40b3-4276-b1c8-e6edf16308a7",
-        "source": "move_target",
         "target": "repair_attempt"
       },
       {
-        "id": "de633f75-d552-4b6c-a330-cc9bb57c79bd",
+        "id": "e5ddcb5e-9f88-4b84-bf73-951cd4bcb7e2",
         "source": "repair_attempt",
         "target": "repair_loop"
       },
       {
-        "id": "3fca0dba-2596-4b68-bc33-488ab0e80ac6",
+        "id": "9fbc7811-53fc-4f57-9d15-5f368f4e8211",
         "source": "repair_outcome",
         "target": "repair_normal",
         "sourceHandle": "normal"
       },
       {
-        "id": "088ee262-9981-41b9-bea6-6bc0838539a8",
+        "id": "d345d44e-22de-473b-97f1-e4a173d94eee",
         "source": "repair_outcome",
         "target": "repair_mistake",
         "sourceHandle": "mistake"
       },
       {
-        "id": "6ee59318-133e-4cac-b063-979f9dbc1e9b",
-        "source": "repair_normal",
-        "target": "repair_loop"
-      },
-      {
-        "id": "9abb45de-0fbc-4f12-9c41-8e40c1d29b58",
+        "id": "8140f0cd-aeb8-442f-baa0-2690405355d2",
         "source": "repair_loop",
         "target": "end_complete",
         "sourceHandle": "complete"
       },
       {
-        "id": "eaf56cb6-33a7-4857-a13c-c207f485f517",
-        "source": "repair_mistake",
-        "target": "repair_loop",
-        "sourceHandle": null,
-        "targetHandle": null
+        "id": "9060c108-8a75-4c59-b080-d5e6d491261c",
+        "source": "wait_1792401413597",
+        "target": "repair_loop"
       },
       {
-        "id": "043520df-e894-429b-83b1-5270a9725ea2",
+        "id": "31bf7cc4-317d-47e9-aca7-bdae2a1a1da2",
+        "source": "repair_loop_rest",
+        "target": "wait_1792401413597",
+        "sourceHandle": "rest_0"
+      },
+      {
+        "id": "7315d41d-eab1-4c56-80e0-cea96c73e925",
         "source": "repair_loop",
-        "target": "repair_loop_admission",
+        "target": "repair_outcome",
         "sourceHandle": "continue"
       },
       {
-        "id": "07bb7c63-c46b-43b5-86c7-0ae80aaa5764",
-        "source": "move_target",
-        "target": "end_interrupted",
-        "sourceHandle": "unreachable",
-        "targetHandle": null
-      },
-      {
-        "id": "repair_loop_rest:rest_0",
-        "source": "repair_loop_rest",
-        "sourceHandle": "rest_0",
-        "target": "wait_1792401413597"
-      },
-      {
-        "id": "repair_loop_rest:rest_1",
-        "source": "repair_loop_rest",
-        "sourceHandle": "rest_1",
-        "target": "repair_outcome"
-      },
-      {
-        "id": "repair_loop_admission:admission_0",
-        "source": "repair_loop_admission",
-        "sourceHandle": "admission_0",
+        "id": "0cb01a80-e0f8-4934-addc-4758b31f80e5",
+        "source": "repair_normal",
         "target": "repair_loop_rest"
       },
       {
-        "id": "repair_loop_admission:admission_1",
-        "source": "repair_loop_admission",
-        "sourceHandle": "admission_1",
-        "target": "end_interrupted"
+        "id": "14b369c5-04f0-4b07-ad00-079c104ff2c6",
+        "source": "repair_mistake",
+        "target": "repair_loop_rest"
+      },
+      {
+        "id": "839c45bf-3464-421b-bec7-6bd16ac8489e",
+        "source": "repair_loop_rest",
+        "target": "repair_loop",
+        "sourceHandle": "rest_1"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "repair_loop",
-          "entry": "repair_loop_admission",
-          "members": [
-            "repair_outcome",
-            "repair_normal",
-            "repair_mistake",
-            "repair_loop_rest",
-            "repair_loop_admission"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-

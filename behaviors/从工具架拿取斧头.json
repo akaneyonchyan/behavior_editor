@@ -1,0 +1,309 @@
+{
+  "behavior": {
+    "name": "从工具架拿取斧头装备在手中",
+    "description": "取下指定1把斧头并装备到工具槽。握稳时解除同一斧头实例与工具架放置点的绑定，释放放置点并绑定工具槽与手部；保留原有属性，不生成新物品。工具架暂为自定义对象；位移、选对象、占用冲突和外部监听沿用通用流程。",
+    "templateVersion": 4,
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "equip_goal",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "equipped_slot_tool",
+        "influence": "装备本次从工具架取下的指定斧头实例"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "rack",
+          "objectType": "interactObject",
+          "objectName": "工具架"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "empty_slot",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot_tool",
+          "influence": "为空"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "behavior_start",
+        "type": "start",
+        "data": {
+          "name": "开始"
+        },
+        "position": {
+          "x": 52.322664233576575,
+          "y": 314.35682481751815
+        }
+      },
+      {
+        "id": "judge_personality",
+        "type": "judge",
+        "data": {
+          "name": "选择拿取动作",
+          "description": "严谨／随性提高对应动作概率，普通动作仍可选。",
+          "judgeAttributes": [
+            {
+              "id": "personality_rigorous",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_rigorous"
+            },
+            {
+              "id": "personality_casual",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_casual"
+            }
+          ],
+          "branches": [
+            {
+              "id": "branch_rigorous",
+              "name": "仔细检查后拿取",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "personality_rigorous",
+                  "attributeId": "personality_rigorous",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "具有（1） · 概率越高",
+                  "influenceType": "具有（1）",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "personality_casual",
+                  "attributeId": "personality_casual",
+                  "source": "object:partner",
+                  "attribute": "personality_casual",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            },
+            {
+              "id": "branch_casual",
+              "name": "顺手拿取",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "personality_rigorous",
+                  "attributeId": "personality_rigorous",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "personality_casual",
+                  "attributeId": "personality_casual",
+                  "source": "object:partner",
+                  "attribute": "personality_casual",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "具有（1） · 概率越高",
+                  "influenceType": "具有（1）",
+                  "influenceRule": "概率越高"
+                }
+              ]
+            },
+            {
+              "id": "default",
+              "name": "普通拿取",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "personality_rigorous",
+                  "attributeId": "personality_rigorous",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "personality_casual",
+                  "attributeId": "personality_casual",
+                  "source": "object:partner",
+                  "attribute": "personality_casual",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 387.7927372262775,
+          "y": 209.71149635036488
+        }
+      },
+      {
+        "id": "result_rigorous",
+        "type": "result",
+        "data": {
+          "name": "仔细检查后拿取",
+          "objectType": "partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "animation": "双手扶住斧柄，缓缓将斧头提离工具架；低头查看斧柄与斧头连接处，调整双手握距后握稳。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "握稳时完成实例转移。",
+          "effectRules": [
+            {
+              "id": "equip_0",
+              "kind": "attribute",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "equipped_slot_tool",
+              "influence": "斧头"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 732.168795620438,
+          "y": 82.38036496350361
+        }
+      },
+      {
+        "id": "result_casual",
+        "type": "result",
+        "data": {
+          "name": "顺手拿取",
+          "objectType": "partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "animation": "身子微侧，单手顺势握住斧柄提离工具架，收回身前，随手换到顺手的握持位置。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "握稳时完成实例转移。",
+          "effectRules": [
+            {
+              "id": "equip_1",
+              "kind": "attribute",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "equipped_slot_tool",
+              "influence": "斧头"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 731.0555474452556,
+          "y": 414.54916058394156
+        }
+      },
+      {
+        "id": "result_normal",
+        "type": "result",
+        "data": {
+          "name": "普通拿取",
+          "objectType": "partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "animation": "伸手握住斧柄，将斧头提离工具架，收回身前并握稳。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "握稳时完成实例转移。",
+          "effectRules": [
+            {
+              "id": "equip_2",
+              "kind": "attribute",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "equipped_slot_tool",
+              "influence": "斧头"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 731.0555474452556,
+          "y": 745.6047080291971
+        }
+      },
+      {
+        "id": "finish",
+        "type": "end",
+        "data": {
+          "name": "持斧待机",
+          "animation": "握着斧柄站稳，手臂自然垂下，斧刃朝外下方，进入持斧待机姿态。",
+          "playMode": "单次",
+          "playExpectation": ""
+        },
+        "position": {
+          "x": 1054.279890510949,
+          "y": 474.6645620437955
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "2f71c5db-2ef7-4347-82fb-4ee9095548f6",
+        "source": "behavior_start",
+        "target": "judge_personality"
+      },
+      {
+        "id": "6ec228ad-c82a-4344-b06b-0cd5ef44dc77",
+        "source": "judge_personality",
+        "target": "result_rigorous",
+        "sourceHandle": "branch_rigorous"
+      },
+      {
+        "id": "0a4a19cb-fef4-4105-9552-457a68a16b8f",
+        "source": "judge_personality",
+        "target": "result_casual",
+        "sourceHandle": "branch_casual"
+      },
+      {
+        "id": "d1f233a6-c874-45e2-8099-f14eb1923637",
+        "source": "judge_personality",
+        "target": "result_normal",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "63edc335-d887-46d5-aa66-97f2ec2679d8",
+        "source": "result_rigorous",
+        "target": "finish"
+      },
+      {
+        "id": "5e8e3267-7afd-4124-978b-5fe1c148083b",
+        "source": "result_casual",
+        "target": "finish"
+      },
+      {
+        "id": "79da771b-3660-4f47-9968-826ad1c87dda",
+        "source": "result_normal",
+        "target": "finish"
+      }
+    ]
+  }
+}

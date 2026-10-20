@@ -31,6 +31,23 @@
     }
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "recovery",
+          "entry": "ground_base",
+          "members": [
+            "ground_base",
+            "weak_variation",
+            "weak_hand",
+            "weak_push",
+            "weak_look"
+          ]
+        }
+      ],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "start",
@@ -40,8 +57,8 @@
           "description": "固定站姿入口，无姿态判断或已倒地直达分支；行为原地进行，无位移节点。"
         },
         "position": {
-          "x": 84.14532216888415,
-          "y": 14.093228448616685
+          "x": -333.794415198513,
+          "y": -134.90039393613523
         }
       },
       {
@@ -65,8 +82,8 @@
           ]
         },
         "position": {
-          "x": 425.0218756575457,
-          "y": 11.667705202666639
+          "x": 20.97137427516776,
+          "y": -136.0632593652653
         }
       },
       {
@@ -91,8 +108,8 @@
           "outputs": []
         },
         "position": {
-          "x": 763.9072407020053,
-          "y": -26.374613007127437
+          "x": 767.6952141524648,
+          "y": -137.48850088728136
         }
       },
       {
@@ -100,7 +117,7 @@
         "type": "judge",
         "data": {
           "name": "默认表现中穿插虚弱动作",
-          "description": "趴地呼吸为主，穿插三个虚弱动作；每个动作从趴地开始，并回到趴地，不自动改变属性或Buff。",
+          "description": "",
           "judgeAttributes": [
             {
               "id": "6a9dda96-6324-46ed-b65a-4d25a6af1874",
@@ -208,11 +225,12 @@
                 }
               ]
             }
-          ]
+          ],
+          "externalExits": []
         },
         "position": {
-          "x": 1113.4304705688196,
-          "y": -150.56873658897632
+          "x": 1133.6329956379386,
+          "y": -130.3662115198576
         }
       },
       {
@@ -228,8 +246,8 @@
           "outputs": []
         },
         "position": {
-          "x": 1502.3874500281863,
-          "y": -115.5901942256815
+          "x": 1498.5994765777266,
+          "y": -133.26740366116053
         }
       },
       {
@@ -245,8 +263,8 @@
           "outputs": []
         },
         "position": {
-          "x": 1505.8551919877045,
-          "y": 110.40798856133864
+          "x": 1499.541902903605,
+          "y": 93.99343694267952
         }
       },
       {
@@ -262,15 +280,15 @@
           "outputs": []
         },
         "position": {
-          "x": 1507.5365933081773,
-          "y": 337.2845199895047
+          "x": 1498.6979885904377,
+          "y": 336.0218621726848
         }
       },
       {
         "id": "recovery",
         "type": "loop",
         "data": {
-          "name": "循环判断｜恢复或继续趴地",
+          "name": "循环判断晕眩buff是否过期",
           "loopVersion": 3,
           "completionCondition": "",
           "completionRules": [
@@ -367,8 +385,8 @@
                 {
                   "id": "e5eca5bb-786c-4a65-a309-231a2ee71217",
                   "source": "object:partner",
-                  "attribute": "dizzy",
-                  "influence": "为0时",
+                  "attribute": "buff:design_dizzy",
+                  "influence": "不具有指定 Buff 时",
                   "objectName": "item:partner/reczz28PAvx7wYyE"
                 }
               ]
@@ -376,8 +394,8 @@
           ]
         },
         "position": {
-          "x": 1889.2989079786544,
-          "y": -35.53335819074664
+          "x": 370.3215543442773,
+          "y": -133.76813633933725
         }
       },
       {
@@ -402,8 +420,8 @@
           "outputs": []
         },
         "position": {
-          "x": 1510.6969163372987,
-          "y": 590.9020363584563
+          "x": 766.9914622303593,
+          "y": 267.661635252554
         }
       },
       {
@@ -417,108 +435,89 @@
           "description": "慢慢醒过来，揉揉眼睛，站起来"
         },
         "position": {
-          "x": 1901.4413568867353,
-          "y": 590.8988496529068
+          "x": 1122.381483908838,
+          "y": 497.4621712082319
         }
       }
     ],
     "edges": [
       {
-        "id": "103ef615-0c5d-4f1e-8ad4-a21eee478f21",
+        "id": "b74e9555-06fc-4e93-849c-3bf188c632d4",
         "source": "start",
         "target": "fall_upright"
       },
       {
-        "id": "16107bf8-cc91-4e60-b826-3d4c68790331",
+        "id": "af1cd3c8-4487-4220-ad51-24ef15772bca",
         "source": "fall_upright",
         "target": "recovery"
       },
       {
-        "id": "f5f8838e-fdef-4560-807c-5794c1cf23d7",
+        "id": "9c2f4658-e781-4872-87c9-d819abc92e95",
         "source": "ground_base",
         "target": "weak_variation"
       },
       {
-        "id": "13478bc6-985b-4451-905b-0226c7803c16",
+        "id": "51f2bf17-54bc-42b9-8988-6324286c824d",
         "source": "weak_variation",
         "target": "recovery",
         "sourceHandle": "none"
       },
       {
-        "id": "1b8fe4a3-33d3-4aaf-8a90-0f1171070551",
+        "id": "3cd57248-154e-4a40-9488-03a33600d0d0",
         "source": "weak_variation",
         "target": "weak_hand",
         "sourceHandle": "hand"
       },
       {
-        "id": "002f8efd-5e56-4694-b3c0-651c8570fdf3",
+        "id": "f962fb81-ed6d-4639-afd5-1734d499f0a0",
         "source": "weak_variation",
         "target": "weak_push",
         "sourceHandle": "push"
       },
       {
-        "id": "bc4e7f88-a44e-449a-af80-4a3a05171af2",
+        "id": "1478d227-3946-4a49-8b80-2d75d63a019a",
         "source": "weak_variation",
         "target": "weak_look",
         "sourceHandle": "look"
       },
       {
-        "id": "c7b05a8d-d66e-4290-b4ee-77e72db088be",
+        "id": "05137ca8-050b-4943-b6d9-4e9c41790c2d",
         "source": "weak_hand",
         "target": "recovery"
       },
       {
-        "id": "cde87175-c04f-409e-af5d-12a71b3cc4c4",
+        "id": "10a9a2a5-e0ea-425c-b66a-69d6ceb986a0",
         "source": "weak_push",
         "target": "recovery"
       },
       {
-        "id": "ec75661e-34fe-484c-a94c-260d450b3c05",
+        "id": "58cffd44-a883-45b9-b8c1-ca3836d8b229",
         "source": "weak_look",
         "target": "recovery"
       },
       {
-        "id": "9cfa50f2-74a5-4572-b36d-88a8430fc290",
+        "id": "951e970b-c378-4335-bbf8-0c6fa99250e9",
         "source": "recovery",
         "target": "ground_base",
         "sourceHandle": "continue"
       },
       {
-        "id": "b28dc7e2-c60a-42e1-bd35-6d1209119887",
+        "id": "3b5742a8-113b-438a-aa81-b6bf9761d12c",
         "source": "recover",
         "target": "end_complete"
       },
       {
-        "id": "63e9af45-e2c6-4809-9e99-9d495ead7b1c",
-        "source": "weak_variation",
-        "target": "recover",
-        "sourceHandle": "bd2839cb-9d89-42a7-b155-3d8464b05b0c",
-        "targetHandle": null
-      },
-      {
-        "id": "794af158-94f5-48f6-915e-c5f70290c8bd",
+        "id": "fe21bfc2-cb03-4264-a628-d620fc9f86e9",
         "source": "recovery",
         "target": "recover",
         "sourceHandle": "complete"
+      },
+      {
+        "id": "17e7ac9b-fcf7-4dd7-a1a3-8b6b5e6e34f9",
+        "source": "weak_variation",
+        "target": "recovery",
+        "sourceHandle": "bd2839cb-9d89-42a7-b155-3d8464b05b0c"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "recovery",
-          "entry": "ground_base",
-          "members": [
-            "ground_base",
-            "weak_variation",
-            "weak_hand",
-            "weak_push",
-            "weak_look"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-

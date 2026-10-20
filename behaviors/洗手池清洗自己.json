@@ -26,9 +26,71 @@
       ],
       "consumableRules": [],
       "attributeRules": []
-    }
+    },
+    "legacyMovement": [
+      {
+        "node": {
+          "id": "move_sink",
+          "type": "move",
+          "data": {
+            "name": "位移到洗手池",
+            "destinationType": "interactObject",
+            "objectType": "interactObject",
+            "objectName": "洗手池",
+            "destination": "洗手池的清洗交互点",
+            "description": "使用已选洗手池的交互点；占用检查与监听沿用位移通用机制。",
+            "occupiedResources": [
+              {
+                "id": "sink_point",
+                "source": "object:interactObject",
+                "objectName": "洗手池",
+                "attribute": "interaction_point_occupied"
+              }
+            ]
+          },
+          "position": {
+            "x": 443.88013800463216,
+            "y": 18.238922617955097
+          },
+          "selected": true,
+          "width": 280,
+          "height": 351,
+          "dragging": false
+        },
+        "edges": [
+          {
+            "id": "6f04517b-6dcd-4d57-8359-3750ab69d5d5",
+            "source": "start",
+            "target": "move_sink",
+            "type": "default"
+          },
+          {
+            "id": "238cc8dc-74b1-4301-b3f0-fc0187d43c80",
+            "source": "move_sink",
+            "target": "open_valve",
+            "type": "default"
+          }
+        ]
+      }
+    ]
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "wash_loop",
+          "entry": "choose_wash",
+          "members": [
+            "choose_wash",
+            "wash_hands",
+            "wash_face",
+            "wash_towel"
+          ]
+        }
+      ],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "start",
@@ -38,32 +100,8 @@
           "description": "目标期望来自上游目标；不写死清洁度阈值，也不默认洗至上限。准入和选址沿用通用机制。"
         },
         "position": {
-          "x": 122.81441388796969,
-          "y": 21.88670714154614
-        }
-      },
-      {
-        "id": "move_sink",
-        "type": "move",
-        "data": {
-          "name": "位移到洗手池",
-          "destinationType": "interactObject",
-          "objectType": "interactObject",
-          "objectName": "洗手池",
-          "destination": "洗手池的清洗交互点",
-          "description": "使用已选洗手池的交互点；占用检查与监听沿用位移通用机制。",
-          "occupiedResources": [
-            {
-              "id": "sink_point",
-              "source": "object:interactObject",
-              "objectName": "洗手池",
-              "attribute": "interaction_point_occupied"
-            }
-          ]
-        },
-        "position": {
-          "x": 443.88013800463216,
-          "y": 18.238922617955097
+          "x": -232.61336666186307,
+          "y": 6.091907791376684
         }
       },
       {
@@ -78,8 +116,8 @@
           "outputs": []
         },
         "position": {
-          "x": 765.5594944689653,
-          "y": 26.151487414528958
+          "x": 143.82770943327682,
+          "y": 15.982976911608773
         }
       },
       {
@@ -117,8 +155,8 @@
           ]
         },
         "position": {
-          "x": 1100.7722448979591,
-          "y": -79.61387755102032
+          "x": 877.0650138337164,
+          "y": 10.450072617700869
         }
       },
       {
@@ -142,8 +180,8 @@
           "outputs": []
         },
         "position": {
-          "x": 1457.161224489796,
-          "y": -146.65714285714284
+          "x": 1247.9804370011532,
+          "y": 20.39695826225943
         }
       },
       {
@@ -167,8 +205,8 @@
           "outputs": []
         },
         "position": {
-          "x": 1455.0661224489795,
-          "y": 170.89020408163265
+          "x": 1251.695912390577,
+          "y": 356.8286818493152
         }
       },
       {
@@ -192,8 +230,8 @@
           "outputs": []
         },
         "position": {
-          "x": 1459.2563265306121,
-          "y": 496.81795918367345
+          "x": 1254.4334721146492,
+          "y": 678.3985038786759
         }
       },
       {
@@ -312,8 +350,8 @@
           ]
         },
         "position": {
-          "x": 1901.7375510204083,
-          "y": -39.688979591836755
+          "x": 507.1989677627894,
+          "y": 16.964150353004072
         }
       },
       {
@@ -328,8 +366,8 @@
           "outputs": []
         },
         "position": {
-          "x": 2247.779832471409,
-          "y": 165.1469814154268
+          "x": 888.1047137952307,
+          "y": 523.9501377327517
         }
       },
       {
@@ -343,188 +381,72 @@
           "description": "释放本次实际占用的洗手池交互点，由前序占用声明自动关联；不重复增加清洁度。"
         },
         "position": {
-          "x": 2561.7877727689693,
-          "y": 137.52916173285973
-        }
-      },
-      {
-        "id": "a30edeff-ec0a-49ee-926b-406ffb8d7fb0",
-        "type": "end",
-        "data": {
-          "animation": "跺跺脚，叉腰叹气",
-          "playMode": "单次",
-          "playExpectation": "",
-          "name": "洗手中断",
-          "description": ""
-        },
-        "position": {
-          "x": 2243.7468252701865,
-          "y": 453.141317806752
-        }
-      },
-      {
-        "id": "wash_loop_admission",
-        "type": "judge",
-        "position": {
-          "x": 2261.7375510204083,
-          "y": -39.688979591836755
-        },
-        "data": {
-          "name": "准入判断",
-          "description": "当前流程允许继续使用洗手池清洗；可用性由准入及外部监听维护，本图不新增资源不足分支。\n不满足原因：洗手池损坏",
-          "judgeAttributes": [
-            {
-              "id": "admission_0",
-              "source": "object:interactObject",
-              "attribute": "durability",
-              "objectName": "洗手池"
-            }
-          ],
-          "branches": [
-            {
-              "id": "admission_0",
-              "name": "满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": [
-                {
-                  "id": "admission_0",
-                  "source": "object:interactObject",
-                  "attribute": "durability",
-                  "influence": "满足条件：归零",
-                  "objectName": "洗手池",
-                  "attributeId": "admission_0"
-                }
-              ]
-            },
-            {
-              "id": "admission_1",
-              "name": "不满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": [
-                {
-                  "id": "admission_0",
-                  "source": "object:interactObject",
-                  "attribute": "durability",
-                  "influence": "不满足条件：归零",
-                  "objectName": "洗手池",
-                  "attributeId": "admission_0"
-                }
-              ]
-            }
-          ],
-          "legacyGate": {
-            "kind": "admission",
-            "condition": "当前流程允许继续使用洗手池清洗；可用性由准入及外部监听维护，本图不新增资源不足分支。\n不满足原因：洗手池损坏",
-            "rules": [
-              {
-                "id": "a540d0e1-98c7-430f-bf84-5874f568ae46",
-                "source": "object:interactObject",
-                "attribute": "durability",
-                "influence": "归零",
-                "objectName": "洗手池"
-              }
-            ],
-            "failureReason": "洗手池损坏"
-          }
+          "x": 885.4361841447064,
+          "y": 731.6607039749078
         }
       }
     ],
     "edges": [
       {
-        "id": "4f3e262e-eb8a-448b-8028-618b3f2cbcc7",
+        "id": "6f04517b-6dcd-4d57-8359-3750ab69d5d5",
         "source": "start",
-        "target": "move_sink"
-      },
-      {
-        "id": "4d50d4c0-e68c-41c5-8434-aa1aed6e8ee0",
-        "source": "move_sink",
         "target": "open_valve"
       },
       {
-        "id": "ff814276-e799-4ddd-881b-4e18a434f356",
+        "id": "6eb9269f-4a01-4aad-b257-85f8e533742a",
         "source": "open_valve",
         "target": "wash_loop"
       },
       {
-        "id": "58f1ec0a-7a4c-400f-9f38-050cc36f84da",
+        "id": "c17314a0-d997-42c5-be5d-470c6d86cf6e",
         "source": "choose_wash",
         "target": "wash_hands",
         "sourceHandle": "hands"
       },
       {
-        "id": "ef2d1106-5b05-4595-b520-b118cfbe09f4",
+        "id": "b8c55679-0fa3-4e0c-8c7b-73a17d40539e",
         "source": "wash_hands",
         "target": "wash_loop"
       },
       {
-        "id": "fbb7a246-5e7b-4971-915c-b6f7097f3364",
+        "id": "baf79e96-9465-4795-80f4-20c4a488c69f",
         "source": "choose_wash",
         "target": "wash_face",
         "sourceHandle": "face"
       },
       {
-        "id": "e5cb7f64-a579-40e8-9838-af7dac5ed968",
+        "id": "bf7079de-0aa3-4b1b-b57d-5bac9c121206",
         "source": "wash_face",
         "target": "wash_loop"
       },
       {
-        "id": "9fd6f887-1e84-4b2d-913c-5e645216e4a8",
+        "id": "fc24d74a-df8b-48da-a852-633a0f1917d5",
         "source": "choose_wash",
         "target": "wash_towel",
         "sourceHandle": "towel"
       },
       {
-        "id": "b721a9f9-1431-4df2-9ed0-22bdf25632f9",
+        "id": "842c408d-5575-4cd0-a4ab-e1a94a380bdc",
         "source": "wash_towel",
         "target": "wash_loop"
       },
       {
-        "id": "db52e62b-fc79-40c4-9604-d6ac5ac2a79b",
+        "id": "8d5bca66-2c57-44aa-a1e1-67765893296d",
         "source": "wash_loop",
         "target": "close_valve",
         "sourceHandle": "complete"
       },
       {
-        "id": "e720622b-78c9-4726-86ec-a0168778471f",
-        "source": "wash_loop",
-        "target": "wash_loop_admission",
-        "sourceHandle": "continue"
-      },
-      {
-        "id": "f8023d27-2146-4a22-adc5-46ea53e99223",
+        "id": "442597ff-fd4b-4174-8620-da5af412bd47",
         "source": "close_valve",
         "target": "end"
       },
       {
-        "id": "wash_loop_admission:admission_0",
-        "source": "wash_loop_admission",
-        "sourceHandle": "admission_0",
-        "target": "choose_wash"
-      },
-      {
-        "id": "wash_loop_admission:admission_1",
-        "source": "wash_loop_admission",
-        "sourceHandle": "admission_1",
-        "target": "a30edeff-ec0a-49ee-926b-406ffb8d7fb0"
+        "id": "aef64989-4747-4460-97e6-dedbe59369d3",
+        "source": "wash_loop",
+        "target": "choose_wash",
+        "sourceHandle": "continue"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "wash_loop",
-          "entry": "wash_loop_admission",
-          "members": [
-            "choose_wash",
-            "wash_hands",
-            "wash_face",
-            "wash_towel",
-            "wash_loop_admission"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-
