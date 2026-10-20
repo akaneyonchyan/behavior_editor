@@ -1,0 +1,342 @@
+{
+  "behavior": {
+    "name": "在床上睡觉",
+    "templateVersion": 4,
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "goal_initial",
+        "source": "object:partner",
+        "attribute": "energy",
+        "influence": "增加"
+      }
+    ],
+    "description": "按原文不配置独立目标规则。建议用精力达到睡眠配置的期望作为循环醒来条件，不把入场80%当恢复目标。仅床上睡眠；找床、位移、点位占用、外部监听与找不到睡觉地点的失败处理留在图外，失败晕眩Buff不在已入床行为里重复发放。上床入睡只一次，之后保持卧姿循环睡眠，无额外稍息、次数上限或地面睡眠分支。",
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "bed",
+          "objectType": "interactObject",
+          "objectName": "床"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "energy_entry",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "energy",
+          "influence": "小于80（当前范围0～100）"
+        },
+        {
+          "id": "no_super_excited",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "buff:design_super_excited",
+          "influence": "不具有指定 Buff 时"
+        },
+        {
+          "id": "empty_tool",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot_tool",
+          "influence": "为空"
+        },
+        {
+          "id": "empty_material",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot_material",
+          "influence": "为空"
+        },
+        {
+          "id": "empty_food",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot_food",
+          "influence": "为空"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "loop",
+          "entry": "sleep",
+          "members": [
+            "sleep",
+            "variation",
+            "turn",
+            "murmur"
+          ]
+        }
+      ],
+      "positions": {}
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始"
+        },
+        "position": {
+          "x": 227.18120648170225,
+          "y": -98.26908001301541
+        }
+      },
+      {
+        "id": "lie",
+        "type": "result",
+        "data": {
+          "name": "上床躺好",
+          "animation": "坐到床沿，用手撑住床面，将双腿收上床，慢慢侧躺，头落在枕头上，调整身体到舒服的位置。",
+          "description": "",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 558.5749948623616,
+          "y": -102.4957071103494
+        }
+      },
+      {
+        "id": "sleep_start",
+        "type": "result",
+        "data": {
+          "name": "闭眼入睡过度",
+          "animation": "轻轻闭眼，肩膀和双手逐渐放松，呼吸由急促变得均匀。",
+          "description": "",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 897.3653806633552,
+          "y": -105.66567743334994
+        }
+      },
+      {
+        "id": "loop",
+        "type": "loop",
+        "data": {
+          "name": "是否睡够",
+          "loopVersion": 3,
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "completionCondition": "精力达到睡眠配置的恢复期望",
+          "completionRules": [],
+          "loopConditions": [
+            {
+              "id": "energy_done",
+              "kind": "goal",
+              "condition": "精力达到睡眠配置的恢复期望",
+              "rules": [
+                {
+                  "id": "energy_done_rule",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "influence": "达到睡眠恢复期望"
+                }
+              ]
+            },
+            {
+              "id": "d3a62c46-039e-45b0-bc2f-0d410a9a0454",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "默认次数"
+            }
+          ]
+        },
+        "position": {
+          "x": 1231.828837654592,
+          "y": -112.05786221190101
+        }
+      },
+      {
+        "id": "sleep",
+        "type": "result",
+        "data": {
+          "name": "安稳睡眠",
+          "animation": "保持侧躺，眼睛闭合，胸口随呼吸轻轻起伏，耳朵或手指偶尔微动。",
+          "description": "",
+          "playMode": "计时",
+          "playExpectation": "持续一段睡眠时间，按睡眠配置",
+          "effectRules": [
+            {
+              "id": "energy_recover",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 1589.4334507293415,
+          "y": -108.84959464339232
+        }
+      },
+      {
+        "id": "variation",
+        "type": "judge",
+        "data": {
+          "name": "睡梦中的小动作",
+          "judgeAttributes": [],
+          "description": "",
+          "branches": [
+            {
+              "id": "turn",
+              "name": "翻身换个姿势",
+              "weightExpectation": "中",
+              "weightFactors": []
+            },
+            {
+              "id": "murmur",
+              "name": "轻声梦呓",
+              "weightExpectation": "低",
+              "weightFactors": []
+            },
+            {
+              "id": "quiet",
+              "name": "继续安睡",
+              "weightExpectation": "高",
+              "weightFactors": []
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1955.6793367509397,
+          "y": -110.13517360345986
+        }
+      },
+      {
+        "id": "turn",
+        "type": "result",
+        "data": {
+          "name": "翻身继续睡",
+          "animation": "闭着眼轻轻翻到另一侧，收拢双腿，头在枕头上蹭一蹭，重新放松。",
+          "description": "从当前卧姿衔接，翻身后仍在床面内，不醒来或坐起。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 2323.0669504916864,
+          "y": -108.54692043092354
+        }
+      },
+      {
+        "id": "murmur",
+        "type": "result",
+        "data": {
+          "name": "梦呓后安静下来",
+          "animation": "嘴角微动，含糊地嘟囔几声，一只手轻轻蜷起，随后放松，恢复平稳呼吸。",
+          "description": "只表现梦呓，不新增情绪或梦境Buff。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 2320.252525174956,
+          "y": 196.61165621431462
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "data": {
+          "name": "睡醒下床回idle",
+          "animation": "呼吸变化，慢慢睁眼，伸展双臂和双腿；撑着床面坐起，揉揉眼睛，将双腿移到床沿，再站起来。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 1584.1516183813005,
+          "y": 221.76991726066387
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e41f82f7-b753-4342-8ddf-cc1a5d09770b",
+        "source": "start",
+        "target": "lie"
+      },
+      {
+        "id": "169b0c6c-8aa7-46f1-8f73-6187c1220971",
+        "source": "lie",
+        "target": "sleep_start"
+      },
+      {
+        "id": "67afe444-d2b2-4b4f-9a77-6a65fdaf2dcd",
+        "source": "sleep_start",
+        "target": "loop"
+      },
+      {
+        "id": "1ac4c745-ab13-4f11-acbc-f69741e21afa",
+        "source": "loop",
+        "target": "sleep",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "482bb512-80bb-41dd-a1b5-285795ed857f",
+        "source": "loop",
+        "target": "end",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "6f25de19-bcd6-484e-a96d-8157593b6385",
+        "source": "sleep",
+        "target": "variation"
+      },
+      {
+        "id": "5bacd132-9586-4721-a6d6-c5944bd8dea2",
+        "source": "variation",
+        "target": "loop",
+        "sourceHandle": "quiet"
+      },
+      {
+        "id": "c9a09015-09bf-47b5-b413-a119de404510",
+        "source": "variation",
+        "target": "turn",
+        "sourceHandle": "turn"
+      },
+      {
+        "id": "6548f90a-be5a-45ff-a761-ef0060781a4b",
+        "source": "variation",
+        "target": "murmur",
+        "sourceHandle": "murmur"
+      },
+      {
+        "id": "cd8f644c-3103-4f79-8dbc-178ba5ef5fd3",
+        "source": "turn",
+        "target": "loop"
+      },
+      {
+        "id": "450bfdda-173b-4dac-9138-c0a253c6b309",
+        "source": "murmur",
+        "target": "loop"
+      }
+    ]
+  }
+}
