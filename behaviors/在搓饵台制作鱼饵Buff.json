@@ -1,0 +1,326 @@
+{
+  "behavior": {
+    "name": "在搓饵台制作鱼饵Buff",
+    "description": "目标为给本行为伙伴添加鱼饵Buff，制作有效时长按产出Buff索引制作配置。按本轮需求暂采用只消耗制作时间、不新增库存原料或手持工具要求的版本；搓饵动作中的饵团为工位表演素材。有效制作时间在执行段累计，稍息/等待/位移不计入。完成后仅产出一次鱼饵Buff。材料、工具若制作配置另有要求须另行映射，不在本稿虚构。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "bait_goal",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "buff:design_fishing_bait",
+        "influence": "增加"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "bait_table",
+          "objectType": "interactObject",
+          "objectName": "搓饵台"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": []
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜制作鱼饵",
+          "description": "目标产出为伙伴鱼饵Buff，配置提供本次有效制作总时长。找台、可达性和解锁检查由策略完成，图内不重复画判断。制作进度属于本次制作任务，不借用仅适用于道具的crafting_progress属性。"
+        },
+        "position": {
+          "x": -160.60265870401315,
+          "y": -27.2840124811097
+        }
+      },
+      {
+        "id": "move_table",
+        "type": "move",
+        "data": {
+          "name": "位移到搓饵台",
+          "destinationType": "interactObject",
+          "objectType": "interactObject",
+          "objectName": "搓饵台",
+          "destination": "搓饵台制作交互点",
+          "description": "沿用通用占用、等候与超时机制，不重复展开。",
+          "occupiedResources": [
+            {
+              "id": "bait_point",
+              "source": "object:interactObject",
+              "objectName": "搓饵台",
+              "attribute": "interaction_point_occupied"
+            }
+          ]
+        },
+        "position": {
+          "x": 176.79089601228645,
+          "y": -66.77630147211607
+        }
+      },
+      {
+        "id": "knead",
+        "type": "result",
+        "data": {
+          "name": "反复揉压与搓饵",
+          "animation": "双手在台面上拢住饵团，用掌根向前揉压，再收拢折回；取一小团放在掌心相对搓揉，搓圆后放回台面，继续下一段制作动作。",
+          "playMode": "计时",
+          "playExpectation": "1分钟",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 565.5644829300695,
+          "y": -44.236842595784026
+        }
+      },
+      {
+        "id": "craft_loop",
+        "type": "loop",
+        "data": {
+          "name": "制作完成或继续",
+          "loopVersion": 2,
+          "completionCondition": "本次累计有效制作时长达到【鱼饵】制作配置要求/到达循环通用上限",
+          "completionRules": [],
+          "resourceCheck": "未完成时，搓饵台耐久度仍大于0，能够继续制作；其他可用性变化由通用监听接管。",
+          "resourceRules": [
+            {
+              "id": "table_usable",
+              "source": "object:interactObject",
+              "objectName": "搓饵台",
+              "attribute": "durability",
+              "influence": "大于0，可继续制作"
+            }
+          ],
+          "failureReason": "搓饵台耐久降至0，无法继续完成本次制作",
+          "restEnabled": false,
+          "restExpectation": "较少发生",
+          "restCondition": "未完成且台面可继续使用时，可短暂松手稍息；具体个性表现沿用通用机制。",
+          "restRules": [],
+          "description": "先判断制作时间是否完成，再判断能否继续，再选择是否稍息。"
+        },
+        "position": {
+          "x": 1674.9116036430016,
+          "y": -249.43050792871637
+        }
+      },
+      {
+        "id": "produce_bait",
+        "type": "result",
+        "data": {
+          "name": "反复揉压与搓饵",
+          "animation": "双手在台面上拢住饵团，用掌根向前揉压，再收拢折回；取一小团放在掌心相对搓揉，搓圆后放回台面，继续下一段制作动作。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 1294.4598942485022,
+          "y": -275.02920349846784
+        }
+      },
+      {
+        "id": "table_broken",
+        "type": "result",
+        "data": {
+          "name": "台面损坏｜吓一跳",
+          "animation": "搓饵台维修部位突然松脱或发出异响，伙伴猛地缩手，身体往后一缩，惊讶地看着台面。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "startled",
+              "kind": "buff",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:emotion_startled",
+              "influence": "增"
+            }
+          ],
+          "outputs": [],
+          "description": "仅未完成且台耐久已为0时进入，具体损坏表现按资产适配"
+        },
+        "position": {
+          "x": 1292.1944899554874,
+          "y": 10.748480882064314
+        }
+      },
+      {
+        "id": "end_complete",
+        "type": "end",
+        "data": {
+          "name": "完成制作",
+          "animation": "把鱼饵收入囊中",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 2398.42833556434,
+          "y": -202.6977457403766
+        }
+      },
+      {
+        "id": "end_interrupted",
+        "type": "end",
+        "data": {
+          "name": "结束制作",
+          "animation": "四周看看，挠头，摊手",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 2053.9108061125467,
+          "y": 95.52899040702044
+        }
+      },
+      {
+        "id": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "正常搓饵",
+              "weightExpectation": "中",
+              "weightFactors": [],
+              "nextNode": ""
+            },
+            {
+              "id": "default",
+              "name": "制作未完成",
+              "weightExpectation": "中",
+              "weightFactors": [],
+              "nextNode": ""
+            }
+          ],
+          "name": "判断节点",
+          "judgeAttributes": []
+        },
+        "position": {
+          "x": 898.4267230741018,
+          "y": -42.60896821504744
+        }
+      },
+      {
+        "id": "72d29530-174b-4e4a-8469-659a33828adf",
+        "type": "result",
+        "data": {
+          "animation": "将最后一团鱼饵搓圆，满意地看一眼搓饵成果，轻轻点头",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "执行节点",
+          "effectRules": [
+            {
+              "id": "af099ad4-8cab-4a3c-825a-f39bb28883a7",
+              "source": "object:partner",
+              "attribute": "buff:design_fishing_bait",
+              "influence": "增",
+              "kind": "buff",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ]
+        },
+        "position": {
+          "x": 2054.4451558762853,
+          "y": -255.03395076371
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "3e21c785-2b17-4b44-af2d-5c44f73bcab5",
+        "source": "start",
+        "target": "move_table"
+      },
+      {
+        "id": "4bca1489-6d8c-4b94-a544-f28728f44be3",
+        "source": "move_table",
+        "target": "end_interrupted",
+        "sourceHandle": "unreachable",
+        "targetHandle": null
+      },
+      {
+        "id": "596d83ef-6e56-4c87-ad98-41120b09918d",
+        "source": "move_table",
+        "target": "knead",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "b22ca8cd-af2f-4dec-8082-931b87f5cb32",
+        "source": "knead",
+        "target": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "08e414cd-6ab8-41cd-91b5-f5bd3656d5fe",
+        "source": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+        "target": "produce_bait",
+        "sourceHandle": "branch_1",
+        "targetHandle": null
+      },
+      {
+        "id": "21efdcbf-46e9-407c-a8ce-75da02f273da",
+        "source": "produce_bait",
+        "target": "craft_loop",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "dd210493-d13d-45f0-a7e9-1dcf2a1c9cb4",
+        "source": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+        "target": "table_broken",
+        "sourceHandle": "default",
+        "targetHandle": null
+      },
+      {
+        "id": "404d6802-f3b0-4f14-a7cf-f0a11d49553e",
+        "source": "craft_loop",
+        "target": "end_interrupted",
+        "sourceHandle": "insufficient"
+      },
+      {
+        "id": "8ebc124b-a3eb-49e0-9d43-958e9a70d5c0",
+        "source": "table_broken",
+        "target": "craft_loop",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "20effd59-2067-404c-bbaa-1805f7e3e21e",
+        "source": "craft_loop",
+        "target": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "0aa2a001-9b93-483b-8e94-090d8a2f3aec",
+        "source": "craft_loop",
+        "target": "72d29530-174b-4e4a-8469-659a33828adf",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "b5ec7db3-ab58-40ad-b83f-1d37f3d21c11",
+        "source": "72d29530-174b-4e4a-8469-659a33828adf",
+        "target": "end_complete",
+        "sourceHandle": null,
+        "targetHandle": null
+      }
+    ]
+  }
+}

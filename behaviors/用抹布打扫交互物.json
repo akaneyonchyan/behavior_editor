@@ -1,0 +1,345 @@
+{
+  "behavior": {
+    "name": "用抹布打扫交互物",
+    "description": "前置【从工具柜拿取抹布】已完成拿取与装备。本行为要求装备槽已装备抹布，目标为提升已选交互物清洁度。位移后直接擦拭，不含准备/拿取/装备抹布环节。三种擦拭结果汇入循环；未达本次目标继续选择动作，达成后收尾。不开启稍息，不展示外部监听控制。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "goal_object_cleanliness",
+        "source": "object:interactObject",
+        "objectName": "目标交互物",
+        "attribute": "cleanliness",
+        "influence": "增加"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "target_object",
+          "objectType": "interactObject",
+          "objectName": "目标交互物"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "rag_equipped",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot",
+          "influence": "有抹布"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜装备槽已有抹布",
+          "description": "拿取和装备由前置【从工具柜拿取抹布】完成。清洁目标值来自上游，不默认打扫至上限。"
+        },
+        "position": {
+          "x": -382.2938666021639,
+          "y": 37.29696259533307
+        }
+      },
+      {
+        "id": "move_target",
+        "type": "move",
+        "data": {
+          "name": "位移到目标交互物",
+          "destinationType": "interactObject",
+          "objectType": "interactObject",
+          "objectName": "目标交互物",
+          "destination": "目标交互物的清洁交互点",
+          "description": "前往已选交互物的清洁交互点；占用检查和监听沿用通用机制。",
+          "occupiedResources": [
+            {
+              "id": "cleaning_point",
+              "source": "object:interactObject",
+              "objectName": "目标交互物",
+              "attribute": "interaction_point_occupied"
+            }
+          ]
+        },
+        "position": {
+          "x": -47.30065280058466,
+          "y": 55.91599289848227
+        }
+      },
+      {
+        "id": "choose_wipe",
+        "type": "judge",
+        "data": {
+          "name": "选择本轮擦拭动作",
+          "description": "先按目标表面及资产适配排除不可用动作，再从可用动作中选择；同等倾向为建议，允许连续重复。",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "back_forth",
+              "name": "大力擦拭",
+              "condition": "目标表面支持前后擦拭",
+              "weightExpectation": "中",
+              "weightFactors": [],
+              "nextNode": "wipe_back_forth"
+            },
+            {
+              "id": "circles",
+              "name": "小心擦细节",
+              "condition": "目标表面支持画圈擦拭",
+              "weightExpectation": "中",
+              "weightFactors": [],
+              "nextNode": "wipe_circles"
+            },
+            {
+              "id": "corners",
+              "name": "抖抖抹布",
+              "condition": "仅在目标存在可擦边缘或缝隙且资产支持动作时可选；不支持则排除此分支",
+              "weightExpectation": "低",
+              "weightFactors": [],
+              "nextNode": "wipe_corners"
+            }
+          ]
+        },
+        "position": {
+          "x": 615.4567581161726,
+          "y": -25.207881186850955
+        }
+      },
+      {
+        "id": "wipe_back_forth",
+        "type": "result",
+        "data": {
+          "name": "来回擦拭",
+          "animation": "将已装备的抹布按在表面，手臂前后用力推拉，擦过一片区域，再收回擦拭的手。",
+          "playMode": "计次",
+          "playExpectation": "1~3次",
+          "description": "",
+          "effectRules": [
+            {
+              "id": "back_forth_cleanliness",
+              "kind": "attribute",
+              "source": "object:interactObject",
+              "objectName": "目标交互物",
+              "attribute": "cleanliness",
+              "influence": "增"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 961.3023098207507,
+          "y": -25.713983376415854
+        }
+      },
+      {
+        "id": "wipe_circles",
+        "type": "result",
+        "data": {
+          "name": "画圈擦拭",
+          "animation": "身体稍微前倾，按住抹布小范围画圈揉擦，再移动到邻近区域，完成后收回擦拭的手。",
+          "playMode": "3~5次",
+          "playExpectation": "",
+          "description": "",
+          "effectRules": [
+            {
+              "id": "circles_cleanliness",
+              "kind": "attribute",
+              "source": "object:interactObject",
+              "objectName": "目标交互物",
+              "attribute": "cleanliness",
+              "influence": "增"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 962.5259160664184,
+          "y": 414.12906226198743
+        }
+      },
+      {
+        "id": "wipe_corners",
+        "type": "result",
+        "data": {
+          "name": "抖抖抹布",
+          "animation": "将已持有的抹布展开抖一抖，歪头检查交互物",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 621.0529392586946,
+          "y": 446.82455089261725
+        }
+      },
+      {
+        "id": "clean_loop",
+        "type": "loop",
+        "data": {
+          "name": "判断清洁目标是否达成",
+          "loopVersion": 2,
+          "completionCondition": "目标交互物清洁度已满足本次上游目标期望",
+          "completionRules": [
+            {
+              "id": "target_clean",
+              "source": "object:interactObject",
+              "objectName": "目标交互物",
+              "attribute": "cleanliness",
+              "influence": "达到本次目标期望"
+            }
+          ],
+          "resourceCheck": "当前打扫可继续；工具装备与交互物可用性由准入及外部监听维护，不新增资源不足分支。",
+          "resourceRules": [],
+          "failureReason": "被插入行为中断",
+          "restEnabled": false,
+          "restExpectation": "",
+          "restCondition": "",
+          "restRules": [],
+          "description": "三种擦拭均汇入这里；未达目标直接回到动作选择，已达目标收尾。不开启稍息。"
+        },
+        "position": {
+          "x": 1316.1050861643198,
+          "y": 8.77918835700575
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "data": {
+          "name": "完成｜检查清洁结果",
+          "animation": "收回擦拭的手，看一眼擦干净的表面，轻轻点头，放松站姿。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 1648.9281381256833,
+          "y": 11.553263085180731
+        }
+      },
+      {
+        "id": "8cdb8cd8-d4ef-467c-94ed-9daf196f8488",
+        "type": "result",
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "擦拭准备",
+          "description": "掏出抹布准备擦拭"
+        },
+        "position": {
+          "x": 279.8504289501752,
+          "y": 58.71836872602421
+        }
+      },
+      {
+        "id": "3dcdc05a-f257-4750-8401-d0286cebd23d",
+        "type": "end",
+        "data": {
+          "animation": "四周看看，挠头，摊手",
+          "playMode": "单次",
+          "playExpectation": "",
+          "name": "结束节点",
+          "description": "找点、其他行为打断直接结束"
+        },
+        "position": {
+          "x": 1654.8200814459462,
+          "y": 343.40547033035443
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "cc903187-17ed-4007-999e-bdb4c3354877",
+        "source": "start",
+        "target": "move_target"
+      },
+      {
+        "id": "10a2a9ac-4ced-49cc-a0dc-b8e77ccb5c5e",
+        "source": "choose_wipe",
+        "target": "wipe_back_forth",
+        "sourceHandle": "back_forth"
+      },
+      {
+        "id": "700d4851-7390-49ad-beb9-bacd918ada50",
+        "source": "wipe_back_forth",
+        "target": "clean_loop"
+      },
+      {
+        "id": "02138161-6534-44c2-8496-af688f8da085",
+        "source": "choose_wipe",
+        "target": "wipe_circles",
+        "sourceHandle": "circles"
+      },
+      {
+        "id": "088f23d0-97a1-4cda-9d3b-cc49f22439d6",
+        "source": "wipe_circles",
+        "target": "clean_loop"
+      },
+      {
+        "id": "da350cb1-f3d9-4cc5-863a-c5cad45f7c30",
+        "source": "choose_wipe",
+        "target": "wipe_corners",
+        "sourceHandle": "corners"
+      },
+      {
+        "id": "19132d35-d059-4947-8be2-deedf98b6214",
+        "source": "clean_loop",
+        "target": "end",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "444c14b5-32ec-415b-bf77-8a7f12ea3b64",
+        "source": "clean_loop",
+        "target": "choose_wipe",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "bfc03106-9812-441c-91c5-c937bbc14103",
+        "source": "move_target",
+        "target": "8cdb8cd8-d4ef-467c-94ed-9daf196f8488",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "7ef13cd7-b1d2-4323-bf7c-dc34e2ef2e20",
+        "source": "8cdb8cd8-d4ef-467c-94ed-9daf196f8488",
+        "target": "choose_wipe",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "2f8bbfca-bd23-4567-906a-7c5c66467cef",
+        "source": "wipe_corners",
+        "target": "choose_wipe",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "8b64f75f-c88e-4977-8c28-65ba9b43a341",
+        "source": "clean_loop",
+        "target": "3dcdc05a-f257-4750-8401-d0286cebd23d",
+        "sourceHandle": "insufficient"
+      },
+      {
+        "id": "c15b4f5b-dcfc-41e8-a272-a1ad3dc5f6a5",
+        "source": "move_target",
+        "target": "3dcdc05a-f257-4750-8401-d0286cebd23d",
+        "sourceHandle": "unreachable",
+        "targetHandle": null
+      }
+    ]
+  }
+}
