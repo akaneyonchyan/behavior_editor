@@ -1,5 +1,6 @@
 import {activeEdges,resolveScopes} from './loopStructure'
-// Visual-only wrappers. All domain nodes and edges retain their original IDs.
+import {containerTarget} from './normalizeBehavior'
+// Visual-only wrappers and boundary segments; domain graph stays unchanged.
 export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
  const {scopes,warnings}=resolveScopes(nodes,edges,layout),byId=new Map(nodes.map(n=>[n.id,n])),collapsedSet=new Set(collapsed)
  const prefix=(()=>{let s='__scope_';while(nodes.some(n=>n.id.startsWith(s)))s+='_';return s})()
@@ -15,7 +16,21 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
   const enclosing=scopes.filter(p=>p.loopId!==s.loopId&&[...sets.get(s.loopId)].every(id=>sets.get(p.loopId).has(id))).sort((a,b)=>a.members.length-b.members.length)
   if(enclosing.length)parents.set(s.loopId,enclosing[0].loopId)
  }
- const active=activeEdges(nodes,edges),boxes=new Map(),positions=new Map(),output=[]
+ const active=activeEdges(nodes,edges).map((e,i)=>({...e,id:e.id||'edge_'+i})),boxes=new Map(),positions=new Map(),output=[]
+ const entryId=id=>groupId(id)+'__entry'
+ const exitId=(scope,edge)=>groupId(scope)+'__exit_'+edge
+ const boundaries=new Map(scopes.map(s=>[s.loopId,[]]))
+ const leaving=e=>{
+  const result=[]
+  let owner=sets.has(e.source)?parents.get(e.source):owners.get(e.source)
+  while(owner){
+   if(sets.get(owner).has(e.target))break
+   result.push(owner);owner=parents.get(owner)
+  }
+  return result
+ }
+ const isReturn=e=>scopes.some(s=>s.loopId===e.target&&s.members.includes(e.source))
+ for(const e of active.filter(e=>!isReturn(e)))for(const id of leaving(e))boundaries.get(id).push({edgeId:e.id,handle:'exit:'+e.id,label:byId.get(e.source)?.data.name||'分支出口'})
  const rep=(id,scope)=>{
   let owner=owners.get(id)
   if(owner===scope||!owner)return id
@@ -28,7 +43,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
   const items=[...nodes.filter(n=>n.id!==scope&&(owners.get(n.id)||null)===scope).map(n=>n.id),...children.map(s=>groupId(s.loopId))]
   const set=new Set(items),links=[]
   for(const e of active){
-   if(scope&&e.target===scope)continue // return-to-check remains drawn but doesn't reverse horizontal ranks
+   if(scope&&e.target===scope)continue // Return-to-check must not reverse horizontal ranks
    const from=rep(e.source,scope),to=rep(e.target,scope)
    if(from!==to&&set.has(from)&&set.has(to)&&!links.some(x=>x[0]===from&&x[1]===to))links.push([from,to])
   }
@@ -46,7 +61,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
    const edge=active.find(e=>e.source===n.id&&e.sourceHandle===b.id)
    if(edge&&set.has(rep(edge.target,scope)))order.set(rep(edge.target,scope),(order.get(rep(n.id,scope))||0)+i/100)
   })
-  let x=scope?32:0,maxHeight=0
+  let x=scope?120:0,maxHeight=0
   const ranks=[...new Set(rank.values())].sort((a,b)=>a-b)
   for(const r of ranks){
    let y=scope?(sizes['header:'+scope]?.height||150)+32:0,width=0
@@ -57,15 +72,23 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
    }
    maxHeight=Math.max(maxHeight,y);x+=width+100
   }
-  if(scope)boxes.set(groupId(scope),collapsedSet.has(scope)?{width:440,height:(sizes['header:'+scope]?.height||150)+52}:{width:Math.max(480,x-68),height:Math.max((sizes['header:'+scope]?.height||150)+100,maxHeight-38)})
+  if(scope)boxes.set(groupId(scope),collapsedSet.has(scope)?{width:440,height:Math.max((sizes['header:'+scope]?.height||150)+52,100+boundaries.get(scope).length*28)}:{width:Math.max(540,x+16),height:Math.max((sizes['header:'+scope]?.height||150)+100,maxHeight-38,(sizes['header:'+scope]?.height||150)+60+boundaries.get(scope).length*48)})
  }
  place(null)
  function emit(scope){
   const children=scopes.filter(s=>(parents.get(s.loopId)||null)===scope)
   for(const child of children){
    const id=groupId(child.loopId),size=boxes.get(id)
-   output.push({id,type:'loopScope',position:layout?.positions?.[id]||positions.get(id),...(scope?{parentNode:groupId(scope)}:{}),data:{scope:child,collapsed:collapsedSet.has(child.loopId),node:byId.get(child.loopId),count:child.members.length,exits:child.members.reduce((n,id)=>n+(byId.get(id)?.data.externalExits?.length||0),0)+(byId.get(child.loopId)?.data.externalExits?.length||0)},style:{width:size.width,height:size.height},zIndex:-1,selectable:false,deletable:false})
-   if(!collapsedSet.has(child.loopId))emit(child.loopId)
+   output.push({id,type:'loopScope',position:layout?.positions?.[id]||positions.get(id),...(scope?{parentNode:groupId(scope)}:{}),data:{boundaryExits:boundaries.get(child.loopId),scope:child,collapsed:collapsedSet.has(child.loopId),node:byId.get(child.loopId),count:child.members.length,exits:child.members.reduce((n,id)=>n+(byId.get(id)?.data.externalExits?.length||0),0)+(byId.get(child.loopId)?.data.externalExits?.length||0)},style:{width:size.width,height:size.height},zIndex:-1,selectable:false,deletable:false})
+   if(!collapsedSet.has(child.loopId)){
+    emit(child.loopId)
+    if(child.entry){
+     const first=rep(child.entry,child.loopId),pos=layout?.positions?.[first]||positions.get(first)||{y:180},size=boxes.get(first)||{height:260}
+     const y=pos.y+(first.startsWith(prefix)?28:size.height/2)-16
+     output.push({id:entryId(child.loopId),type:'loopPortal',parentNode:id,position:{x:32,y},data:{kind:'entry'},draggable:false,selectable:false,deletable:false})
+    }
+    boundaries.get(child.loopId).forEach((exit,i)=>output.push({id:exitId(child.loopId,exit.edgeId),type:'loopPortal',parentNode:id,position:{x:size.width-64,y:(sizes['header:'+child.loopId]?.height||150)+32+i*48},data:{kind:'exit',label:exit.label},draggable:false,selectable:false,deletable:false}))
+   }
   }
   for(const n of nodes.filter(n=>n.id!==scope&&(owners.get(n.id)||null)===scope)){
    output.push({...n,position:layout?.positions?.[n.id]||positions.get(n.id)||{x:0,y:0},...(scope?{parentNode:groupId(scope)}:{}),draggable:false,deletable:false})
@@ -79,13 +102,31 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
   while(owner){if(visible.has(groupId(owner)))return groupId(owner);owner=parents.get(owner)}
   return id
  }
- const lines=active.map(e=>{
-  // Iteration completion is represented by containment, never by a visible return wire.
-  if(scopes.some(s=>s.loopId===e.target&&s.members.includes(e.source)))return null
-  const source=endpoint(e.source),target=endpoint(e.target)
-  if(source===target&&e.source!==e.target)return null
-  const controller=scopes.some(s=>s.loopId===e.source)&&source===groupId(e.source)
-  return {...e,source,target,sourceHandle:source!==e.source?(controller?e.sourceHandle:'out'):e.sourceHandle,targetHandle:target!==e.target?'in':e.targetHandle,type:'default'}
- }).filter(Boolean)
+ const lines=[]
+ const segment=(e,suffix,source,sourceHandle,target,targetHandle)=>{
+  if(source!==target)lines.push({...e,id:e.id+suffix,source,sourceHandle,target,targetHandle,type:'default'})
+ }
+ for(const e of active){
+  // Completing an iteration needs no visible return wire.
+  if(isReturn(e))continue
+  const targetId=containerTarget(scopes,e.source,e.target,e.sourceHandle)
+  const target=endpoint(targetId)
+  let source=endpoint(e.source),sourceHandle=e.sourceHandle
+  const targetHandle=target!==e.target?'in':e.targetHandle
+  // Body entry originates at the play glyph, never the container header.
+  if(sets.has(e.source)&&e.sourceHandle==='continue'){
+   if(!visible.has(entryId(e.source)))continue
+   source=entryId(e.source);sourceHandle='out'
+  }
+  if(source===target)continue
+  for(const scope of leaving(e)){
+   const group=groupId(scope)
+   if(!visible.has(group))continue
+   if(visible.has(exitId(scope,e.id)))segment(e,':inside:'+scope,source,sourceHandle,exitId(scope,e.id),'in')
+   source=group;sourceHandle='exit:'+e.id
+  }
+  // A hidden child still exits via its container's matching boundary port.
+  segment(e,':outside',source,sourceHandle,target,targetHandle)
+ }
  return {nodes:output,edges:lines,warnings,scopes}
 }

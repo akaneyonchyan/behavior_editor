@@ -35,3 +35,13 @@
 .scope-flow-note {font-size:11px;color:#aaa0ad;margin-top:6px;}
 .scope-toggle {position:absolute;right:150px;top:10px;}
 .loop-goal-summary {font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px;}
+
+.loop-scope {position:relative;}
+.loop-scope>.react-flow__handle {background:#f472b6;}
+.scope-output>.react-flow__handle {right:-5px;top:50%;}
+.scope-boundary {width:95px;font-size:10px;}
+.loop-portal {width:32px;height:32px;border:1px solid #f472b6;border-radius:50%;background:#241d29;color:#f472b6;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.loop-portal .react-flow__handle {background:#f472b6;}
+.loop-portal.exit {width:24px;height:24px;font-size:14px;}
+
+.scope-boundary>span {position:relative;top:-18px;}
