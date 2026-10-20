@@ -185,3 +185,10 @@ tests/online-behaviors.cjs、download-behavior.cjs 和 online-files.spec.cjs 以
 缓存模板有独立版本；回退到旧缓存模板时采用新版内置模板。现有正式文件和编辑草稿继续恢复，不清空缓存，不批量迁移线上文件。examples/eat-snack.json 保留为旧格式兼容示例；新格式示例见 examples/external-exits.json。
 
 数据：节点 data.externalExits=[{handle,note}]，执行节点 handle 为空字符串，判断使用稳定分支ID，循环使用 complete/insufficient/rest/continue。此列表与同出口 graph.edges 互斥，documentValidation 同时覆盖本地、在线、上传及发布校验。支持关闭的循环出口保留记录；分支删除清理对应记录，排序不改ID。旧 move 类型仍被校验器接受，但创建入口停用。实现入口：externalExits.js、BranchDestination.jsx、behaviorStore.setBranchDestination；回归：tests/external-exits.cjs、external-exits.spec.cjs、move-outputs.spec.cjs。
+
+
+## 在线需求清单（2026-10-20）
+
+RequirementsPanel 根据页签选择当前图或全部在线文件。onlineRequirements.loadRequirementFiles 读取单次 manifest，再按 SHA 读取对应公开快照，最多4个并发，使用 AbortSignal 取消，逐文件记录失败且保持目录顺序。collectOnlineRequirements 复用单图 collectRequirements 的上下文键，附加 files 与 locations.fileName/fileSha/behaviorName；同节点ID来自不同文件不能互相覆盖。不调用 importConfig，不更改本地状态。文件链接使用隔离的 fileView.openOnline；Markdown 导出注明范围、来源和未完成文件。
+
+回归：tests/online-requirements.cjs（归并、来源、不同上下文、公共库变化、导出、并发/取消/部分失败），tests/online-requirements.spec.cjs（全目录不受过滤、匿名读取、来源跳转、刷新重试、草稿隔离、公共库未就绪）。

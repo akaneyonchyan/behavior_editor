@@ -80,12 +80,32 @@ export function collectRequirements(info,nodes,lib){
  }
  return result
 }
-export function requirementsMarkdown(report,name,syncedAt){
+export function collectOnlineRequirements(files,lib){
+ const report=Object.fromEntries(Object.keys(REQUIREMENT_TABS).map(k=>[k,[]])),groups=new Map()
+ for(const file of files){
+  const result=collectRequirements(file.config.behavior,file.config.graph.nodes,lib)
+  for(const tab of Object.keys(REQUIREMENT_TABS))for(const row of result[tab]){
+   let merged=groups.get(row.key)
+   if(!merged){merged={...row,locations:[],files:[]};groups.set(row.key,merged);report[tab].push(merged)}
+   if(!merged.files.some(f=>f.name===file.name))merged.files.push({name:file.name,behaviorName:file.config.behavior.name,sha:file.sha})
+   for(const location of row.locations){
+    if(!merged.locations.some(l=>l.fileName===file.name&&l.nodeId===location.nodeId&&l.path===location.path))
+     merged.locations.push({...location,fileName:file.name,fileSha:file.sha,behaviorName:file.config.behavior.name})
+   }
+  }
+ }
+ return report
+}
+export function requirementsMarkdown(report,name,syncedAt,scope={}){
  const escape=v=>String(v??'').replace(/\|/g,'\\|').replace(/\r?\n/g,'<br>')
- const lines=['# '+String(name||'未命名行为').replace(/[\r\n]/g,' ')+' · 需求清单','','依据公共库快照：'+(syncedAt||'本机公共库'),'仅核对当前行为图；未匹配不等于游戏不支持。表演资产均待人工核对。','']
+ const lines=['# '+String(name||'未命名行为').replace(/[\r\n]/g,' ')+' · 需求清单','','依据公共库快照：'+(syncedAt||'本机公共库'),(scope.online?'核对已发布在线文件；':'仅核对当前行为图；')+'未匹配不等于游戏不支持。表演资产均待人工核对。','']
+ if(scope.online){
+  lines.push('读取成功 '+scope.files.length+' / '+scope.total+' 个文件；在线快照：'+(scope.publishedAt||'时间未提供'),'')
+  if(scope.failures?.length)lines.push('注意：清单不完整，以下文件读取失败：',...scope.failures.map(f=>'- '+escape(f.name)+'：'+escape(f.message)),'')
+ }
  for(const [tab,title] of Object.entries(REQUIREMENT_TABS)){
   lines.push('## '+title+'（'+report[tab].length+'）','','| 内容 | 字段 | 对象 / 属性上下文 | 原因 | 使用位置 |','|---|---|---|---|---|')
-  for(const row of report[tab])lines.push('| '+[row.display,row.field,row.context,row.reason,row.locations.map(l=>l.label+' ['+(l.nodeId||'准入')+'] / '+l.path).join('\n')].map(escape).join(' | ')+' |')
+  for(const row of report[tab])lines.push('| '+[row.display,row.field,row.context,row.reason,row.locations.map(l=>(l.fileName?l.fileName+'（'+l.behaviorName+'） / ':'')+l.label+' ['+(l.nodeId||'准入')+'] / '+l.path).join('\n')].map(escape).join(' | ')+' |')
   if(!report[tab].length)lines.push('| 暂无待核对内容 | | | | |')
   lines.push('')
  }

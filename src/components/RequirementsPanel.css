@@ -4,3 +4,9 @@
 .requirements-dialog .library-table td:last-child { width:30%; }
 .requirement-location { display:block; background:transparent; border:0; color:var(--accent); font:inherit; text-align:left; cursor:pointer; padding:3px 0; }
 .requirement-location:hover { text-decoration:underline; }
+
+.requirement-file { padding:4px 0 8px; border-bottom:1px solid var(--border); }
+.requirement-file details { font-size:12px; }
+.requirement-file summary { cursor:pointer; }
+.requirement-file small { display:block; }
+.requirement-failures { max-height:150px; overflow:auto; }
