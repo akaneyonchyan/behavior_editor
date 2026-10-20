@@ -26,7 +26,6 @@ export function LoopConditionsEditor({node,compact=false,onUpdate}){
    {c.kind==='count'?<label>最大次数<input aria-label={'结束条件 '+(i+1)+' 最大次数'} value={c.maxIterations||''} placeholder="填写次数或设计期望" onChange={e=>patch(c.id,{maxIterations:e.target.value})}/></label>:compact?<div className="loop-goal-summary">{c.condition}{c.rules?.map(r=><div key={r.id}><RuleText rule={r} kind={r.attribute?.startsWith('buff:')?'buff':'attribute'} influences={['较低时','较高时','处于指定状态时','具有指定 Buff 时','不具有指定 Buff 时']}/></div>)}{!c.condition&&!c.rules?.length&&<small>引用行为目标 · 可在右侧设置</small>}</div>:<>
     <LibraryRules title="目标满足属性条件" value={c.rules||[]} onChange={rules=>patch(c.id,{rules})}/>
     <p className="form-hint">此项内属性规则全部满足时结束；不填规则时引用行为准入数据中的满足目标。</p>
-    {c.condition&&<label>补充条件说明<textarea aria-label={'结束条件 '+(i+1)+' 说明'} value={c.condition} onChange={e=>patch(c.id,{condition:e.target.value})}/></label>}
    </>}
   </section>}</SortableList>
  </div>
@@ -47,4 +46,3 @@ export default function LoopFields({node}){
   <LoopScopeSettings key={node.id} node={node}/>
  </div>
 }
-

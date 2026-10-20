@@ -10,6 +10,21 @@ async function dragCenter(page,locator,point,group=false){
  const x=group?header.x+header.width-20:header.x+30,y=group?header.y+header.height-4:header.y+12
  await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+point.x-(box.x+box.width/2),y+point.y-(box.y+box.height/2),{steps:20});await page.mouse.up();await page.waitForTimeout(120)
 }
+test('existing condition text never restores a duplicate sidebar input',async({page})=>{
+ await page.evaluate(async()=>{
+  const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js')
+  const n=g.getState().nodes.find(n=>n.type==='loop')
+  g.getState().updateNode(n.id,{loopConditions:[{id:'existing-goal',kind:'goal',condition:'本次实际获得木材 > N',rules:[{id:'rule',source:'原料',attribute:'数量',influence:'本次实际获得量达到N'}]}]})
+ })
+ await page.locator('.scope-title').click()
+ const panel=page.locator('.property-panel')
+ await expect(panel).not.toContainText('补充条件说明')
+ await expect(panel.locator('.loop-conditions-editor textarea')).toHaveCount(0)
+ await panel.getByRole('combobox',{name:'规则描述',exact:true}).fill('获得木材达到预期')
+ const loop=(await state(page)).graph.nodes.find(n=>n.type==='loop')
+ expect(loop.data.loopConditions[0].rules[0].influence).toBe('获得木材达到预期')
+ expect(loop.data.loopConditions[0].condition).toBe('本次实际获得木材 > N')
+})
 test('empty wrappers do not lock free nodes; drag into, between and out of loops with one-step undo',async({page})=>{
  await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js'),{NODE_CONFIG}=await import('/src/constants/behaviorTypes.js');const node=(id,type)=>({id,type,data:structuredClone(NODE_CONFIG[type].defaultData),position:{x:0,y:0}});g.getState().importConfig({behavior:{name:'拖动测试'},graph:{nodes:[node('start','start'),node('a','loop'),node('b','loop'),node('free','result')],edges:[],layout:{version:1,scopes:[{loopId:'a',entry:'',members:[]},{loopId:'b',entry:'',members:[]}],positions:{start:{x:-350,y:0},__scope_a:{x:0,y:0},__scope_b:{x:750,y:0},free:{x:150,y:700}}}}})})
  const free=page.locator('[data-id=free]'),a=page.locator('[data-id=__scope_a]'),b=page.locator('[data-id=__scope_b]')
@@ -67,4 +82,3 @@ test('dropping a new empty loop preserves existing positions and remains indepen
  expect((await state(page)).graph.layout.positions['__scope_'+added.id]).not.toEqual(current.graph.layout.positions['__scope_'+added.id])
  expect((await state(page)).graph.layout.scopes.find(s=>s.loopId===added.id).members).toEqual([])
 })
-
