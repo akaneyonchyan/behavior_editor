@@ -1,7 +1,24 @@
-.requirements-dialog .library-intro,.requirements-dialog .library-tools { font-size:12px; }
+.dialog.requirements-dialog { width:calc(100vw - 48px); max-width:1920px; height:calc(100dvh - 48px); max-height:calc(100dvh - 48px); overflow:hidden; }
+.requirements-dialog .dialog-header { padding:10px 18px; gap:12px; flex-shrink:0; }
+.requirements-dialog .dialog-header h3 { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.requirements-dialog .dialog-close { flex-shrink:0; }
+.requirements-dialog .library-intro,.requirements-dialog .library-tools { font-size:12px; padding:6px 18px; line-height:1.5; flex-shrink:0; }
+.requirements-dialog .library-tools { align-items:center; }
+.requirements-controls { display:flex; flex-wrap:wrap; align-items:center; flex-shrink:0; padding:4px 18px; gap:6px 20px; }
+.requirements-controls .library-tools { padding:0; }
+.requirements-controls .library-tools:last-child { flex:1; min-width:300px; }
+.requirements-dialog .library-tools input { flex:1; max-width:520px; }
+.requirements-dialog .library-table-wrap { min-height:0; padding:0 18px 8px; overscroll-behavior:contain; }
+.requirements-dialog .library-table { table-layout:fixed; min-width:960px; line-height:1.5; }
+.requirements-dialog .library-table th,.requirements-dialog .library-table td { padding:7px 10px; }
+.requirements-dialog .library-table th:nth-child(1) { width:25%; }
+.requirements-dialog .library-table th:nth-child(2) { width:20%; }
+.requirements-dialog .library-table th:nth-child(3) { width:17%; }
+.requirements-dialog .library-table th:nth-child(4) { width:38%; }
 .requirements-dialog .library-table td { white-space:pre-wrap; overflow-wrap:anywhere; }
-.requirements-dialog .library-table td:first-child { width:25%; }
-.requirements-dialog .library-table td:last-child { width:30%; }
+.requirements-dialog .library-table small { max-width:none; overflow:visible; margin-top:2px; }
+.requirements-dialog .dialog-footer { padding:8px 18px; flex-shrink:0; }
+.requirements-dialog .requirement-failures { flex-shrink:1; min-height:36px; }
 .requirement-location { display:block; background:transparent; border:0; color:var(--accent); font:inherit; text-align:left; cursor:pointer; padding:3px 0; }
 .requirement-location:hover { text-decoration:underline; }
 
@@ -10,3 +27,13 @@
 .requirement-file summary { cursor:pointer; }
 .requirement-file small { display:block; }
 .requirement-failures { max-height:150px; overflow:auto; }
+@media (max-width:700px) {
+ .dialog.requirements-dialog { width:calc(100vw - 16px); max-width:calc(100vw - 16px); height:calc(100dvh - 16px); max-height:calc(100dvh - 16px); }
+ .requirements-dialog .library-intro { max-height:64px; overflow:auto; }
+ .requirements-dialog .dialog-header,.requirements-dialog .library-tools,.requirements-dialog .dialog-footer { padding:6px 10px; }
+ .requirements-dialog .library-table-wrap { padding:0 10px 8px; }
+ .requirements-controls { padding:6px 10px; }
+ .requirements-controls .library-tools { padding:0; }
+ .requirements-controls .library-tools:last-child { min-width:0; flex-basis:100%; }
+ .requirements-dialog .dialog-footer span { max-height:36px; overflow:auto; }
+}
