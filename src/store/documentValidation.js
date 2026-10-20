@@ -41,6 +41,7 @@ export function validateConfig(config, types) {
     for(const key of ['completionCondition','failureReason','restExpectation','restCondition'])if(n.data[key]!==undefined&&typeof n.data[key]!=='string')fail(key+' 必须是文字')
     if(n.data.admissionEnabled!==undefined&&typeof n.data.admissionEnabled!=='boolean')fail('准入检查启用状态必须为布尔值')
     if(n.data.restEnabled!==undefined&&typeof n.data.restEnabled!=='boolean')fail('稍息启用状态必须为布尔值')
+    if(n.data.checkTiming!==undefined&&n.data.checkTiming!=='before')fail('循环判定时机只支持 before；旧图可不填')
     if(n.data.loopVersion!==undefined&&n.data.loopVersion!==2)fail('不支持的循环节点版本')
     if(n.data.objectType!==undefined&&typeof n.data.objectType!=='string')fail('对象类型必须是文字标识')
     if (n.data.outputs !== undefined && !Array.isArray(n.data.outputs)) fail('产出必须是列表')
@@ -85,6 +86,16 @@ export function validateConfig(config, types) {
       }
     }
     objectRef(n.data);ids.set(n.id, n)
+  }
+  const layout=config.graph.layout
+  if(layout!==undefined){
+    if(!layout||layout.version!==1||!Array.isArray(layout.scopes)||!layout.positions||typeof layout.positions!=='object'||Array.isArray(layout.positions))fail('结构布局格式无效')
+    const seen=new Set()
+    for(const scope of layout.scopes){
+      if(!scope||ids.get(scope.loopId)?.type!=='loop'||seen.has(scope.loopId)||typeof scope.entry!=='string'||!Array.isArray(scope.members)||!scope.members.includes(scope.entry)||scope.members.includes(scope.loopId)||new Set(scope.members).size!==scope.members.length||scope.members.some(id=>typeof id!=='string'||!ids.has(id)||ids.get(id).type==='start'))fail('循环范围引用无效')
+      seen.add(scope.loopId)
+    }
+    for(const p of Object.values(layout.positions))if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.y))fail('结构布局坐标无效')
   }
   const loopPorts=new Set()
   const starts=config.graph.nodes.filter(n=>n.type==='start')

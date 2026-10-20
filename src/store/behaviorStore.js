@@ -1,3 +1,4 @@
+import {checkScope,convertToPrecheck} from '../utils/loopStructure'
 import {externalExit, exitEnabled, clearExit, portKey, bypassLegacyMove} from '../utils/externalExits'
 import { create } from 'zustand'
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow'
@@ -7,12 +8,12 @@ import { isLoopOutput, isLoopOutputEnabled } from '../utils/loopFlow'
 import {splitLegacyEnd} from '../utils/endings'
 import {emptyBehavior,normalizeMetadata,ensureStart} from '../utils/behaviorMetadata'
 const clone = value => JSON.parse(JSON.stringify(value))
-const snapshot = s => clone({ nodes: s.nodes, edges: s.edges, behaviorInfo: s.behaviorInfo })
+const snapshot = s => clone({ nodes: s.nodes, edges: s.edges, behaviorInfo: s.behaviorInfo, layout:s.layout })
 export const useBehaviorStore = create((set, get) => {
   const commit = patch => { get().checkpoint(); set(patch) }
   const restore = (s, patch) => ({ ...patch, selectedNode: patch.nodes.find(n => n.id === s.selectedNode?.id) || null })
   return {
-    behaviorInfo: emptyBehavior().behavior,
+    behaviorInfo: emptyBehavior().behavior, layout:null,
     nodes: emptyBehavior().graph.nodes, edges: [], selectedNode: null, past: [], future: [], clipboard: null, pasteCount: 0, documentRevision:0,
     checkpoint: () => set(s => ({ past: [...s.past.slice(-99), snapshot(s)], future: [] })),
     undo: () => set(s => s.past.length ? { ...restore(s, s.past.at(-1)), past: s.past.slice(0, -1), future: [snapshot(s), ...s.future] } : {}),
@@ -43,7 +44,15 @@ export const useBehaviorStore = create((set, get) => {
     },
     removeLegacyMove: id => {
       const s=get(),{nodes,edges,archive}=bypassLegacyMove(s.nodes,s.edges,id)
-      commit({nodes,edges,behaviorInfo:{...s.behaviorInfo,legacyMovement:[...(s.behaviorInfo.legacyMovement||[]),clone(archive)]},selectedNode:null,documentRevision:s.documentRevision+1})
+      const layout=s.layout?{...s.layout,scopes:s.layout.scopes.filter(x=>x.entry!==id).map(x=>({...x,members:x.members.filter(member=>member!==id)})),positions:{}}:null
+      commit({layout,nodes,edges,behaviorInfo:{...s.behaviorInfo,legacyMovement:[...(s.behaviorInfo.legacyMovement||[]),clone(archive)]},selectedNode:null,documentRevision:s.documentRevision+1})
+    },
+    setStructurePositions: positions => commit({layout:{version:1,scopes:get().layout?.scopes||[],positions:clone(positions)}}),
+    confirmLoopScope: (scope,precheck=true) => {
+      const s=get();checkScope(s.nodes,s.edges,scope)
+      const patch=precheck?convertToPrecheck(s.nodes,s.edges,scope):{nodes:s.nodes,edges:s.edges}
+      const layout={version:1,scopes:[...(s.layout?.scopes||[]).filter(x=>x.loopId!==scope.loopId),clone(scope)],positions:{}}
+      commit({...patch,layout,selectedNode:patch.nodes.find(n=>n.id===scope.loopId)||null,documentRevision:s.documentRevision+1})
     },
     changeNodes: changes => set(s => {
       const nodes = applyNodeChanges(changes.filter(c=>!(c.type==='remove'&&s.nodes.some(n=>n.id===c.id&&n.type==='start'))), s.nodes)
@@ -94,12 +103,13 @@ export const useBehaviorStore = create((set, get) => {
       const s = get(), removed = new Set(ids || s.nodes.filter(n => n.selected).map(n => n.id))
       s.nodes.filter(n=>n.type==='start').forEach(n=>removed.delete(n.id))
       if (!removed.size && !s.edges.some(e => e.selected)) return
-      commit({ nodes: s.nodes.filter(n => !removed.has(n.id)), edges: s.edges.filter(e => !e.selected && !removed.has(e.source) && !removed.has(e.target)), selectedNode: removed.has(s.selectedNode?.id) ? null : s.selectedNode })
+      const layout=s.layout?{...s.layout,scopes:s.layout.scopes.filter(x=>!removed.has(x.loopId)&&!removed.has(x.entry)).map(x=>({...x,members:x.members.filter(id=>!removed.has(id))})),positions:{}}:null
+      commit({ layout,nodes: s.nodes.filter(n => !removed.has(n.id)), edges: s.edges.filter(e => !e.selected && !removed.has(e.source) && !removed.has(e.target)), selectedNode: removed.has(s.selectedNode?.id) ? null : s.selectedNode })
     },
     copy: () => {
       const s = get(), nodes = s.nodes.filter(n => n.selected&&n.type!=='start'), ids = new Set(nodes.map(n => n.id))
       if(!nodes.length){set({clipboard:null});return}
-      if (nodes.length) set({ clipboard: clone({ nodes, edges: s.edges.filter(e => ids.has(e.source) && ids.has(e.target)) }), pasteCount: 0 })
+      if (nodes.length) set({ clipboard: clone({ nodes, layout:s.layout,edges: s.edges.filter(e => ids.has(e.source) && ids.has(e.target)) }), pasteCount: 0 })
     },
     paste: () => {
       const s = get(); if (!s.clipboard) return
@@ -113,11 +123,13 @@ export const useBehaviorStore = create((set, get) => {
         return n
       })
       const edges = clone(s.clipboard.edges).filter(e=>ids.has(e.source)&&ids.has(e.target)).map(e => ({ ...e, id: crypto.randomUUID(), source: ids.get(e.source), target: ids.get(e.target), selected: false }))
-      commit({ nodes: [...s.nodes.map(n => ({ ...n, selected: false })), ...nodes], edges: [...s.edges.map(e => ({ ...e, selected: false })), ...edges], selectedNode: nodes[0], pasteCount: count })
+      const scopes=(s.clipboard.layout?.scopes||[]).filter(x=>ids.has(x.loopId)&&ids.has(x.entry)&&x.members.every(id=>ids.has(id))).map(x=>({loopId:ids.get(x.loopId),entry:ids.get(x.entry),members:x.members.map(id=>ids.get(id))}))
+      const layout=scopes.length?{version:1,scopes:[...(s.layout?.scopes||[]),...scopes],positions:s.layout?.positions||{}}:s.layout
+      commit({ layout,nodes: [...s.nodes.map(n => ({ ...n, selected: false })), ...nodes], edges: [...s.edges.map(e => ({ ...e, selected: false })), ...edges], selectedNode: nodes[0], pasteCount: count })
     },
     exportConfig: () => {
       const s = get()
-      return clone({ behavior: s.behaviorInfo, graph: { nodes: s.nodes.map(({ id, type, data, position }) => ({ id, type, data, position })), edges: s.edges.map(({ id, source, target, sourceHandle, targetHandle }) => ({ id, source, target, sourceHandle, targetHandle })) } })
+      return clone({ behavior: s.behaviorInfo, graph: { ...(s.layout?{layout:s.layout}:{}), nodes: s.nodes.map(({ id, type, data, position }) => ({ id, type, data, position })), edges: s.edges.map(({ id, source, target, sourceHandle, targetHandle }) => ({ id, source, target, sourceHandle, targetHandle })) } })
     },
     importConfig: config => {
       validateConfig(config, NODE_CONFIG)
@@ -132,7 +144,7 @@ export const useBehaviorStore = create((set, get) => {
         if (!ids.has(e.source) || !ids.has(e.target)) throw new Error('连线引用了不存在的节点')
         return { ...clone(e), id: crypto.randomUUID(), type: 'default' }
       })
-      commit({ behaviorInfo: normalizeMetadata(clone(config.behavior)), ...ensureStart(nodes,edges), selectedNode: null, documentRevision:get().documentRevision+1 })
+      commit({ layout:config.graph.layout?clone(config.graph.layout):null,behaviorInfo: normalizeMetadata(clone(config.behavior)), ...ensureStart(nodes,edges), selectedNode: null, documentRevision:get().documentRevision+1 })
     }
   }
 })

@@ -8,7 +8,7 @@ async function drop(page,files){
 async function config(page){return page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return JSON.stringify(g.getState().exportConfig())})}
 test.beforeEach(async({page})=>{await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}));await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await expect(page.locator('.react-flow__node')).toHaveCount(7);await page.waitForTimeout(400)})
 test('drop JSON loads named graph, fits viewport and preserves palette node dragging',async({page})=>{
- const data=JSON.parse(await config(page));data.behavior.name='拖入行为';data.graph.nodes=data.graph.nodes.slice(0,2);data.graph.edges=data.graph.edges.filter(e=>data.graph.nodes.some(n=>n.id===e.source)&&data.graph.nodes.some(n=>n.id===e.target))
+ const data=JSON.parse(await config(page));data.behavior.name='拖入行为';delete data.graph.layout;data.graph.nodes=data.graph.nodes.slice(0,2);data.graph.edges=data.graph.edges.filter(e=>data.graph.nodes.some(n=>n.id===e.source)&&data.graph.nodes.some(n=>n.id===e.target))
  await drop(page,[{name:'test.json',text:JSON.stringify(data)}])
  await expect(page.locator('.react-flow__node')).toHaveCount(2);await expect(page.locator('.save-status')).toContainText('test.json');await expect(page.locator('.canvas-file-drop-hint')).toHaveCount(0)
  await expect.poll(async()=>JSON.parse(await config(page)).behavior.name).toBe('拖入行为')

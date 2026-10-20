@@ -2,6 +2,7 @@ import React,{useState} from 'react'
 import {useBehaviorStore} from '../store/behaviorStore'
 import {exportCanvasPng,captureCanvas,preparePngDestination} from '../utils/pngExport'
 import {getSaveDirectory,useDocumentSession} from '../store/documentSession'
+import {useCanvasView} from '../store/canvasView'
 
 export default function PngExport(){
   const directoryName=useDocumentSession(s=>s.directoryName),canChoose=typeof window.showSaveFilePicker==='function'
@@ -9,15 +10,22 @@ export default function PngExport(){
   async function run(){
     if(busy)return
     setBusy(true);setError('');setNotice('')
+    let snapshot
     try{
-      const source=document.querySelector('.canvas > .react-flow'),options={scope,scale,name:useBehaviorStore.getState().behaviorInfo.name}
+      let source=document.querySelector('.canvas > .react-flow')
+      const state=useBehaviorStore.getState(),options={scope,scale,name:state.behaviorInfo.name}
       captureCanvas(source,options) // Reject invalid/oversized canvases before showing a save dialog.
       const destination=await preparePngDestination(options.name,getSaveDirectory())
       if(destination.cancelled)return
+      if(scope==='all'&&useCanvasView.getState().mode==='structure'){
+        const {structureSnapshot}=await import('./structureSnapshot')
+        snapshot=await structureSnapshot({nodes:structuredClone(state.nodes),edges:structuredClone(state.edges),layout:structuredClone(state.layout),behaviorInfo:structuredClone(state.behaviorInfo)})
+        source=snapshot.source
+      }
       const frame=await exportCanvasPng(source,options,{download:destination.download})
       setOpen(false);setNotice((destination.saved?'PNG 已保存：'+destination.name:'已生成 PNG 并发起浏览器下载')+'（'+frame.pixelWidth+'×'+frame.pixelHeight+'）')
     }catch(e){setError('导出失败：'+e.message)}
-    finally{setBusy(false)}
+    finally{snapshot?.dispose();setBusy(false)}
   }
   return <>
     <button className="toolbar-btn" onClick={()=>{setOpen(true);setError('');setNotice('')}}>导出 PNG</button>

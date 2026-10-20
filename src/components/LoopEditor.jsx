@@ -1,3 +1,4 @@
+import LoopScopeSettings from './LoopScopeSettings'
 import BranchDestination,{BranchPort} from './BranchDestination'
 import {useDisplayGraph} from '../store/graphDisplay'
 import React, { useEffect } from 'react'
@@ -19,7 +20,7 @@ export function LoopNodeStages({id,data}) {
   const enabled=data.restEnabled!==false,admission=data.admissionEnabled!==false
   const summary=(text,rules)=>!text&&!rules?.length?'待配置规则':<>{text}{(rules||[]).map((r,i)=><React.Fragment key={r.id}>{(text||i>0)?'；':''}<RuleText rule={r} kind={r.attribute?.startsWith('buff:')?'buff':'attribute'} influences={['较低时','较高时','处于指定状态时','具有指定 Buff 时','不具有指定 Buff 时']}/></React.Fragment>)}</>
   const output=(handle,label,disabled=false)=><div className={'loop-output '+(disabled?'inactive':'')}><span>{label}</span><BranchPort data={data} handle={handle} disabled={disabled}/></div>
-  return <div className="loop-stages">
+  return <div className="loop-stages"><p className="form-hint">{data.checkTiming==='before'?'先判定能否进入本轮，再执行内部节点':'旧图时序待核对'}</p>
     <section><strong>① 目标达成判定</strong><p>{summary(data.completionCondition,data.completionRules)}</p>
       {data.loopCondition&&<p className="loop-legacy">旧条件待核对：{data.loopCondition}</p>}
       {data.loopRules?.length>0&&<p className="loop-legacy">旧属性规则待核对：{summary('',data.loopRules)}</p>}
@@ -41,7 +42,7 @@ export default function LoopFields({node}) {
   const update=patch=>updateNode(node.id,patch)
   const legacy=edges.filter(e=>e.source===node.id&&!e.sourceHandle)
   const target=(handle,label)=><BranchDestination node={node} handle={handle} label={label}/>
-  return <div className="loop-editor">
+  return <div className="loop-editor"><LoopScopeSettings key={node.id} node={node}/>
     <p className="form-hint">按 ① → ② → ③ 依次判断；一旦从出口离开，就不再进行后面的判定。每个出口选择连接节点或跳出行为。</p>
     <section><h4>① 目标达成判定</h4><div className="form-group"><label>目标达成规则</label><textarea aria-label="目标达成规则" value={data.completionCondition||''} placeholder="例如：已完成目标要求的进食次数" onChange={e=>update({completionCondition:e.target.value})}/></div>
       <LibraryRules title="目标达成属性条件" value={data.completionRules} onChange={completionRules=>update({completionRules})}/>
@@ -58,7 +59,7 @@ export default function LoopFields({node}) {
       {enabled&&<><div className="form-group"><label>稍息发生倾向</label><TextChoice label="稍息发生倾向" options={EXPECTATIONS} value={data.restExpectation||''} onChange={restExpectation=>update({restExpectation})} placeholder="选择或描述大致倾向"/></div><div className="form-group"><label>稍息判定规则</label><textarea aria-label="稍息判定规则" value={data.restCondition||''} onChange={e=>update({restCondition:e.target.value})} placeholder="例如：疲惫时更倾向于稍息"/></div><LibraryRules title="稍息属性条件" value={data.restRules} onChange={restRules=>update({restRules})}/></>}
       {data.restProbability!==undefined&&<p className="form-hint">旧版概率 {data.restProbability}% 已保留；新设计使用文字倾向，不自动换算。</p>}
       {target('rest','触发 → 待机节点')}{target('continue',enabled?'不触发 → 继续执行节点':admission?'满足 → 继续执行节点':'未达成 → 继续执行节点')}
-      <p className="form-hint">待机结束后的去向，请从待机节点再连回执行节点。关闭稍息时跳过第三步，已有稍息连线保留但不生效。</p>
+      <p className="form-hint">待机结束后返回循环判定，重新检查能否进入本轮。关闭稍息时跳过第三步，已有稍息连线保留但不生效。</p>
     </section>
     {legacy.length>0&&<section className="loop-legacy"><h4>旧版连线待归类</h4>{legacy.map(edge=><div className="form-group" key={edge.id}><label>连向 {nodes.find(n=>n.id===edge.target)?.data.name||edge.target}</label><select aria-label={'旧连线出口 '+edge.target} value="" onChange={e=>assignLoopEdge(edge.id,e.target.value)}><option value="">请选择这条线对应的结果</option>{LOOP_OUTPUTS.map(o=><option key={o.id} value={o.id} disabled={!isLoopOutputEnabled(data,o.id)||edges.some(e=>e.source===node.id&&e.sourceHandle===o.id)}>{o.label}</option>)}</select></div>)}</section>}
   </div>

@@ -8,7 +8,7 @@ const PREFIX = 'pps-behavior-v2:'
 const draftKey = PREFIX + 'draft:' + crypto.randomUUID()
 const empty = emptyBehavior
 const content = () => graph.getState().exportConfig()
-export const fingerprint = c => JSON.stringify({ ...c, graph: { ...c.graph, nodes:c.graph.nodes.map(({id,type,data,position})=>({id,type,data,position})), edges: c.graph.edges.map(({ id, ...e }) => e) } })
+export const fingerprint = c => JSON.stringify({ ...c, graph: { ...(c.graph.layout?{layout:c.graph.layout}:{}), nodes:c.graph.nodes.map(({id,type,data,position})=>({id,type,data,position})), edges: c.graph.edges.map(({ id, ...e }) => e) } })
 let baseline = fingerprint(empty()), fileHandle = null, diskText = null, directory = null
 let documentId = crypto.randomUUID(), localFingerprint = '', diskFingerprint = '', initialized = false
 let localTimer, writing = false
@@ -56,7 +56,7 @@ async function cachedTemplate(){
     try{
       const cache=await directory.getDirectoryHandle(CACHE_DIRECTORY)
       const file=await (await cache.getFileHandle(TEMPLATE_FILE)).getFile()
-      const config=parse(await file.text());validateConfig(config,NODE_CONFIG);return config.behavior.templateVersion===2?config:blankTemplate()
+      const config=parse(await file.text());validateConfig(config,NODE_CONFIG);return config.behavior.templateVersion===3?config:blankTemplate()
     }catch{ /* A missing or inaccessible cache is recreated from the built-in template. */ }
   }
   return blankTemplate()

@@ -1,3 +1,6 @@
+import StructuredCanvas from './StructuredCanvas'
+import CanvasViewTabs from './CanvasViewTabs'
+import {useCanvasView} from '../store/canvasView'
 import {externalExit} from '../utils/externalExits'
 import React, { useEffect, useRef } from 'react'
 import ReactFlow, { Background, Controls, MiniMap, MarkerType, ConnectionLineType, useNodesInitialized, useReactFlow } from 'reactflow'
@@ -32,14 +35,16 @@ export default function Canvas() {
   const flow = useRef(null)
   const dragDepth=useRef(0),[fileHover,setFileHover]=useState(false)
   const s = useBehaviorStore()
+  const mode=useCanvasView(v=>v.mode)
   useEffect(()=>{
+    if(mode==='structure')return
     const focus=e=>{
       const state=useBehaviorStore.getState(),node=state.nodes.find(n=>n.id===e.detail)
       state.selectNode(node||null)
       if(node){state.changeNodes(state.nodes.map(n=>({id:n.id,type:'select',selected:n.id===node.id})));flow.current?.fitView({nodes:[{id:node.id}],padding:.5,maxZoom:1,duration:250})}
     }
     window.addEventListener('pps-focus-node',focus);return()=>window.removeEventListener('pps-focus-node',focus)
-  },[])
+  },[mode])
   useEffect(() => {
     const onKey = e => {
       if (e.isComposing || e.target.closest('input, textarea, select, [contenteditable="true"]') || document.querySelector('.dialog-overlay')) return
@@ -56,9 +61,11 @@ export default function Canvas() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+  if(mode==='structure')return <StructuredCanvas graph={{nodes:s.nodes,edges:s.edges,behaviorInfo:s.behaviorInfo,layout:s.layout}} revision={s.documentRevision} onSelect={n=>{s.selectNode(n);s.changeNodes(s.nodes.map(x=>({id:x.id,type:'select',selected:x.id===n?.id})))}} onPositions={s.setStructurePositions} onAdd={s.addNode}/>
   return <div className="canvas"
     onDragEnter={e=>{if(Array.from(e.dataTransfer.types).includes('Files')){e.preventDefault();dragDepth.current++;setFileHover(true)}}}
     onDragLeave={()=>{dragDepth.current=Math.max(0,dragDepth.current-1);if(!dragDepth.current)setFileHover(false)}}>
+    <CanvasViewTabs/>
     {fileHover&&<div className="canvas-file-drop-hint" role="status">松开以打开行为图 JSON（替换当前画布，未保存时会先提示）</div>}
     <ReactFlow nodes={s.nodes} edges={s.edges.filter(e=>!(e.sourceHandle&&s.nodes.some(n=>n.id===e.source&&n.type==='loop'&&!isLoopOutputEnabled(n.data,e.sourceHandle))))} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
       onNodesChange={s.changeNodes} onEdgesChange={s.changeEdges} onConnect={s.connect}

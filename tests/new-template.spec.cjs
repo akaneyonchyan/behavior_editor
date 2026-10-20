@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test')
 test('new uses complete blank template, cancel preserves old draft, reload restores new template',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
  await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
- await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const c=g.getState().exportConfig();c.graph.nodes=c.graph.nodes.filter(n=>n.type==='start');c.graph.edges=[];c.behavior.name='旧的单节点草稿';g.getState().importConfig(c)})
+ await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const c=g.getState().exportConfig();c.graph.nodes=c.graph.nodes.filter(n=>n.type==='start');c.graph.edges=[];delete c.graph.layout;c.behavior.name='旧的单节点草稿';g.getState().importConfig(c)})
  await expect(page.locator('.react-flow__node')).toHaveCount(1)
  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'新建',exact:true}).click();await expect(page.locator('.react-flow__node')).toHaveCount(1)
  page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'新建',exact:true}).click();await expect(page.locator('.react-flow__node')).toHaveCount(7)

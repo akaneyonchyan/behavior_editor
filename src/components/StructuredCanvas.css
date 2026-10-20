@@ -1,0 +1,24 @@
+.canvas,.online-preview-body {position:relative;}
+.structured-canvas {flex:1;min-width:0;height:100%;position:relative;}
+.canvas-view-tools {position:absolute;top:8px;left:12px;right:12px;z-index:8;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:11px;pointer-events:none;}
+.canvas-view-tools>* {pointer-events:auto;}
+.canvas-view-tools [role=tablist] {display:flex;border-bottom:1px solid #435366;background:#101720;}
+.canvas-view-tools button {background:#111a24;color:#b6c4d6;border:1px solid #334355;padding:5px 9px;font-size:11px;cursor:pointer;}
+.canvas-view-tools [role=tab] {border:0;border-bottom:2px solid transparent;}
+.canvas-view-tools [aria-selected=true] {color:#7dd3fc;border-bottom-color:#38bdf8;}
+.canvas-view-tools span {color:#91a4bc;background:#101720;padding:4px 6px;}
+.structure-warnings {position:absolute;top:48px;left:12px;z-index:8;max-width:460px;max-height:180px;overflow:auto;background:#201d22;color:#f6c785;border:1px solid #786044;padding:6px 10px;font-size:12px;}
+.structure-warnings summary {cursor:pointer;}
+.structure-warnings button {display:block;text-align:left;background:none;color:inherit;border:0;cursor:pointer;margin:6px 0;}
+.loop-scope {width:100%;height:100%;border:1px solid #f472b6;border-radius:12px;background:rgba(244,114,182,.035);color:#e5e7eb;}
+.loop-scope header {padding:12px 16px;border-bottom:1px solid #f472b63a;min-height:68px;}
+.loop-scope header small {display:block;color:#b5a8b3;margin-top:5px;font-size:12px;}
+.scope-title {font-size:14px;font-weight:600;background:none;border:0;color:#f472b6;cursor:pointer;}
+.scope-toggle {float:right;background:none;border:1px solid #7c5269;color:#f3bbd7;border-radius:4px;padding:3px 8px;cursor:pointer;}
+.loop-scope p {padding:12px 16px;font-size:12px;}
+.scope-settings {border:1px solid #5b4054;border-radius:6px;padding:10px;margin-bottom:14px;}
+.scope-settings summary {font-weight:600;cursor:pointer;color:#f3bbd7;}
+.scope-settings label {display:block;font-size:12px;margin:6px 0;}
+.scope-settings input[type=checkbox] {width:auto;margin-right:6px;}
+.scope-settings .scope-members {max-height:180px;overflow:auto;}
+.scope-settings button {font-size:12px;margin:5px 5px 0 0;}

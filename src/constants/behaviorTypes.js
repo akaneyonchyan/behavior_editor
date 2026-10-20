@@ -70,9 +70,10 @@ export const NODE_CONFIG = {
     label: '循环',
     color: '#F472B6',
     icon: '↻',
-    description: '依次判定目标、准入与稍息',
+    description: '先判定目标、准入与稍息，再进入循环体',
     defaultData: {
       loopVersion: 2,
+      checkTiming: 'before',
       completionCondition: '',
       completionRules: [],
       resourceCheck: '',

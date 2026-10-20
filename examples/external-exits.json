@@ -19,7 +19,7 @@
         "influence": ""
       }
     ],
-    "templateVersion": 2
+    "templateVersion": 3
   },
   "graph": {
     "nodes": [
@@ -115,7 +115,8 @@
               "handle": "insufficient",
               "note": ""
             }
-          ]
+          ],
+          "checkTiming": "before"
         }
       },
       {
@@ -145,7 +146,7 @@
       {
         "id": "behavior_start_next",
         "source": "behavior_start",
-        "target": "template_judge"
+        "target": "template_loop"
       },
       {
         "id": "template_judge_branch_1",
@@ -185,8 +186,24 @@
       {
         "id": "template_wait_next",
         "source": "template_wait",
-        "target": "template_judge"
+        "target": "template_loop"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "template_loop",
+          "entry": "template_judge",
+          "members": [
+            "template_judge",
+            "template_result_1",
+            "template_result_2",
+            "template_wait"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }

@@ -192,3 +192,20 @@ tests/online-behaviors.cjs、download-behavior.cjs 和 online-files.spec.cjs 以
 RequirementsPanel 根据页签选择当前图或全部在线文件。onlineRequirements.loadRequirementFiles 读取单次 manifest，再按 SHA 读取对应公开快照，最多4个并发，使用 AbortSignal 取消，逐文件记录失败且保持目录顺序。collectOnlineRequirements 复用单图 collectRequirements 的上下文键，附加 files 与 locations.fileName/fileSha/behaviorName；同节点ID来自不同文件不能互相覆盖。不调用 importConfig，不更改本地状态。文件链接使用隔离的 fileView.openOnline；Markdown 导出注明范围、来源和未完成文件。
 
 回归：tests/online-requirements.cjs（归并、来源、不同上下文、公共库变化、导出、并发/取消/部分失败），tests/online-requirements.spec.cjs（全目录不受过滤、匿名读取、来源跳转、刷新重试、草稿隔离、公共库未就绪）。
+
+
+## 父子结构视图与循环先判定（2026-10-20）
+
+画布默认使用结构视图：循环框包围循环判定与内部节点，顺序从左向右，判断分支按配置顺序上下展开；共同后续只显示一份。完整包含的范围可嵌套；交叉范围或中途入口会提示核对，保留原连线。容器仅用于展示，不是新的行为节点。
+
+新空白模板在首次进入、执行返回、稍息返回时，都先经过循环判定：目标检查 → 已启用的准入检查 → 已启用的稍息判定 → 内部执行。原有节点类型、规则字段、外部跳出、准入与稍息开关保持不变。不会模拟运行或导出工程行为树。
+
+旧文件不会自动重接线。选中循环节点，在“循环范围与先判定”中选择起点、识别并核对候选成员，再点击“确认范围并采用先判定”。起点须对应继续执行出口；转换将外部首次入口和稍息返回接到循环判定，原连线归档，整次操作可撤销。入口位于循环中途、内部直接返回起点、范围无法返回判定等情形会阻止转换，先在连线视图整理。
+
+结构视图支持选中节点编辑配置、移动循环容器、折叠/展开和重新排布。连线增删、单节点自由移动和多选编辑使用“连线视图”；两种视图共享同一份行为数据。视图切换及折叠不算文件修改；移动容器及确认范围会进入撤销记录，并随 JSON/草稿保存。折叠仅在当前查看期间保持。在线文件可查看同样的结构，但不能编辑。
+
+本地 PNG 的“完整行为图”会生成独立的完整展开结构，不影响当前折叠和保存状态；“当前可见区域”保留当前折叠并按视口裁切。超大图仍受图片尺寸限制。
+
+实现入口：loopStructure.js 推导/校验范围与显式转换；structureLayout.js 生成可视容器和分层布局；StructuredCanvas.jsx 隔离测量、折叠与位置；LoopScopeSettings.jsx 提供范围确认。graph.layout={version:1,scopes:[{loopId,entry,members}],positions:{id:{x,y}}} 可选，data.checkTiming='before' 表示已采用先判定，legacyLoopRouting 保留转换的原连线。缺少 checkTiming 的旧图不推定时序。模板版本3只更新模板缓存，不迁移正式文件或草稿。
+
+测试：tests/structure.cjs 与 structure.spec.cjs 覆盖模板、转换/撤销、入口校验、嵌套、共享节点、折叠、布局保存、复制/删除、只读预览和完整展开 PNG。既有浏览器回归显式选择连线视图，新结构测试显式选择结构视图。

@@ -1,3 +1,6 @@
+import StructuredCanvas from './StructuredCanvas'
+import CanvasViewTabs from './CanvasViewTabs'
+import {useCanvasView} from '../store/canvasView'
 import React,{useEffect,useMemo,useState} from 'react'
 import ReactFlow,{Background,Controls,MiniMap,MarkerType,applyNodeChanges} from 'reactflow'
 import {GraphDisplayContext} from '../store/graphDisplay'
@@ -12,21 +15,22 @@ import {useFileView} from '../store/fileView'
 const nodeTypes={...Object.fromEntries(Object.keys(NODE_CONFIG).map(t=>[t,BehaviorNode])),start:StartNode}
 const edgeTypes={default:FlowingEdge}
 export default function OnlinePreview({file}){
+ const mode=useCanvasView(s=>s.mode)
  useEffect(()=>{
   const key=e=>{if((e.ctrlKey||e.metaKey)&&['z','y','d','s'].includes(e.key.toLowerCase())){e.preventDefault();e.stopImmediatePropagation()}}
   window.addEventListener('keydown',key,true);return()=>window.removeEventListener('keydown',key,true)
  },[])
  const initial=useMemo(()=>{
   const c=structuredClone(file.config)
-  return {...ensureStart(c.graph.nodes.map((n,i)=>({...n,position:n.position||{x:i*380,y:0},selected:false})),c.graph.edges.map((e,i)=>({...e,id:'preview_'+i,type:'default'}))),behaviorInfo:normalizeMetadata(c.behavior)}
+  return {...ensureStart(c.graph.nodes.map((n,i)=>({...n,position:n.position||{x:i*380,y:0},selected:false})),c.graph.edges.map((e,i)=>({...e,id:'preview_'+i,type:'default'}))),layout:c.graph.layout,behaviorInfo:normalizeMetadata(c.behavior)}
  },[file])
  const [nodes,setNodes]=useState(initial.nodes),setSelected=useFileView(s=>s.selectOnline)
  const edges=initial.edges.filter(e=>!e.sourceHandle||!nodes.some(n=>n.id===e.source&&n.type==='loop'&&!isLoopOutputEnabled(n.data,e.sourceHandle)))
  return <section className="online-preview" aria-label="在线行为只读画布">
-   <div className="online-preview-body"><GraphDisplayContext.Provider value={{...initial,nodes}}>
+   <div className="online-preview-body">{mode==='structure'?<StructuredCanvas graph={initial} readOnly onSelect={setSelected}/>:<><CanvasViewTabs/><GraphDisplayContext.Provider value={{...initial,nodes}}>
     <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} nodesDraggable={false} nodesConnectable={false} edgesUpdatable={false} deleteKeyCode={null} onNodesChange={changes=>setNodes(n=>applyNodeChanges(changes.filter(c=>['dimensions','select'].includes(c.type)),n))} onNodeClick={(_,n)=>setSelected(n)} onPaneClick={()=>setSelected(null)} defaultEdgeOptions={{markerEnd:{type:MarkerType.ArrowClosed,color:'#94A3B8'}}} minZoom={.1} maxZoom={2} fitView>
      <Background/><Controls showInteractive={false}/><MiniMap nodeColor={node=>NODE_CONFIG[node.type]?.color||'#94A3B8'} maskColor="rgba(5,7,12,.7)"/>
     </ReactFlow>
-   </GraphDisplayContext.Provider></div>
+   </GraphDisplayContext.Provider></>}</div>
  </section>
 }

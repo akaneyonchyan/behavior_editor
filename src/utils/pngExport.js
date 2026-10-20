@@ -25,7 +25,7 @@ export function pngName(name, date = new Date()) {
   return (name || '未命名行为').replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_').slice(0,80) + '-行为图-' + stamp + '.png'
 }
 let exporting = false
-const auxiliary = '.react-flow__background,.react-flow__panel,.react-flow__minimap,.react-flow__controls,.react-flow__attribution,.react-flow__handle,.react-flow__selection,.react-flow__nodesselection,.react-flow__connection,.edge-flow-trail,.edge-flow-head,.react-flow__edge-interaction'
+const auxiliary = '[data-export-ignore],.react-flow__background,.react-flow__panel,.react-flow__minimap,.react-flow__controls,.react-flow__attribution,.react-flow__handle,.react-flow__selection,.react-flow__nodesselection,.react-flow__connection,.edge-flow-trail,.edge-flow-head,.react-flow__edge-interaction'
 
 export function captureCanvas(source, {scope='all', scale=2}={}) {
   const viewport = source?.querySelector('.react-flow__viewport')
