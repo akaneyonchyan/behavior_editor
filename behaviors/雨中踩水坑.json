@@ -31,9 +31,67 @@
         "attribute": "leisure",
         "influence": "增加"
       }
+    ],
+    "legacyMovement": [
+      {
+        "node": {
+          "id": "move_to_puddle",
+          "type": "move",
+          "data": {
+            "name": "跑到水坑边",
+            "destinationType": "interactObject",
+            "destination": "水坑",
+            "objectType": "environmentItem",
+            "objectName": "水坑",
+            "occupiedResources": [
+              {
+                "id": "d446b27a-c174-44db-8068-8202dd280ebc",
+                "source": "object:environmentItem",
+                "attribute": "",
+                "objectName": "水坑"
+              }
+            ]
+          },
+          "position": {
+            "x": 330.8436914678182,
+            "y": 244.86861610097867
+          },
+          "selected": true,
+          "width": 280,
+          "height": 283,
+          "dragging": false
+        },
+        "edges": [
+          {
+            "id": "9c3d74a7-4d76-489c-b1db-d2a19a695d26",
+            "source": "behavior_start",
+            "target": "move_to_puddle",
+            "type": "default"
+          },
+          {
+            "id": "cdabbf69-872f-478d-8bcd-3bee6e5735df",
+            "source": "move_to_puddle",
+            "target": "result_jump_in",
+            "type": "default"
+          },
+          {
+            "id": "c00070fb-6654-4b7f-9e76-7f8408c35de0",
+            "source": "move_to_puddle",
+            "target": "end_rain_stopped",
+            "sourceHandle": "unreachable",
+            "targetHandle": null,
+            "type": "default"
+          }
+        ]
+      }
     ]
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "behavior_start",
@@ -42,29 +100,6 @@
         "position": {
           "x": 1.7150769724812562,
           "y": 232.00553880736902
-        }
-      },
-      {
-        "id": "move_to_puddle",
-        "type": "move",
-        "data": {
-          "name": "跑到水坑边",
-          "destinationType": "interactObject",
-          "destination": "水坑",
-          "objectType": "environmentItem",
-          "objectName": "水坑",
-          "occupiedResources": [
-            {
-              "id": "d446b27a-c174-44db-8068-8202dd280ebc",
-              "source": "object:environmentItem",
-              "attribute": "",
-              "objectName": "水坑"
-            }
-          ]
-        },
-        "position": {
-          "x": 330.8436914678182,
-          "y": 244.86861610097867
         }
       },
       {
@@ -94,8 +129,8 @@
           "outputs": []
         },
         "position": {
-          "x": 671.1203062842833,
-          "y": 232.00553880736902
+          "x": 326.1258496382136,
+          "y": 232.21209748525462
         }
       },
       {
@@ -149,8 +184,8 @@
           ]
         },
         "position": {
-          "x": 1031.9778447705241,
-          "y": 228.5753848624065
+          "x": 983.3163185736557,
+          "y": 229.2176546877347
         }
       },
       {
@@ -163,6 +198,13 @@
           "playExpectation": "",
           "effectRules": [
             {
+              "id": "fx_face_surprise",
+              "kind": "buff",
+              "source": "object:partner",
+              "attribute": "buff:emotion_surprise_pos",
+              "influence": "增"
+            },
+            {
               "id": "fx_face_leisure",
               "kind": "attribute",
               "source": "object:partner",
@@ -170,18 +212,19 @@
               "influence": "增"
             },
             {
-              "id": "fx_face_surprise",
-              "kind": "buff",
+              "id": "8565693d-5ae9-49a8-b814-3919ec59f37f",
               "source": "object:partner",
-              "attribute": "buff:emotion_surprise_pos",
-              "influence": "增"
+              "attribute": "cleanliness",
+              "influence": "减",
+              "kind": "attribute",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
             }
           ],
           "outputs": []
         },
         "position": {
-          "x": 1399.5609155401476,
-          "y": 28.622231501642716
+          "x": 1352.1050309691566,
+          "y": 227.4610605075723
         }
       },
       {
@@ -204,15 +247,15 @@
           "outputs": []
         },
         "position": {
-          "x": 1401.7991046803288,
-          "y": 425.9148404363784
+          "x": 1345.6209839576588,
+          "y": 643.9435898585847
         }
       },
       {
         "id": "loop_play",
         "type": "loop",
         "data": {
-          "name": "玩够了吗",
+          "name": "玩够了/次数上限",
           "loopVersion": 3,
           "completionCondition": "娱乐需求已满足（玩够了）",
           "completionRules": [
@@ -308,12 +351,19 @@
                   "influence": "较高时"
                 }
               ]
+            },
+            {
+              "id": "8d773b01-b16b-4607-bfac-55c29587fafb",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "3"
             }
           ]
         },
         "position": {
-          "x": 1746.5091523973788,
-          "y": 151.19727038874998
+          "x": 650.264176911285,
+          "y": 232.80402091773135
         }
       },
       {
@@ -326,8 +376,8 @@
           "playExpectation": ""
         },
         "position": {
-          "x": 2093.374394979347,
-          "y": 205.64979652486716
+          "x": 1354.5458280017783,
+          "y": 1231.5024325807105
         }
       },
       {
@@ -340,159 +390,128 @@
           "playExpectation": ""
         },
         "position": {
-          "x": 2091.705584505878,
-          "y": 531.1085090467927
+          "x": 1345.7886634859906,
+          "y": 967.3516247172047
         }
       },
       {
-        "id": "loop_play_admission",
+        "id": "5b86ed29-eb0a-4c4c-9089-47976cafc217",
         "type": "judge",
-        "position": {
-          "x": 2106.509152397379,
-          "y": 151.19727038874998
-        },
         "data": {
-          "name": "准入判断",
-          "description": "仍在下雨，水坑还在\n不满足原因：雨停了，或水坑消失",
-          "judgeAttributes": [
-            {
-              "id": "admission_0",
-              "source": "object:environmen",
-              "attribute": "weather"
-            }
-          ],
           "branches": [
             {
-              "id": "admission_0",
-              "name": "满足",
-              "weightExpectation": "按条件判定",
+              "id": "branch_1",
+              "name": "没玩够",
+              "weightExpectation": "中",
               "weightFactors": [
                 {
-                  "id": "admission_0",
-                  "source": "object:environmen",
-                  "attribute": "weather",
-                  "influence": "满足条件：处于指定状态时：小雨或大雨",
-                  "attributeId": "admission_0"
+                  "version": 2,
+                  "id": "4727a3bb-92dc-4eba-b307-569eda313a52",
+                  "attributeId": "4727a3bb-92dc-4eba-b307-569eda313a52",
+                  "source": "object:partner",
+                  "attribute": "leisure",
+                  "influence": "具体值 · 允许选中",
+                  "influenceType": "具体值",
+                  "influenceRule": "允许选中",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
                 }
-              ]
+              ],
+              "nextNode": ""
             },
             {
-              "id": "admission_1",
-              "name": "不满足",
-              "weightExpectation": "按条件判定",
+              "id": "default",
+              "name": "玩够了",
+              "weightExpectation": "中",
               "weightFactors": [
                 {
-                  "id": "admission_0",
-                  "source": "object:environmen",
-                  "attribute": "weather",
-                  "influence": "不满足条件：处于指定状态时：小雨或大雨",
-                  "attributeId": "admission_0"
+                  "version": 2,
+                  "id": "4727a3bb-92dc-4eba-b307-569eda313a52",
+                  "attributeId": "4727a3bb-92dc-4eba-b307-569eda313a52",
+                  "source": "object:partner",
+                  "attribute": "leisure",
+                  "influence": "具体值 · 排除选中",
+                  "influenceType": "具体值",
+                  "influenceRule": "排除选中",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
                 }
-              ]
+              ],
+              "nextNode": ""
             }
           ],
-          "legacyGate": {
-            "kind": "admission",
-            "condition": "仍在下雨，水坑还在\n不满足原因：雨停了，或水坑消失",
-            "rules": [
-              {
-                "id": "loop_res_weather",
-                "source": "object:environmen",
-                "attribute": "weather",
-                "influence": "处于指定状态时：小雨或大雨"
-              }
-            ],
-            "failureReason": "雨停了，或水坑消失"
-          }
+          "name": "判断是否玩够了",
+          "judgeAttributes": [
+            {
+              "id": "4727a3bb-92dc-4eba-b307-569eda313a52",
+              "source": "object:partner",
+              "attribute": "leisure",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 986.6219448410534,
+          "y": 644.8698186709029
         }
       }
     ],
     "edges": [
       {
-        "id": "d651c5dd-a184-48a5-8357-7a8e447d5931",
+        "id": "9c3d74a7-4d76-489c-b1db-d2a19a695d26",
         "source": "behavior_start",
-        "target": "move_to_puddle"
-      },
-      {
-        "id": "3196cc91-28c3-4386-8d02-2662a0e76628",
-        "source": "move_to_puddle",
         "target": "result_jump_in"
       },
       {
-        "id": "d6ba0b9d-e104-4e0a-b746-78a6f06e1777",
+        "id": "1e074237-1dc4-46a6-86a7-9f37445f1b71",
         "source": "result_jump_in",
         "target": "loop_play"
       },
       {
-        "id": "ab5902e4-b6b4-44e9-abcb-b944d81d2d27",
+        "id": "830edcae-01fb-48e4-a6db-621b2cc23958",
         "source": "judge_stomp",
         "target": "result_splash_face",
         "sourceHandle": "branch_splash_face"
       },
       {
-        "id": "79da7694-863f-435c-a15f-73563a8920bd",
+        "id": "62e96787-2630-4140-8433-c027495b560f",
         "source": "judge_stomp",
         "target": "result_stomp",
         "sourceHandle": "default"
       },
       {
-        "id": "4a8eba47-f409-4da4-8253-f4e9a22fc554",
+        "id": "917f83b2-6425-435a-8b70-94d9bb58408f",
         "source": "result_splash_face",
         "target": "loop_play"
       },
       {
-        "id": "979e94f3-c248-4fe5-a249-82db15c66fd4",
+        "id": "3cede7a3-bfbf-4d1a-8f8d-d17cc76e88f9",
         "source": "result_stomp",
         "target": "loop_play"
       },
       {
-        "id": "50085c49-4479-4b9c-990d-bce1dd7d98b9",
+        "id": "0157a3b7-7d66-44e8-b141-29570e76a6f8",
         "source": "loop_play",
-        "target": "end_satisfied",
-        "sourceHandle": "complete"
-      },
-      {
-        "id": "d8763a38-a9e6-46dd-8f1d-18ec0f33964a",
-        "source": "loop_play",
-        "target": "loop_play_admission",
+        "target": "judge_stomp",
         "sourceHandle": "continue"
       },
       {
-        "id": "cf15272c-3525-4951-8248-9f9d367c2265",
-        "source": "move_to_puddle",
+        "id": "719c023e-0a9e-4368-85d2-97013f3f8002",
+        "source": "loop_play",
+        "target": "5b86ed29-eb0a-4c4c-9089-47976cafc217",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "e66d399c-768c-43c8-ba0a-8db9b9510df1",
+        "source": "5b86ed29-eb0a-4c4c-9089-47976cafc217",
         "target": "end_rain_stopped",
-        "sourceHandle": "unreachable",
-        "targetHandle": null
+        "sourceHandle": "branch_1"
       },
       {
-        "id": "loop_play_admission:admission_0",
-        "source": "loop_play_admission",
-        "sourceHandle": "admission_0",
-        "target": "judge_stomp"
-      },
-      {
-        "id": "loop_play_admission:admission_1",
-        "source": "loop_play_admission",
-        "sourceHandle": "admission_1",
-        "target": "end_rain_stopped"
+        "id": "69b84f7f-d752-46f8-bac7-a970ae724180",
+        "source": "5b86ed29-eb0a-4c4c-9089-47976cafc217",
+        "target": "end_satisfied",
+        "sourceHandle": "default"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "loop_play",
-          "entry": "loop_play_admission",
-          "members": [
-            "judge_stomp",
-            "result_splash_face",
-            "result_stomp",
-            "loop_play_admission"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-

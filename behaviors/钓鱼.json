@@ -50,9 +50,68 @@
       "interactObjectType": "",
       "consumables": [],
       "attributes": []
-    }
+    },
+    "legacyMovement": [
+      {
+        "node": {
+          "id": "move",
+          "type": "move",
+          "data": {
+            "name": "前往指定钓鱼点",
+            "destination": "目标策略已选定的钓鱼场所及交互点位",
+            "destinationType": "interactObject",
+            "description": "占用与监听沿用通用位移。β1不等待被占点位：寻找替代点位，否则通用失败收尾。到达失败不进入抛竿。绑定本次鱼竿实例；固定装备或临时生成来源待确认。",
+            "occupiedResources": [
+              {
+                "id": "spot",
+                "source": "object:interactPlace",
+                "attribute": "interaction_point_occupied",
+                "objectName": "item:interactPlace/reczz28P8vM5Gf9F"
+              }
+            ],
+            "objectType": "interactPlace",
+            "objectName": "item:interactPlace/reczz28P8vM5Gf9F"
+          },
+          "position": {
+            "x": -1263.9745455710326,
+            "y": 1661.2414684883497
+          },
+          "selected": true,
+          "width": 280,
+          "height": 390,
+          "dragging": false
+        },
+        "edges": [
+          {
+            "id": "2bca50ab-e3a0-40a9-aa2c-3a3b1a621451",
+            "source": "start",
+            "target": "move",
+            "type": "default"
+          },
+          {
+            "id": "45992a5d-8452-447a-8b86-971337430481",
+            "source": "move",
+            "target": "loop",
+            "type": "default"
+          },
+          {
+            "id": "c1ec455f-a317-4e6f-8e1f-5904727fdf14",
+            "source": "move",
+            "target": "end_interrupted",
+            "sourceHandle": "unreachable",
+            "targetHandle": null,
+            "type": "default"
+          }
+        ]
+      }
+    ]
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "start",
@@ -62,32 +121,8 @@
           "description": "建议以提竿结算作为完整一轮；空军也计次。次数由目标策略传入。"
         },
         "position": {
-          "x": -1608.8175920135493,
-          "y": 1678.3983452737207
-        }
-      },
-      {
-        "id": "move",
-        "type": "move",
-        "data": {
-          "name": "前往指定钓鱼点",
-          "destination": "目标策略已选定的钓鱼场所及交互点位",
-          "destinationType": "interactObject",
-          "description": "占用与监听沿用通用位移。β1不等待被占点位：寻找替代点位，否则通用失败收尾。到达失败不进入抛竿。绑定本次鱼竿实例；固定装备或临时生成来源待确认。",
-          "occupiedResources": [
-            {
-              "id": "spot",
-              "source": "object:interactPlace",
-              "attribute": "interaction_point_occupied",
-              "objectName": "item:interactPlace/reczz28P8vM5Gf9F"
-            }
-          ],
-          "objectType": "interactPlace",
-          "objectName": "item:interactPlace/reczz28P8vM5Gf9F"
-        },
-        "position": {
-          "x": -1263.9745455710326,
-          "y": 1661.2414684883497
+          "x": -2243.28414639331,
+          "y": 1649.6813725270767
         }
       },
       {
@@ -224,8 +259,8 @@
           ]
         },
         "position": {
-          "x": -843.8142719904582,
-          "y": 1481.9911918472937
+          "x": -1413.0364276197956,
+          "y": 1654.9992493649388
         }
       },
       {
@@ -233,7 +268,7 @@
         "type": "result",
         "data": {
           "name": "抛竿时断裂",
-          "animation": "向水面挥竿时竿身折断，伙伴停手看向断口",
+          "animation": "向水面挥竿时竿身折断，伙伴停手看向断口，低头看断竿，叹气收起",
           "playMode": "单次",
           "description": "本轮无鱼、不计完整轮数。已执行成本保留，不新增损坏Buff。",
           "effectRules": [
@@ -246,11 +281,17 @@
               "objectName": "鱼竿"
             }
           ],
-          "outputs": []
+          "outputs": [],
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "监听耐久度，跳出/不符合准入条件，通用中断"
+            }
+          ]
         },
         "position": {
-          "x": -459.65941310008105,
-          "y": 1073.233615183045
+          "x": -998.0780375426641,
+          "y": 1643.0141123824035
         }
       },
       {
@@ -258,7 +299,7 @@
         "type": "result",
         "data": {
           "name": "抛竿时脱手",
-          "animation": "挥竿时握柄滑脱，鱼竿沿抛出方向飞离",
+          "animation": "挥竿时握柄滑脱，鱼竿沿抛出方向飞离，摊开双手，看向鱼竿飞出的方向",
           "playMode": "单次",
           "description": "无鱼、不计完整轮数；保留已执行成本，记录飞出方向与工具实例，交接独立【脱手】行为。",
           "effectRules": [
@@ -271,11 +312,17 @@
               "objectName": "buff"
             }
           ],
-          "outputs": []
+          "outputs": [],
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "失去装备物，不符合准入条件，通用中断"
+            }
+          ]
         },
         "position": {
-          "x": -456.0169710135534,
-          "y": 1509.463616749683
+          "x": -994.8746801312785,
+          "y": 2050.1628155741105
         }
       },
       {
@@ -298,8 +345,8 @@
           "outputs": []
         },
         "position": {
-          "x": -440.04110117799075,
-          "y": 1963.1830448154556
+          "x": -996.3841386572095,
+          "y": 2477.3671582384695
         }
       },
       {
@@ -314,8 +361,8 @@
           "outputs": []
         },
         "position": {
-          "x": -440.1139515137185,
-          "y": 2418.5573581306626
+          "x": -993.8332829920128,
+          "y": 2843.190693282688
         }
       },
       {
@@ -343,84 +390,6 @@
             }
           ],
           "branches": [
-            {
-              "id": "early",
-              "name": "提前咬钩",
-              "weightExpectation": "低",
-              "nextNode": "early",
-              "weightFactors": [
-                {
-                  "id": "a17",
-                  "source": "object:partner",
-                  "attribute": "energy",
-                  "version": 2,
-                  "attributeId": "a17",
-                  "influence": "不影响",
-                  "influenceType": "",
-                  "influenceRule": "不影响"
-                },
-                {
-                  "version": 2,
-                  "id": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
-                  "attributeId": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
-                  "source": "object:partner",
-                  "attribute": "fishingLevel",
-                  "influence": "越高，概率越大",
-                  "influenceType": "数值高",
-                  "influenceRule": "概率越高"
-                },
-                {
-                  "version": 2,
-                  "id": "5b1d3c70-4dc1-486a-a91c-62cee11d1666",
-                  "attributeId": "5b1d3c70-4dc1-486a-a91c-62cee11d1666",
-                  "source": "object:partner",
-                  "attribute": "提前咬钩",
-                  "influence": "指定值，概率提高",
-                  "objectName": "Buff",
-                  "influenceType": "具体值",
-                  "influenceRule": "概率越高"
-                }
-              ]
-            },
-            {
-              "id": "sleep",
-              "name": "平静等鱼",
-              "weightExpectation": "高",
-              "nextNode": "sleep",
-              "weightFactors": [
-                {
-                  "id": "a17",
-                  "source": "object:partner",
-                  "attribute": "energy",
-                  "version": 2,
-                  "attributeId": "a17",
-                  "influence": "不影响",
-                  "influenceType": "",
-                  "influenceRule": "不影响"
-                },
-                {
-                  "version": 2,
-                  "id": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
-                  "attributeId": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
-                  "source": "object:partner",
-                  "attribute": "fishingLevel",
-                  "influence": "不影响",
-                  "influenceType": "",
-                  "influenceRule": "不影响"
-                },
-                {
-                  "version": 2,
-                  "id": "5b1d3c70-4dc1-486a-a91c-62cee11d1666",
-                  "attributeId": "5b1d3c70-4dc1-486a-a91c-62cee11d1666",
-                  "source": "object:partner",
-                  "attribute": "提前咬钩",
-                  "influence": "不影响",
-                  "objectName": "Buff",
-                  "influenceType": "",
-                  "influenceRule": "不影响"
-                }
-              ]
-            },
             {
               "id": "ignore",
               "name": "鱼不理",
@@ -498,12 +467,91 @@
                   "influenceRule": "不影响"
                 }
               ]
+            },
+            {
+              "id": "early",
+              "name": "提前咬钩",
+              "weightExpectation": "低",
+              "nextNode": "early",
+              "weightFactors": [
+                {
+                  "id": "a17",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "a17",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
+                  "attributeId": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "越高，概率越大",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "5b1d3c70-4dc1-486a-a91c-62cee11d1666",
+                  "attributeId": "5b1d3c70-4dc1-486a-a91c-62cee11d1666",
+                  "source": "object:partner",
+                  "attribute": "提前咬钩",
+                  "influence": "指定值，概率提高",
+                  "objectName": "Buff",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越高"
+                }
+              ]
+            },
+            {
+              "id": "sleep",
+              "name": "平静等鱼",
+              "weightExpectation": "高",
+              "nextNode": "sleep",
+              "weightFactors": [
+                {
+                  "id": "a17",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "a17",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
+                  "attributeId": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "5b1d3c70-4dc1-486a-a91c-62cee11d1666",
+                  "attributeId": "5b1d3c70-4dc1-486a-a91c-62cee11d1666",
+                  "source": "object:partner",
+                  "attribute": "提前咬钩",
+                  "influence": "不影响",
+                  "objectName": "Buff",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
             }
-          ]
+          ],
+          "externalExits": []
         },
         "position": {
-          "x": 339.65876530488674,
-          "y": 1988.690684584028
+          "x": -234.16372308950605,
+          "y": 1641.4706172703668
         }
       },
       {
@@ -519,8 +567,8 @@
           "playExpectation": "等到提前咬钩事件即结束"
         },
         "position": {
-          "x": 734.8748158066858,
-          "y": 1773.9219475284917
+          "x": 240.56242969127902,
+          "y": 2210.7362389889927
         }
       },
       {
@@ -535,8 +583,8 @@
           "outputs": []
         },
         "position": {
-          "x": 741.0347880406812,
-          "y": 2721.606019832868
+          "x": 252.16135608083744,
+          "y": 1910.3337146722984
         }
       },
       {
@@ -551,8 +599,8 @@
           "outputs": []
         },
         "position": {
-          "x": 737.8581622598635,
-          "y": 2402.7283651934245
+          "x": 244.75238246215497,
+          "y": 1639.0563709777048
         }
       },
       {
@@ -568,8 +616,8 @@
           "playExpectation": "等待至本轮基础时长到期，应用抛竿修正"
         },
         "position": {
-          "x": 738.0588623871809,
-          "y": 2089.5302650254453
+          "x": 242.22432045234973,
+          "y": 2492.2014023737756
         }
       },
       {
@@ -678,8 +726,8 @@
           ]
         },
         "position": {
-          "x": 1253.37258582797,
-          "y": 1866.1080114650972
+          "x": 705.1639040615947,
+          "y": 1638.2193755755238
         }
       },
       {
@@ -687,7 +735,7 @@
         "type": "result",
         "data": {
           "name": "提竿时断裂",
-          "animation": "向上提竿时竿身折断，伙伴看着断竿愣住",
+          "animation": "向上提竿时竿身折断，伙伴看着断竿愣住，低头看断竿，叹气收起",
           "playMode": "单次",
           "description": "无鱼；建议不记完整轮数，已执行成本保留。",
           "effectRules": [
@@ -700,11 +748,17 @@
               "objectName": "item:equippedItem/reczz28P8wcbRpgX"
             }
           ],
-          "outputs": []
+          "outputs": [],
+          "externalExits": [
+            {
+              "handle": "",
+              "note": ""
+            }
+          ]
         },
         "position": {
-          "x": 1641.407189220401,
-          "y": 1142.2277818950085
+          "x": 1112.7789671587427,
+          "y": 1650.3744578215428
         }
       },
       {
@@ -712,7 +766,7 @@
         "type": "result",
         "data": {
           "name": "提竿时脱手",
-          "animation": "用力向后提竿，握柄滑脱，鱼竿向身后飞出",
+          "animation": "用力向后提竿，握柄滑脱，鱼竿向身后飞出，摊开双手，看向鱼竿飞出的方向",
           "playMode": "单次",
           "description": "无鱼；建议不记完整轮数；记录实际方向，交接独立【脱手】行为。",
           "effectRules": [
@@ -724,11 +778,17 @@
               "kind": "buff"
             }
           ],
-          "outputs": []
+          "outputs": [],
+          "externalExits": [
+            {
+              "handle": "",
+              "note": ""
+            }
+          ]
         },
         "position": {
-          "x": 1642.6851005483477,
-          "y": 1665.98773170308
+          "x": 1110.9617748123987,
+          "y": 2059.386978915246
         }
       },
       {
@@ -809,8 +869,8 @@
           ]
         },
         "position": {
-          "x": 1653.6577709094445,
-          "y": 2154.2582167305154
+          "x": 1114.4437653960238,
+          "y": 2493.2355324665596
         }
       },
       {
@@ -842,11 +902,12 @@
           ],
           "attributeChanges": [
             ""
-          ]
+          ],
+          "externalExits": []
         },
         "position": {
-          "x": 2052.04964414078,
-          "y": 1932.627614327671
+          "x": 1491.955668801013,
+          "y": 1654.6576058226865
         }
       },
       {
@@ -869,11 +930,12 @@
           "outputs": [],
           "attributeChanges": [
             ""
-          ]
+          ],
+          "externalExits": []
         },
         "position": {
-          "x": 2063.2617120979035,
-          "y": 2484.2833792755996
+          "x": 1489.3430500832094,
+          "y": 2111.9228085943073
         }
       },
       {
@@ -973,8 +1035,8 @@
           ]
         },
         "position": {
-          "x": 2439.4311804803865,
-          "y": 2067.014119290423
+          "x": -1807.9061844065832,
+          "y": 1665.4181825964822
         }
       },
       {
@@ -985,8 +1047,8 @@
           "description": "按现有待机库选择短暂表演，保持鱼竿安全持有，不重置轮数；随后重新抛竿。"
         },
         "position": {
-          "x": 2865.4533761340517,
-          "y": 2692.5134128523796
+          "x": 2267.7594388230186,
+          "y": 1654.0890272520014
         }
       },
       {
@@ -1000,53 +1062,8 @@
           "description": "沿用原文；即使全程空军仍按目标轮数完成，不改成必须钓到鱼。"
         },
         "position": {
-          "x": 2870.542769735276,
-          "y": 1965.8244432130914
-        }
-      },
-      {
-        "id": "end_interrupted",
-        "type": "end",
-        "data": {
-          "name": "资源失效，中断钓鱼",
-          "animation": "放低双手，叹气摇头",
-          "playMode": "单次",
-          "playExpectation": "",
-          "description": "建议收尾；保留已得鱼获和已完成轮数，只释放本次实际占用。"
-        },
-        "position": {
-          "x": 2869.294294747628,
-          "y": 2326.6233890841545
-        }
-      },
-      {
-        "id": "end_broken",
-        "type": "end",
-        "data": {
-          "name": "断竿后收尾",
-          "animation": "低头看断竿，叹气收起",
-          "playMode": "单次",
-          "playExpectation": "",
-          "description": "建议收尾；后续修理交给监听和目标策略。"
-        },
-        "position": {
-          "x": 2004.192632819666,
-          "y": 969.4176930778244
-        }
-      },
-      {
-        "id": "end_fly",
-        "type": "end",
-        "data": {
-          "name": "脱手后交接",
-          "animation": "摊开双手，看向鱼竿飞出的方向",
-          "playMode": "单次",
-          "playExpectation": "",
-          "description": "建议收尾；交接【脱手】监听行为，不在本图展开。"
-        },
-        "position": {
-          "x": 2022.9065627250584,
-          "y": 1476.8610174659875
+          "x": -1412.3596109980226,
+          "y": 2365.035618409621
         }
       },
       {
@@ -1062,17 +1079,13 @@
           "playExpectation": "本轮剩余等待时间，包含已产生的一次延长"
         },
         "position": {
-          "x": -19.843260054736447,
-          "y": 2227.3438949438837
+          "x": -626.0943618726362,
+          "y": 2639.059072367348
         }
       },
       {
         "id": "loop_rest",
         "type": "judge",
-        "position": {
-          "x": 2799.4311804803865,
-          "y": 2067.014119290423
-        },
         "data": {
           "name": "稍息判断",
           "description": "完整一轮后、目标未完成且资源可用时。",
@@ -1097,289 +1110,183 @@
             "rules": [],
             "expectation": "通常发生"
           }
-        }
-      },
-      {
-        "id": "loop_admission",
-        "type": "judge",
-        "position": {
-          "x": 2799.4311804803865,
-          "y": 2067.014119290423
         },
-        "data": {
-          "name": "准入判断",
-          "description": "鱼竿仍可用且由伙伴持有，钓鱼场所及点位仍有效；鱼饵可选，耗尽不阻断。\n不满足原因：鱼竿或钓鱼点位不再可用。",
-          "judgeAttributes": [],
-          "branches": [
-            {
-              "id": "admission_0",
-              "name": "满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": []
-            },
-            {
-              "id": "admission_1",
-              "name": "不满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": []
-            }
-          ],
-          "legacyGate": {
-            "kind": "admission",
-            "condition": "鱼竿仍可用且由伙伴持有，钓鱼场所及点位仍有效；鱼饵可选，耗尽不阻断。\n不满足原因：鱼竿或钓鱼点位不再可用。",
-            "rules": [],
-            "failureReason": "鱼竿或钓鱼点位不再可用。"
-          }
+        "position": {
+          "x": 1895.324674794801,
+          "y": 1656.0310704986323
         }
       }
     ],
     "edges": [
       {
-        "id": "daae65a0-3516-41f3-9937-adde4bc6ea04",
+        "id": "2bca50ab-e3a0-40a9-aa2c-3a3b1a621451",
         "source": "start",
-        "target": "move"
-      },
-      {
-        "id": "15fe757d-8cc9-4bf6-8731-591559cebf21",
-        "source": "move",
         "target": "loop"
       },
       {
-        "id": "44fbbd09-9d0d-49cf-9734-566a2fef9ffb",
+        "id": "7ce5996d-dc98-467a-9628-5fb560252574",
         "source": "cast",
         "target": "cast_broken",
         "sourceHandle": "broken"
       },
       {
-        "id": "05df7d12-5c05-4217-ae92-a600769cc47d",
+        "id": "4a716fb9-8442-405b-91e8-3b1fedbd7920",
         "source": "cast",
         "target": "cast_fly",
         "sourceHandle": "fly"
       },
       {
-        "id": "4b50e24c-b99e-4d75-8aa6-573bf31f549b",
+        "id": "1eb37eeb-2730-4483-9ce5-4570b272377d",
         "source": "cast",
         "target": "best",
         "sourceHandle": "best"
       },
       {
-        "id": "c1672823-5647-4970-b45d-5e702423f0a5",
+        "id": "5ab11494-5237-428d-9098-3f2703b28a08",
         "source": "cast",
         "target": "normal",
         "sourceHandle": "normal"
       },
       {
-        "id": "4c72f373-70b7-4b01-acf3-7e76b456f832",
-        "source": "cast_broken",
-        "target": "end_broken"
-      },
-      {
-        "id": "02a87995-1696-45aa-a3d6-20a2b0630331",
-        "source": "cast_fly",
-        "target": "end_fly"
-      },
-      {
-        "id": "000d3e4a-aede-4855-9bf2-b50797f37e1d",
+        "id": "ac322dcc-0080-470a-9468-866e6c05ecbb",
         "source": "wait_judge",
         "target": "early",
         "sourceHandle": "early"
       },
       {
-        "id": "4e0febdf-ee6b-4e8d-8175-694241b1134f",
+        "id": "2eda58cc-a08c-4ffc-91b9-e0872cc63868",
         "source": "wait_judge",
         "target": "ignore",
         "sourceHandle": "ignore"
       },
       {
-        "id": "33a64955-6fcc-4ee0-a7cb-ce1142a7d520",
+        "id": "d0b625d3-0826-4847-9365-59d22f5b356f",
         "source": "early",
         "target": "lift"
       },
       {
-        "id": "1362243a-e098-4067-a9e5-03a7d8326e19",
+        "id": "ade32fea-c893-4ead-9f93-24dc6e31d30f",
         "source": "waiting",
         "target": "lift"
       },
       {
-        "id": "f8b1dcb0-ce1e-4df3-bffb-acf82bb44e36",
+        "id": "33c5e03e-2aec-4f08-8676-e961db5af4bc",
         "source": "lift",
         "target": "lift_broken",
         "sourceHandle": "broken"
       },
       {
-        "id": "0b5168e7-de35-415a-b493-9cc6eb79eb02",
+        "id": "b51c6ca8-8bc8-406f-b5d9-111a01f4de82",
         "source": "lift",
         "target": "lift_fly",
         "sourceHandle": "fly"
       },
       {
-        "id": "c7f5b8c6-260d-48ef-a9de-7e0eb4bcbf6f",
+        "id": "d6718704-3dff-41d9-9597-d00e519418f0",
         "source": "lift",
         "target": "catch_judge",
         "sourceHandle": "ok"
       },
       {
-        "id": "0a9d75d2-9cf7-46ea-aa2a-620b5d02dd0f",
-        "source": "lift_broken",
-        "target": "end_broken"
-      },
-      {
-        "id": "90da650d-1dfe-4210-81d6-8983af6ac8a2",
-        "source": "lift_fly",
-        "target": "end_fly"
-      },
-      {
-        "id": "c86d69cc-0d7e-45bc-8b05-1c01a13e3418",
+        "id": "05cf34f2-1974-4d7b-9e5a-af51bbcce3d1",
         "source": "catch_judge",
         "target": "fish",
         "sourceHandle": "fish"
       },
       {
-        "id": "6f251fcc-2c26-45af-ae72-8e7acfed5d74",
+        "id": "1041e348-b0bf-4e57-b1d2-64b3f9285eb7",
         "source": "catch_judge",
         "target": "empty",
         "sourceHandle": "empty"
       },
       {
-        "id": "0fc3817d-15be-4282-a370-49c6b727c3e8",
-        "source": "fish",
-        "target": "loop"
-      },
-      {
-        "id": "f6f3320e-796d-4097-bc3a-e22dc923d2e6",
-        "source": "empty",
-        "target": "loop"
-      },
-      {
-        "id": "d837f4be-075d-4cf6-8c59-07a470f3b2b3",
+        "id": "8d35a98a-5d5e-43bd-8016-9853e41ea621",
         "source": "loop",
         "target": "end_complete",
         "sourceHandle": "complete"
       },
       {
-        "id": "71a35ffe-ca8b-4306-a515-6cf83cfa719f",
-        "source": "loop",
-        "target": "loop_admission",
-        "sourceHandle": "continue"
-      },
-      {
-        "id": "a884497b-88b3-4880-a511-428a326bcdf4",
+        "id": "a83d6741-df5e-496f-afcd-85b53e4985bb",
         "source": "rest",
         "target": "loop"
       },
       {
-        "id": "606660a2-db89-4b3b-9376-c8023f7c17a3",
+        "id": "0912ffaf-ccc9-4da2-a283-25c480ddb1d5",
         "source": "best",
         "target": "ba3cf311-f3ee-452b-8d8e-7ed4479a8231",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "d1d6aac1-0d4d-4d80-8708-ee9f3dc76b6e",
+        "id": "2f1a212e-2b71-49de-8c43-185849cccd3b",
         "source": "normal",
         "target": "ba3cf311-f3ee-452b-8d8e-7ed4479a8231",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "dd3157b3-1d59-4464-8e9c-f31651f27d5e",
+        "id": "58273092-0e90-4cb9-8c4f-448761c453fb",
         "source": "ba3cf311-f3ee-452b-8d8e-7ed4479a8231",
         "target": "wait_judge",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "f900b252-5066-4170-9cbe-3d9a9f83234e",
+        "id": "69fa38f4-8391-4cb1-b9c5-8c8264ce9dbb",
         "source": "ignore",
         "target": "ba3cf311-f3ee-452b-8d8e-7ed4479a8231",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "0fd4bb87-0b54-4b5d-8aff-bad554afc919",
+        "id": "6139c422-8cb7-4928-9013-dcfd50435097",
         "source": "sleep",
         "target": "ba3cf311-f3ee-452b-8d8e-7ed4479a8231",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "aab5f2d6-2e5d-4e43-9213-9747fa26c1ae",
+        "id": "9b92117c-68dc-4f38-820b-31fa7666eb15",
         "source": "wait_judge",
         "target": "sleep",
         "sourceHandle": "normal",
         "targetHandle": null
       },
       {
-        "id": "383264d4-3e9f-468c-9a4c-5566b46fa860",
+        "id": "1b56b855-e873-454e-acd5-9b76997229a5",
         "source": "wait_judge",
         "target": "waiting",
         "sourceHandle": "sleep",
         "targetHandle": null
       },
       {
-        "id": "1283c3a8-dde3-4730-941c-734a7ba67a6b",
-        "source": "move",
-        "target": "end_interrupted",
-        "sourceHandle": "unreachable",
-        "targetHandle": null
-      },
-      {
-        "id": "loop_rest:rest_0",
+        "id": "94b5f118-dc95-459b-9b7c-b8f081196042",
         "source": "loop_rest",
-        "sourceHandle": "rest_0",
-        "target": "rest"
+        "target": "rest",
+        "sourceHandle": "rest_0"
       },
       {
-        "id": "loop_rest:rest_1",
+        "id": "c5735acc-ba4c-45c6-88bc-f0de2f07a352",
         "source": "loop_rest",
-        "sourceHandle": "rest_1",
-        "target": "cast"
+        "target": "cast",
+        "sourceHandle": "rest_1"
       },
       {
-        "id": "loop_admission:admission_0",
-        "source": "loop_admission",
-        "sourceHandle": "admission_0",
+        "id": "384df40b-af95-450c-86b8-7bce8ab7f0bd",
+        "source": "loop",
+        "target": "cast",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "ba846c9e-1fa1-40ea-8a3a-aad5d72cb554",
+        "source": "fish",
         "target": "loop_rest"
       },
       {
-        "id": "loop_admission:admission_1",
-        "source": "loop_admission",
-        "sourceHandle": "admission_1",
-        "target": "end_interrupted"
+        "id": "43d8b1f0-7850-4696-a521-136f56853fce",
+        "source": "empty",
+        "target": "loop_rest"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "loop",
-          "entry": "loop_admission",
-          "members": [
-            "cast",
-            "cast_broken",
-            "cast_fly",
-            "best",
-            "normal",
-            "wait_judge",
-            "early",
-            "sleep",
-            "ignore",
-            "waiting",
-            "lift",
-            "lift_broken",
-            "lift_fly",
-            "catch_judge",
-            "fish",
-            "empty",
-            "rest",
-            "ba3cf311-f3ee-452b-8d8e-7ed4479a8231",
-            "loop_rest",
-            "loop_admission"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-

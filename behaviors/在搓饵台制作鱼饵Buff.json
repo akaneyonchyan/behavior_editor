@@ -26,9 +26,72 @@
       ],
       "consumableRules": [],
       "attributeRules": []
-    }
+    },
+    "legacyMovement": [
+      {
+        "node": {
+          "id": "move_table",
+          "type": "move",
+          "data": {
+            "name": "位移到搓饵台",
+            "destinationType": "interactObject",
+            "objectType": "interactObject",
+            "objectName": "搓饵台",
+            "destination": "搓饵台制作交互点",
+            "description": "沿用通用占用、等候与超时机制，不重复展开。",
+            "occupiedResources": [
+              {
+                "id": "bait_point",
+                "source": "object:interactObject",
+                "objectName": "搓饵台",
+                "attribute": "interaction_point_occupied"
+              }
+            ]
+          },
+          "position": {
+            "x": 176.79089601228645,
+            "y": -66.77630147211607
+          },
+          "selected": true,
+          "width": 280,
+          "height": 351,
+          "dragging": false
+        },
+        "edges": [
+          {
+            "id": "4340b311-ff2c-4570-8f98-f083ee3d9c36",
+            "source": "start",
+            "target": "move_table",
+            "type": "default"
+          },
+          {
+            "id": "40accbaf-1d73-482e-aa96-d9511b20583a",
+            "source": "move_table",
+            "target": "knead",
+            "sourceHandle": null,
+            "targetHandle": null,
+            "type": "default"
+          }
+        ]
+      }
+    ]
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "craft_loop",
+          "entry": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+          "members": [
+            "produce_bait",
+            "table_broken",
+            "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88"
+          ]
+        }
+      ],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "start",
@@ -38,40 +101,16 @@
           "description": "目标产出为伙伴鱼饵Buff，配置提供本次有效制作总时长。找台、可达性和解锁检查由策略完成，图内不重复画判断。制作进度属于本次制作任务，不借用仅适用于道具的crafting_progress属性。"
         },
         "position": {
-          "x": -160.60265870401315,
-          "y": -27.2840124811097
-        }
-      },
-      {
-        "id": "move_table",
-        "type": "move",
-        "data": {
-          "name": "位移到搓饵台",
-          "destinationType": "interactObject",
-          "objectType": "interactObject",
-          "objectName": "搓饵台",
-          "destination": "搓饵台制作交互点",
-          "description": "沿用通用占用、等候与超时机制，不重复展开。",
-          "occupiedResources": [
-            {
-              "id": "bait_point",
-              "source": "object:interactObject",
-              "objectName": "搓饵台",
-              "attribute": "interaction_point_occupied"
-            }
-          ]
-        },
-        "position": {
-          "x": 176.79089601228645,
-          "y": -66.77630147211607
+          "x": 149.06953623871385,
+          "y": -90.38702579019369
         }
       },
       {
         "id": "knead",
         "type": "result",
         "data": {
-          "name": "反复揉压与搓饵",
-          "animation": "双手在台面上拢住饵团，用掌根向前揉压，再收拢折回；取一小团放在掌心相对搓揉，搓圆后放回台面，继续下一段制作动作。",
+          "name": "搓饵准备动作",
+          "animation": "双手在台面上拢住饵团，用掌根向前揉压，再收拢折回；",
           "playMode": "计时",
           "playExpectation": "1分钟",
           "effectRules": [],
@@ -79,8 +118,8 @@
           "description": ""
         },
         "position": {
-          "x": 565.5644829300695,
-          "y": -44.236842595784026
+          "x": 498.3058484741251,
+          "y": -74.02968281936634
         }
       },
       {
@@ -173,8 +212,8 @@
           ]
         },
         "position": {
-          "x": 1674.9116036430016,
-          "y": -249.43050792871637
+          "x": 840.7120773826975,
+          "y": -78.44551186293972
         }
       },
       {
@@ -182,24 +221,24 @@
         "type": "result",
         "data": {
           "name": "反复揉压与搓饵",
-          "animation": "双手在台面上拢住饵团，用掌根向前揉压，再收拢折回；取一小团放在掌心相对搓揉，搓圆后放回台面，继续下一段制作动作。",
-          "playMode": "单次",
+          "animation": "取一小团放在掌心相对搓揉，搓圆后放回台面，继续下一段制作动作",
+          "playMode": "计次",
           "playExpectation": "",
           "effectRules": [],
           "outputs": [],
           "description": ""
         },
         "position": {
-          "x": 1294.4598942485022,
-          "y": -275.02920349846784
+          "x": 1511.0426628184105,
+          "y": -80.63276472960058
         }
       },
       {
         "id": "table_broken",
         "type": "result",
         "data": {
-          "name": "台面损坏｜吓一跳",
-          "animation": "搓饵台维修部位突然松脱或发出异响，伙伴猛地缩手，身体往后一缩，惊讶地看着台面。",
+          "name": "发现虫子吓一跳",
+          "animation": "材料中突然钻出小虫子，伙伴猛地缩手，身体往后一缩，惊讶地看着台面。",
           "playMode": "单次",
           "playExpectation": "",
           "effectRules": [
@@ -216,8 +255,8 @@
           "description": "仅未完成且台耐久已为0时进入，具体损坏表现按资产适配"
         },
         "position": {
-          "x": 1292.1944899554874,
-          "y": 10.748480882064314
+          "x": 1512.209245663795,
+          "y": 134.65859328518508
         }
       },
       {
@@ -231,23 +270,8 @@
           "description": ""
         },
         "position": {
-          "x": 2398.42833556434,
-          "y": -202.6977457403766
-        }
-      },
-      {
-        "id": "end_interrupted",
-        "type": "end",
-        "data": {
-          "name": "结束制作",
-          "animation": "四周看看，挠头，摊手",
-          "playMode": "单次",
-          "playExpectation": "",
-          "description": ""
-        },
-        "position": {
-          "x": 2053.9108061125467,
-          "y": 95.52899040702044
+          "x": 1509.1875588203661,
+          "y": 496.47582683481323
         }
       },
       {
@@ -259,23 +283,55 @@
               "id": "branch_1",
               "name": "正常搓饵",
               "weightExpectation": "中",
-              "weightFactors": [],
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "2645d35d-dee9-4f7b-a6b5-1bf0637300e0",
+                  "attributeId": "2645d35d-dee9-4f7b-a6b5-1bf0637300e0",
+                  "source": "object:partner",
+                  "attribute": "trait_ability_timid_cautious",
+                  "influence": "不影响",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ],
               "nextNode": ""
             },
             {
               "id": "default",
-              "name": "制作未完成",
-              "weightExpectation": "中",
-              "weightFactors": [],
+              "name": "发现虫子吓一跳",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "2645d35d-dee9-4f7b-a6b5-1bf0637300e0",
+                  "attributeId": "2645d35d-dee9-4f7b-a6b5-1bf0637300e0",
+                  "source": "object:partner",
+                  "attribute": "trait_ability_timid_cautious",
+                  "influence": "指定值，概率提高",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越高"
+                }
+              ],
               "nextNode": ""
             }
           ],
           "name": "判断节点",
-          "judgeAttributes": []
+          "judgeAttributes": [
+            {
+              "id": "2645d35d-dee9-4f7b-a6b5-1bf0637300e0",
+              "source": "object:partner",
+              "attribute": "trait_ability_timid_cautious",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "externalExits": []
         },
         "position": {
-          "x": 898.4267230741018,
-          "y": -42.60896821504744
+          "x": 1182.1155400641712,
+          "y": -78.5456395500274
         }
       },
       {
@@ -300,179 +356,71 @@
           ]
         },
         "position": {
-          "x": 2054.4451558762853,
-          "y": -255.03395076371
-        }
-      },
-      {
-        "id": "craft_loop_admission",
-        "type": "judge",
-        "position": {
-          "x": 2034.9116036430016,
-          "y": -249.43050792871637
-        },
-        "data": {
-          "name": "准入判断",
-          "description": "未完成时，搓饵台耐久度仍大于0，能够继续制作；其他可用性变化由通用监听接管。\n不满足原因：搓饵台耐久降至0，无法继续完成本次制作",
-          "judgeAttributes": [
-            {
-              "id": "admission_0",
-              "source": "object:interactObject",
-              "objectName": "搓饵台",
-              "attribute": "durability"
-            }
-          ],
-          "branches": [
-            {
-              "id": "admission_0",
-              "name": "满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": [
-                {
-                  "id": "admission_0",
-                  "source": "object:interactObject",
-                  "objectName": "搓饵台",
-                  "attribute": "durability",
-                  "influence": "满足条件：大于0，可继续制作",
-                  "attributeId": "admission_0"
-                }
-              ]
-            },
-            {
-              "id": "admission_1",
-              "name": "不满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": [
-                {
-                  "id": "admission_0",
-                  "source": "object:interactObject",
-                  "objectName": "搓饵台",
-                  "attribute": "durability",
-                  "influence": "不满足条件：大于0，可继续制作",
-                  "attributeId": "admission_0"
-                }
-              ]
-            }
-          ],
-          "legacyGate": {
-            "kind": "admission",
-            "condition": "未完成时，搓饵台耐久度仍大于0，能够继续制作；其他可用性变化由通用监听接管。\n不满足原因：搓饵台耐久降至0，无法继续完成本次制作",
-            "rules": [
-              {
-                "id": "table_usable",
-                "source": "object:interactObject",
-                "objectName": "搓饵台",
-                "attribute": "durability",
-                "influence": "大于0，可继续制作"
-              }
-            ],
-            "failureReason": "搓饵台耐久降至0，无法继续完成本次制作"
-          }
+          "x": 1172.5435192677878,
+          "y": 293.80566402621736
         }
       }
     ],
     "edges": [
       {
-        "id": "3e21c785-2b17-4b44-af2d-5c44f73bcab5",
+        "id": "72b78dcf-976f-4495-8b72-878537be4f2c",
         "source": "start",
-        "target": "move_table"
-      },
-      {
-        "id": "4bca1489-6d8c-4b94-a544-f28728f44be3",
-        "source": "move_table",
-        "target": "end_interrupted",
-        "sourceHandle": "unreachable",
-        "targetHandle": null
-      },
-      {
-        "id": "596d83ef-6e56-4c87-ad98-41120b09918d",
-        "source": "move_table",
         "target": "knead",
-        "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "b22ca8cd-af2f-4dec-8082-931b87f5cb32",
+        "id": "6e9882de-dd1c-4901-afd9-f7c0c32c3556",
         "source": "knead",
         "target": "craft_loop",
         "sourceHandle": null
       },
       {
-        "id": "08e414cd-6ab8-41cd-91b5-f5bd3656d5fe",
+        "id": "50046d27-935d-4113-8763-a2b1a3ccfa90",
         "source": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
         "target": "produce_bait",
         "sourceHandle": "branch_1",
         "targetHandle": null
       },
       {
-        "id": "21efdcbf-46e9-407c-a8ce-75da02f273da",
+        "id": "0a4b1f9f-4480-4c35-a455-6f4a53d0c3db",
         "source": "produce_bait",
         "target": "craft_loop",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "dd210493-d13d-45f0-a7e9-1dcf2a1c9cb4",
+        "id": "2d0a0bd1-a326-4288-beab-9ca4a5f4539d",
         "source": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
         "target": "table_broken",
         "sourceHandle": "default",
         "targetHandle": null
       },
       {
-        "id": "8ebc124b-a3eb-49e0-9d43-958e9a70d5c0",
+        "id": "90265852-2296-42ba-af45-8ffa0a44c868",
         "source": "table_broken",
         "target": "craft_loop",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "20effd59-2067-404c-bbaa-1805f7e3e21e",
-        "source": "craft_loop",
-        "target": "craft_loop_admission",
-        "sourceHandle": "continue"
-      },
-      {
-        "id": "0aa2a001-9b93-483b-8e94-090d8a2f3aec",
+        "id": "1aef7a8c-4bf8-4413-9d95-454d2846ea6f",
         "source": "craft_loop",
         "target": "72d29530-174b-4e4a-8469-659a33828adf",
         "sourceHandle": "complete"
       },
       {
-        "id": "b5ec7db3-ab58-40ad-b83f-1d37f3d21c11",
+        "id": "b7d5d658-4c11-417a-b051-3ef5c8128382",
         "source": "72d29530-174b-4e4a-8469-659a33828adf",
         "target": "end_complete",
         "sourceHandle": null,
         "targetHandle": null
       },
       {
-        "id": "craft_loop_admission:admission_0",
-        "source": "craft_loop_admission",
-        "sourceHandle": "admission_0",
-        "target": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88"
-      },
-      {
-        "id": "craft_loop_admission:admission_1",
-        "source": "craft_loop_admission",
-        "sourceHandle": "admission_1",
-        "target": "end_interrupted"
+        "id": "46c3faed-90c9-4595-bc0e-f51d88791b3b",
+        "source": "craft_loop",
+        "target": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+        "sourceHandle": "continue"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "craft_loop",
-          "entry": "craft_loop_admission",
-          "members": [
-            "produce_bait",
-            "table_broken",
-            "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
-            "craft_loop_admission"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-

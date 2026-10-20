@@ -34,9 +34,73 @@
           "influence": "有抹布"
         }
       ]
-    }
+    },
+    "legacyMovement": [
+      {
+        "node": {
+          "id": "move_target",
+          "type": "move",
+          "data": {
+            "name": "位移到目标交互物",
+            "destinationType": "interactObject",
+            "objectType": "interactObject",
+            "objectName": "目标交互物",
+            "destination": "目标交互物的清洁交互点",
+            "description": "前往已选交互物的清洁交互点；占用检查和监听沿用通用机制。",
+            "occupiedResources": [
+              {
+                "id": "cleaning_point",
+                "source": "object:interactObject",
+                "objectName": "目标交互物",
+                "attribute": "interaction_point_occupied"
+              }
+            ]
+          },
+          "position": {
+            "x": -47.30065280058466,
+            "y": 55.91599289848227
+          },
+          "selected": true,
+          "width": 280,
+          "height": 371,
+          "dragging": false
+        },
+        "edges": [
+          {
+            "id": "0c25f4c4-fc53-4548-acbb-f36d35451155",
+            "source": "start",
+            "target": "move_target",
+            "type": "default"
+          },
+          {
+            "id": "960717f6-1bb1-4567-afc2-094adf75fad1",
+            "source": "move_target",
+            "target": "8cdb8cd8-d4ef-467c-94ed-9daf196f8488",
+            "sourceHandle": null,
+            "targetHandle": null,
+            "type": "default"
+          }
+        ]
+      }
+    ]
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "clean_loop",
+          "entry": "choose_wipe",
+          "members": [
+            "choose_wipe",
+            "wipe_back_forth",
+            "wipe_circles",
+            "wipe_corners"
+          ]
+        }
+      ],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "start",
@@ -46,32 +110,8 @@
           "description": "拿取和装备由前置【从工具柜拿取抹布】完成。清洁目标值来自上游，不默认打扫至上限。"
         },
         "position": {
-          "x": -382.2938666021639,
-          "y": 37.29696259533307
-        }
-      },
-      {
-        "id": "move_target",
-        "type": "move",
-        "data": {
-          "name": "位移到目标交互物",
-          "destinationType": "interactObject",
-          "objectType": "interactObject",
-          "objectName": "目标交互物",
-          "destination": "目标交互物的清洁交互点",
-          "description": "前往已选交互物的清洁交互点；占用检查和监听沿用通用机制。",
-          "occupiedResources": [
-            {
-              "id": "cleaning_point",
-              "source": "object:interactObject",
-              "objectName": "目标交互物",
-              "attribute": "interaction_point_occupied"
-            }
-          ]
-        },
-        "position": {
-          "x": -47.30065280058466,
-          "y": 55.91599289848227
+          "x": -46.93321691352611,
+          "y": 50.98515237854281
         }
       },
       {
@@ -80,14 +120,31 @@
         "data": {
           "name": "选择本轮擦拭动作",
           "description": "先按目标表面及资产适配排除不可用动作，再从可用动作中选择；同等倾向为建议，允许连续重复。",
-          "judgeAttributes": [],
+          "judgeAttributes": [
+            {
+              "id": "9e090ca9-5b0f-4cd6-8570-4c6f605d7576",
+              "source": "object:partner",
+              "attribute": "personality_pragmatic",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
           "branches": [
             {
               "id": "back_forth",
               "name": "大力擦拭",
               "condition": "目标表面支持前后擦拭",
               "weightExpectation": "中",
-              "weightFactors": [],
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "9e090ca9-5b0f-4cd6-8570-4c6f605d7576",
+                  "attributeId": "9e090ca9-5b0f-4cd6-8570-4c6f605d7576",
+                  "source": "object:partner",
+                  "attribute": "personality_pragmatic",
+                  "influence": "指定值，概率提高",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
               "nextNode": "wipe_back_forth"
             },
             {
@@ -95,7 +152,17 @@
               "name": "小心擦细节",
               "condition": "目标表面支持画圈擦拭",
               "weightExpectation": "中",
-              "weightFactors": [],
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "9e090ca9-5b0f-4cd6-8570-4c6f605d7576",
+                  "attributeId": "9e090ca9-5b0f-4cd6-8570-4c6f605d7576",
+                  "source": "object:partner",
+                  "attribute": "personality_pragmatic",
+                  "influence": "不影响",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
               "nextNode": "wipe_circles"
             },
             {
@@ -103,14 +170,25 @@
               "name": "抖抖抹布",
               "condition": "仅在目标存在可擦边缘或缝隙且资产支持动作时可选；不支持则排除此分支",
               "weightExpectation": "低",
-              "weightFactors": [],
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "9e090ca9-5b0f-4cd6-8570-4c6f605d7576",
+                  "attributeId": "9e090ca9-5b0f-4cd6-8570-4c6f605d7576",
+                  "source": "object:partner",
+                  "attribute": "personality_pragmatic",
+                  "influence": "不影响",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
               "nextNode": "wipe_corners"
             }
-          ]
+          ],
+          "externalExits": []
         },
         "position": {
-          "x": 615.4567581161726,
-          "y": -25.207881186850955
+          "x": 903.5256152940926,
+          "y": 56.945089193518015
         }
       },
       {
@@ -135,8 +213,8 @@
           "outputs": []
         },
         "position": {
-          "x": 961.3023098207507,
-          "y": -25.713983376415854
+          "x": 1239.4886474474931,
+          "y": 62.0169738675317
         }
       },
       {
@@ -161,8 +239,8 @@
           "outputs": []
         },
         "position": {
-          "x": 962.5259160664184,
-          "y": 414.12906226198743
+          "x": 1246.1968324527681,
+          "y": 348.2232956777112
         }
       },
       {
@@ -178,8 +256,8 @@
           "outputs": []
         },
         "position": {
-          "x": 621.0529392586946,
-          "y": 446.82455089261725
+          "x": 1244.1917703069807,
+          "y": 636.0964592754431
         }
       },
       {
@@ -285,8 +363,8 @@
           ]
         },
         "position": {
-          "x": 1316.1050861643198,
-          "y": 8.77918835700575
+          "x": 574.7813255624316,
+          "y": 58.6811295425087
         }
       },
       {
@@ -300,8 +378,8 @@
           "description": ""
         },
         "position": {
-          "x": 1648.9281381256833,
-          "y": 11.553263085180731
+          "x": 906.3506396226012,
+          "y": 526.8764409256817
         }
       },
       {
@@ -317,161 +395,70 @@
           "description": "掏出抹布准备擦拭"
         },
         "position": {
-          "x": 279.8504289501752,
-          "y": 58.71836872602421
-        }
-      },
-      {
-        "id": "3dcdc05a-f257-4750-8401-d0286cebd23d",
-        "type": "end",
-        "data": {
-          "animation": "四周看看，挠头，摊手",
-          "playMode": "单次",
-          "playExpectation": "",
-          "name": "结束节点",
-          "description": "找点、其他行为打断直接结束"
-        },
-        "position": {
-          "x": 1654.8200814459462,
-          "y": 343.40547033035443
-        }
-      },
-      {
-        "id": "clean_loop_admission",
-        "type": "judge",
-        "position": {
-          "x": 1676.1050861643198,
-          "y": 8.77918835700575
-        },
-        "data": {
-          "name": "准入判断",
-          "description": "当前打扫可继续；工具装备与交互物可用性由准入及外部监听维护，不新增资源不足分支。\n不满足原因：被插入行为中断",
-          "judgeAttributes": [],
-          "branches": [
-            {
-              "id": "admission_0",
-              "name": "满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": []
-            },
-            {
-              "id": "admission_1",
-              "name": "不满足",
-              "weightExpectation": "按条件判定",
-              "weightFactors": []
-            }
-          ],
-          "legacyGate": {
-            "kind": "admission",
-            "condition": "当前打扫可继续；工具装备与交互物可用性由准入及外部监听维护，不新增资源不足分支。\n不满足原因：被插入行为中断",
-            "rules": [],
-            "failureReason": "被插入行为中断"
-          }
+          "x": 260.8326546795894,
+          "y": 58.13820382741284
         }
       }
     ],
     "edges": [
       {
-        "id": "cc903187-17ed-4007-999e-bdb4c3354877",
+        "id": "cba08459-cb62-4e26-9bb2-da6c62bec400",
         "source": "start",
-        "target": "move_target"
+        "target": "8cdb8cd8-d4ef-467c-94ed-9daf196f8488",
+        "targetHandle": null
       },
       {
-        "id": "10a2a9ac-4ced-49cc-a0dc-b8e77ccb5c5e",
+        "id": "14f94c95-9e07-4db5-a6f8-51b6702e67b9",
         "source": "choose_wipe",
         "target": "wipe_back_forth",
         "sourceHandle": "back_forth"
       },
       {
-        "id": "700d4851-7390-49ad-beb9-bacd918ada50",
+        "id": "defa673d-2851-42b8-9db0-78c2f62f00d0",
         "source": "wipe_back_forth",
         "target": "clean_loop"
       },
       {
-        "id": "02138161-6534-44c2-8496-af688f8da085",
+        "id": "c68166b7-e97b-4622-a2c1-daf5738a9fac",
         "source": "choose_wipe",
         "target": "wipe_circles",
         "sourceHandle": "circles"
       },
       {
-        "id": "088f23d0-97a1-4cda-9d3b-cc49f22439d6",
+        "id": "6f297b5c-81fd-4b7d-96c9-1f73da58f1a7",
         "source": "wipe_circles",
         "target": "clean_loop"
       },
       {
-        "id": "da350cb1-f3d9-4cc5-863a-c5cad45f7c30",
+        "id": "4743c4e6-96ad-4212-97b9-2360dfce9d4e",
         "source": "choose_wipe",
         "target": "wipe_corners",
         "sourceHandle": "corners"
       },
       {
-        "id": "19132d35-d059-4947-8be2-deedf98b6214",
+        "id": "6bf30e64-01a7-4aef-b91c-2dce546b8eb5",
         "source": "clean_loop",
         "target": "end",
         "sourceHandle": "complete"
       },
       {
-        "id": "444c14b5-32ec-415b-bf77-8a7f12ea3b64",
-        "source": "clean_loop",
-        "target": "clean_loop_admission",
-        "sourceHandle": "continue"
-      },
-      {
-        "id": "bfc03106-9812-441c-91c5-c937bbc14103",
-        "source": "move_target",
-        "target": "8cdb8cd8-d4ef-467c-94ed-9daf196f8488",
-        "sourceHandle": null,
-        "targetHandle": null
-      },
-      {
-        "id": "7ef13cd7-b1d2-4323-bf7c-dc34e2ef2e20",
+        "id": "f2b3b110-2e0e-445e-a677-6501e1b46ba5",
         "source": "8cdb8cd8-d4ef-467c-94ed-9daf196f8488",
         "target": "clean_loop",
         "sourceHandle": null
       },
       {
-        "id": "2f8bbfca-bd23-4567-906a-7c5c66467cef",
+        "id": "40147f61-ccdb-4e78-a8bb-3087ca169e08",
         "source": "wipe_corners",
         "target": "clean_loop",
         "sourceHandle": null
       },
       {
-        "id": "c15b4f5b-dcfc-41e8-a272-a1ad3dc5f6a5",
-        "source": "move_target",
-        "target": "3dcdc05a-f257-4750-8401-d0286cebd23d",
-        "sourceHandle": "unreachable",
-        "targetHandle": null
-      },
-      {
-        "id": "clean_loop_admission:admission_0",
-        "source": "clean_loop_admission",
-        "sourceHandle": "admission_0",
-        "target": "choose_wipe"
-      },
-      {
-        "id": "clean_loop_admission:admission_1",
-        "source": "clean_loop_admission",
-        "sourceHandle": "admission_1",
-        "target": "3dcdc05a-f257-4750-8401-d0286cebd23d"
+        "id": "0dce9870-eb48-48a0-ba46-1e577fe74d44",
+        "source": "clean_loop",
+        "target": "choose_wipe",
+        "sourceHandle": "continue"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "clean_loop",
-          "entry": "clean_loop_admission",
-          "members": [
-            "choose_wipe",
-            "wipe_back_forth",
-            "wipe_circles",
-            "wipe_corners",
-            "clean_loop_admission"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-

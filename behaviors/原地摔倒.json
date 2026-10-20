@@ -23,6 +23,19 @@
     }
   },
   "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "get_up_loop",
+          "entry": "sit_dazed",
+          "members": [
+            "sit_dazed"
+          ]
+        }
+      ],
+      "positions": {}
+    },
     "nodes": [
       {
         "id": "start",
@@ -32,8 +45,8 @@
           "description": "触发时处于位移过程；冻结触发瞬间的前进方向和原位移目标，不重新选方向或寻路。原地摔跤仅允许动作所需的小范围前扑，不新增位移节点。"
         },
         "position": {
-          "x": 64.69168947894929,
-          "y": -29.87553435935149
+          "x": 70.45876869374655,
+          "y": -138.52634456014817
         }
       },
       {
@@ -99,8 +112,8 @@
           "description": ""
         },
         "position": {
-          "x": 702.5575929582974,
-          "y": -37.35529145935868
+          "x": 694.945128578597,
+          "y": -140.1235605853139
         }
       },
       {
@@ -116,8 +129,8 @@
           "description": "这是循环主体，不可跳过。每轮都先坐一阵再判断。"
         },
         "position": {
-          "x": 1041.421225313058,
-          "y": -90.34242430312833
+          "x": 1353.8302108091898,
+          "y": -143.35829135130163
         }
       },
       {
@@ -210,8 +223,8 @@
           ]
         },
         "position": {
-          "x": 1375.45216875282,
-          "y": -91.87292578630894
+          "x": 1023.0948537506488,
+          "y": -145.36323699719023
         }
       },
       {
@@ -225,58 +238,44 @@
           "description": "结束后交回原位移流程，沿原目标继续前行；"
         },
         "position": {
-          "x": 1710.4225647164762,
-          "y": -107.22240332831188
+          "x": 1351.0300946348254,
+          "y": 181.86421931374633
         }
       }
     ],
     "edges": [
       {
-        "id": "5a8a91b1-9140-479d-be8f-6cf6ddbf269d",
+        "id": "fbd245cb-5a09-4897-864b-3af9575ebac4",
         "source": "start",
         "target": "trip_fall"
       },
       {
-        "id": "b7482fba-dcab-4f06-8178-4e42d3d90ff3",
+        "id": "11d1248f-c73f-489c-842a-57c9f0fffb57",
         "source": "trip_fall",
         "target": "sit_transition"
       },
       {
-        "id": "b35b5360-027e-4321-8832-35c835d773c7",
+        "id": "c88e7f4b-b756-4d20-886b-e6a42643d3f4",
         "source": "sit_transition",
         "target": "get_up_loop"
       },
       {
-        "id": "f295c15e-5097-4af4-be33-a8da51eccb72",
+        "id": "0af7c6a0-9db9-4e54-bdc6-728234819ed2",
         "source": "sit_dazed",
         "target": "get_up_loop"
       },
       {
-        "id": "d1195f0c-85f2-4dc0-9e86-585595ebd6ea",
+        "id": "9d1a2698-0261-4edb-bf05-9c67c441d303",
         "source": "get_up_loop",
         "target": "sit_dazed",
         "sourceHandle": "continue"
       },
       {
-        "id": "7b3126dc-e6d2-4974-b36e-ac84ff4b815a",
+        "id": "0594ad3f-95c4-427a-b3b9-13e6317622d0",
         "source": "get_up_loop",
         "target": "end_complete",
         "sourceHandle": "complete"
       }
-    ],
-    "layout": {
-      "version": 1,
-      "scopes": [
-        {
-          "loopId": "get_up_loop",
-          "entry": "sit_dazed",
-          "members": [
-            "sit_dazed"
-          ]
-        }
-      ],
-      "positions": {}
-    }
+    ]
   }
 }
-

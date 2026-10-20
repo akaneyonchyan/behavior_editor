@@ -478,73 +478,73 @@
     ],
     "edges": [
       {
-        "id": "603bbfe0-26fe-477a-97ad-5ae1ee14402f",
+        "id": "fb4af705-3cc0-4697-a8f8-37aaec19a263",
         "source": "start",
         "target": "laugh_start"
       },
       {
-        "id": "6ce49a22-a0cb-4161-9103-092f07aa297b",
+        "id": "6bb139db-9c86-4331-b4f1-7132fffdc77b",
         "source": "laugh_start",
         "target": "laugh_loop"
       },
       {
-        "id": "4b326370-4985-4319-abe6-6cdeef3d2677",
+        "id": "89677943-a1d2-43ae-b198-1891ab9d37b1",
         "source": "laugh_default",
         "target": "laugh_variation"
       },
       {
-        "id": "c92a0caa-6dad-4484-bdaf-1215ee362489",
+        "id": "034dc061-0d48-4270-91c1-f0fff765cb35",
         "source": "laugh_variation",
         "target": "laugh_clap",
         "sourceHandle": "clap"
       },
       {
-        "id": "7a7c751d-f29b-4c89-b69b-fd06684283f6",
+        "id": "9ffde101-52af-46e9-b322-bfb0d007ad66",
         "source": "laugh_clap",
         "target": "laugh_loop"
       },
       {
-        "id": "8ab93ee9-2506-4670-be24-ddcd212fb2f5",
+        "id": "f4dac12d-0fef-4e41-b655-ba80aef5c164",
         "source": "laugh_variation",
         "target": "laugh_belly",
         "sourceHandle": "belly"
       },
       {
-        "id": "ce96273a-9da2-4e9d-a446-3a0c1cbac6de",
+        "id": "ef88485e-ff3f-4957-ad93-fdc3bf471c00",
         "source": "laugh_belly",
         "target": "laugh_loop"
       },
       {
-        "id": "cfc8af6a-e25d-4f59-8fb4-f6d47750549b",
+        "id": "a20acdf9-cf7f-4f39-b17d-6fd84b8bf0da",
         "source": "laugh_variation",
         "target": "laugh_steps",
         "sourceHandle": "steps"
       },
       {
-        "id": "5524e6de-22a9-45f2-9339-b72263c6d509",
+        "id": "e8ca7324-4437-4c73-870e-b01eab08dabd",
         "source": "laugh_steps",
         "target": "laugh_loop"
       },
       {
-        "id": "9c066f1b-df22-4016-bcc9-2711d2b61132",
+        "id": "c38b5ce4-90e1-4682-ab93-c4ff8155faf8",
         "source": "relief_check",
         "target": "end_still_excited",
         "sourceHandle": "still_excited"
       },
       {
-        "id": "639ba122-8027-401d-8076-39542890e3ab",
+        "id": "bd310b04-38f6-4d69-a7fd-e61fba028aaa",
         "source": "laugh_loop",
         "target": "laugh_default",
         "sourceHandle": "continue"
       },
       {
-        "id": "6de19071-d6ff-4d89-b407-f9150a88c844",
+        "id": "632f5555-00cf-45bb-8bf6-b95879562985",
         "source": "laugh_loop",
         "target": "relief_check",
         "sourceHandle": "complete"
       },
       {
-        "id": "0a28a9c3-70b4-43fe-9a34-07d70c774e1e",
+        "id": "63758a45-d999-4c57-ac5c-8c65a1732be6",
         "source": "relief_check",
         "target": "end_complete",
         "sourceHandle": "relieved"
@@ -552,4 +552,3 @@
     ]
   }
 }
-
