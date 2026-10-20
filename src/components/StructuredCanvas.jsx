@@ -44,7 +44,7 @@ function FitStructure({geometry,revision}){
  useEffect(()=>{const timer=setTimeout(()=>fitView({padding:.12,maxZoom:1}),80);return()=>clearTimeout(timer)},[geometry,revision,fitView])
  return null
 }
-export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositions,onAdd,onUpdate,onMove,onAddStructure,revision=0}){
+export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositions,onAdd,onUpdate,onMove,onAddStructure,onSelectEdge,revision=0}){
  const [sizes,setSizes]=useState({}),[collapsed,setCollapsed]=useState([]),[dragged,setDragged]=useState({}),[previewPositions,setPreviewPositions]=useState(null)
  const dragStart=useRef(null),flow=useRef(null),selectRef=useRef(onSelect);selectRef.current=onSelect
  useEffect(()=>{setDragged({})},[graph.layout])
@@ -92,8 +92,9 @@ export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositi
   <CanvasViewTabs><button onClick={()=>readOnly?setPreviewPositions({}):onPositions?.({})}>重新排布</button><button onClick={()=>setCollapsed([])}>全部展开</button><span>顺序从左向右；连线编辑可切换连线视图</span></CanvasViewTabs>
   {computed.warnings.length>0&&<details className="structure-warnings" data-export-ignore="true"><summary>结构核对（{computed.warnings.length}）</summary>{computed.warnings.map((w,i)=><button key={i} onClick={()=>{const n=graph.nodes.find(n=>n.id===w.id);if(n)onSelect(n)}}>{graph.nodes.find(n=>n.id===w.id)?.data.name||w.id||'流程'}：{w.message}</button>)}</details>}
   <GraphDisplayContext.Provider value={graph}>
-  <ReactFlow nodes={nodes} edges={computed.edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes}
+  <ReactFlow nodes={nodes} edges={computed.edges.map(e=>({...e,selectable:!readOnly,selected:!readOnly&&e.selected}))} nodeTypes={nodeTypes} edgeTypes={edgeTypes}
    onInit={f=>{flow.current=f}} onNodesChange={change}
+   onEdgeClick={(event,edge)=>{if(!readOnly)onSelectEdge?.(edge.data.originalEdgeId,event.shiftKey)}}
    onNodeClick={(_,n)=>{if(n.type!=='loopPortal')onSelect(graph.nodes.find(x=>x.id===(n.data?.scope?.loopId||n.id)))}}
    onPaneClick={()=>onSelect(null)}
    nodeDragThreshold={3} onNodeDragStart={(_,n)=>{dragStart.current={...n.position}}} onNodeDragStop={finishMove}
