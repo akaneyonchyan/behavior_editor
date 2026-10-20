@@ -25,7 +25,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
  function place(scope){
   const children=scopes.filter(s=>(parents.get(s.loopId)||null)===scope)
   for(const child of children)place(child.loopId)
-  const items=[...nodes.filter(n=>(owners.get(n.id)||null)===scope).map(n=>n.id),...children.map(s=>groupId(s.loopId))]
+  const items=[...nodes.filter(n=>n.id!==scope&&(owners.get(n.id)||null)===scope).map(n=>n.id),...children.map(s=>groupId(s.loopId))]
   const set=new Set(items),links=[]
   for(const e of active){
    if(scope&&e.target===scope)continue // return-to-check remains drawn but doesn't reverse horizontal ranks
@@ -49,7 +49,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
   let x=scope?32:0,maxHeight=0
   const ranks=[...new Set(rank.values())].sort((a,b)=>a-b)
   for(const r of ranks){
-   let y=scope?88:0,width=0
+   let y=scope?(sizes['header:'+scope]?.height||150)+32:0,width=0
    const column=items.filter(id=>rank.get(id)===r).sort((a,b)=>order.get(a)-order.get(b))
    for(const id of column){
     const n=byId.get(id),size=boxes.get(id)||sizes[id]||{width:280,height:n?.type==='loop'?720:n?.type==='start'?300:260}
@@ -57,7 +57,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
    }
    maxHeight=Math.max(maxHeight,y);x+=width+100
   }
-  if(scope)boxes.set(groupId(scope),collapsedSet.has(scope)?{width:360,height:180}:{width:Math.max(420,x-68),height:Math.max(220,maxHeight-38)})
+  if(scope)boxes.set(groupId(scope),collapsedSet.has(scope)?{width:440,height:(sizes['header:'+scope]?.height||150)+52}:{width:Math.max(480,x-68),height:Math.max((sizes['header:'+scope]?.height||150)+100,maxHeight-38)})
  }
  place(null)
  function emit(scope){
@@ -67,7 +67,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
    output.push({id,type:'loopScope',position:layout?.positions?.[id]||positions.get(id),...(scope?{parentNode:groupId(scope)}:{}),data:{scope:child,collapsed:collapsedSet.has(child.loopId),node:byId.get(child.loopId),count:child.members.length,exits:child.members.reduce((n,id)=>n+(byId.get(id)?.data.externalExits?.length||0),0)+(byId.get(child.loopId)?.data.externalExits?.length||0)},style:{width:size.width,height:size.height},zIndex:-1,selectable:false,deletable:false})
    if(!collapsedSet.has(child.loopId))emit(child.loopId)
   }
-  for(const n of nodes.filter(n=>(owners.get(n.id)||null)===scope)){
+  for(const n of nodes.filter(n=>n.id!==scope&&(owners.get(n.id)||null)===scope)){
    output.push({...n,position:layout?.positions?.[n.id]||positions.get(n.id)||{x:0,y:0},...(scope?{parentNode:groupId(scope)}:{}),draggable:false,deletable:false})
   }
  }
@@ -80,9 +80,12 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
   return id
  }
  const lines=active.map(e=>{
+  // Iteration completion is represented by containment, never by a visible return wire.
+  if(scopes.some(s=>s.loopId===e.target&&s.members.includes(e.source)))return null
   const source=endpoint(e.source),target=endpoint(e.target)
   if(source===target&&e.source!==e.target)return null
-  return {...e,source,target,sourceHandle:source!==e.source?'out':e.sourceHandle,targetHandle:target!==e.target?'in':e.targetHandle,type:'default',...(scopes.some(s=>s.loopId===e.target&&s.members.includes(e.source))?{label:'返回判定'}:{})}
+  const controller=scopes.some(s=>s.loopId===e.source)&&source===groupId(e.source)
+  return {...e,source,target,sourceHandle:source!==e.source?(controller?e.sourceHandle:'out'):e.sourceHandle,targetHandle:target!==e.target?'in':e.targetHandle,type:'default'}
  }).filter(Boolean)
  return {nodes:output,edges:lines,warnings,scopes}
 }

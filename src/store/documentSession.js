@@ -56,7 +56,7 @@ async function cachedTemplate(){
     try{
       const cache=await directory.getDirectoryHandle(CACHE_DIRECTORY)
       const file=await (await cache.getFileHandle(TEMPLATE_FILE)).getFile()
-      const config=parse(await file.text());validateConfig(config,NODE_CONFIG);return config.behavior.templateVersion===3?config:blankTemplate()
+      const config=parse(await file.text());validateConfig(config,NODE_CONFIG);return config.behavior.templateVersion===4?config:blankTemplate()
     }catch{ /* A missing or inaccessible cache is recreated from the built-in template. */ }
   }
   return blankTemplate()

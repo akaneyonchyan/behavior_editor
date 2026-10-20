@@ -3,7 +3,7 @@ const select=(page,id)=>page.evaluate(async id=>{const {useBehaviorStore:g}=awai
 test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
  await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
- await expect(page.locator('.react-flow__node')).toHaveCount(7)
+ await page.evaluate(async()=>{const {blankTemplate}=await import('/tests/fixtures/legacyTemplate.js');const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().importConfig(blankTemplate())});await expect(page.locator('.react-flow__node')).toHaveCount(7)
 })
 test('external branch labels, no ports, undo, loop toggles, PNG snapshot and reload',async({page})=>{
  await expect(page.locator('.node-palette .palette-node').filter({hasText:'位移'})).toHaveCount(0)
@@ -24,7 +24,7 @@ test('external branch labels, no ports, undo, loop toggles, PNG snapshot and rel
  await select(page,'template_result_1')
  await page.getByLabel('后续去向类型',{exact:true}).selectOption('external')
  await expect(page.locator('[data-id=template_result_1] .external-exit')).toContainText('跳出行为')
- await select(page,'template_loop')
+ await select(page,'template_loop');await page.getByText('旧版兼容配置（迁移前核对）',{exact:true}).click()
  await page.getByLabel('启用准入检查',{exact:true}).uncheck()
  await expect(loop.locator('.external-exit')).toHaveCount(0)
  await page.getByLabel('启用准入检查',{exact:true}).check()
@@ -35,7 +35,7 @@ test('external branch labels, no ports, undo, loop toggles, PNG snapshot and rel
  await page.reload();await expect(page.locator('.external-exit')).toHaveCount(3)
 })
 test('published preview displays exits without mutating local graph',async({page})=>{
- const config=await page.evaluate(async()=>{const {blankTemplate}=await import('/src/utils/blankTemplate.js');return blankTemplate()})
+ const config=await page.evaluate(async()=>{const {blankTemplate}=await import('/tests/fixtures/legacyTemplate.js');return blankTemplate()})
  await page.route('**/data/behaviors/index.json',r=>r.fulfill({json:{version:1,files:[{name:'跳出测试.json',sha:'a'.repeat(40),size:100}]}}))
  await page.route('**/data/behaviors/'+ 'a'.repeat(40)+'.json',r=>r.fulfill({json:config}))
  await page.getByRole('tab',{name:'在线',exact:true}).click();await page.getByRole('button',{name:'跳出测试.json',exact:true}).click()
@@ -47,7 +47,7 @@ test('published preview displays exits without mutating local graph',async({page
 })
 
 test('toolbar sample uses current external-exit format without movement',async({page})=>{
- await page.getByRole('button',{name:'载入示例',exact:true}).click()
+ page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'载入示例',exact:true}).click()
  await expect(page.locator('.react-flow__node-move')).toHaveCount(0)
  await expect(page.locator('[data-id=template_result_2]')).toContainText('沮丧地叹气')
  await expect(page.locator('[data-id=template_result_2] .external-exit')).toContainText('跳出行为')

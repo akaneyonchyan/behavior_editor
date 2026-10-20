@@ -1,4 +1,5 @@
 import {checkScope,convertToPrecheck} from '../utils/loopStructure'
+import {separateLoopLogic} from '../utils/loopMigration'
 import {externalExit, exitEnabled, clearExit, portKey, bypassLegacyMove} from '../utils/externalExits'
 import { create } from 'zustand'
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow'
@@ -48,6 +49,10 @@ export const useBehaviorStore = create((set, get) => {
       commit({layout,nodes,edges,behaviorInfo:{...s.behaviorInfo,legacyMovement:[...(s.behaviorInfo.legacyMovement||[]),clone(archive)]},selectedNode:null,documentRevision:s.documentRevision+1})
     },
     setStructurePositions: positions => commit({layout:{version:1,scopes:get().layout?.scopes||[],positions:clone(positions)}}),
+    separateLoopLogic: id => {
+      const s=get(),patch=separateLoopLogic(s.nodes,s.edges,s.layout,id)
+      commit({...patch,selectedNode:patch.nodes.find(n=>n.id===id),documentRevision:s.documentRevision+1})
+    },
     confirmLoopScope: (scope,precheck=true) => {
       const s=get();checkScope(s.nodes,s.edges,scope)
       const patch=precheck?convertToPrecheck(s.nodes,s.edges,scope):{nodes:s.nodes,edges:s.edges}

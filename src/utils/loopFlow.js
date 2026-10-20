@@ -5,7 +5,7 @@ export const LOOP_OUTPUTS = [
   {id:'continue',label:'不稍息 → 继续执行'}
 ]
 export const isLoopOutput=id=>LOOP_OUTPUTS.some(o=>o.id===id)
-export const isLoopOutputEnabled=(data,handle)=>isLoopOutput(handle)&&!(handle==='rest'&&data.restEnabled===false)&&!(handle==='insufficient'&&data.admissionEnabled===false)
+export const isLoopOutputEnabled=(data,handle)=>isLoopOutput(handle)&&(data.loopVersion===3?['complete','continue'].includes(handle):!(handle==='rest'&&data.restEnabled===false)&&!(handle==='insufficient'&&data.admissionEnabled===false))
 // Ordered short-circuit semantics. These booleans are outcomes, not numeric simulation.
 export function resolveLoopOutput({complete,admissionSatisfied,resourcesEnough,restTriggered},restEnabled=true,admissionEnabled=true) {
   if(complete)return 'complete'

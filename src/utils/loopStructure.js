@@ -21,13 +21,14 @@ export function inferLoopScope(nodes,edges,loopId,entryOverride){
  if(node?.type!=='loop')throw new Error('循环节点不存在')
  const outgoing=edges.filter(e=>e.source===loopId&&e.sourceHandle==='continue')
  const entry=entryOverride|| (outgoing.length===1?outgoing[0].target:null)
+ if(!entry&&node.data.loopVersion===3&&!outgoing.length)return {loopId,entry:'',members:[]}
  if(!entry||entry===loopId||!nodes.some(n=>n.id===entry&&n.type!=='start'&&n.type!=='end'))throw new Error('请先指定唯一的循环体起点（继续执行出口）。')
  const usable=activeEdges(nodes,edges)
  // Exclude the controller's outgoing edges: the body must lead back to this controller.
  const bodyEdges=usable.filter(e=>e.source!==loopId)
  const forward=reachable(entry,bodyEdges,loopId),backward=reachable(loopId,bodyEdges,null,true)
  const body=nodes.filter(n=>forward.has(n.id)&&backward.has(n.id)&&n.id!==loopId).map(n=>n.id)
- if(!body.includes(entry))throw new Error('循环体没有返回该循环判定的路径，请先核对连线。')
+ if(!body.includes(entry)&&node.data.loopVersion!==3)throw new Error('循环体没有返回该循环判定的路径，请先核对连线。')
  const members=new Set(body)
  // Include authored terminating branches inside the body, but not terminal end nodes.
  // They remain explicit exits rather than duplicated shared continuations.
@@ -50,6 +51,7 @@ export function inferLoopScope(nodes,edges,loopId,entryOverride){
 }
 export function checkScope(nodes,edges,scope){
  const ids=new Set(nodes.map(n=>n.id)),members=new Set(scope.members)
+ if(nodes.find(n=>n.id===scope.loopId)?.data.loopVersion===3&&scope.entry===''&&scope.members.length===0)return scope
  if(nodes.find(n=>n.id===scope.loopId)?.type!=='loop'||!members.has(scope.entry)||members.has(scope.loopId)||scope.members.some(id=>!ids.has(id)||nodes.find(n=>n.id===id)?.type==='start'))throw new Error('循环范围包含失效节点或起点不在范围内。')
  const entries=edges.filter(e=>members.has(e.target)&&!members.has(e.source)&&e.source!==scope.loopId)
  if(entries.some(e=>e.target!==scope.entry))throw new Error('有连线从循环外进入中途节点，请先核对这些入口。')
@@ -61,16 +63,22 @@ export function checkScope(nodes,edges,scope){
 export function convertToPrecheck(nodes,edges,scope){
  checkScope(nodes,edges,scope)
  const node=nodes.find(n=>n.id===scope.loopId),members=new Set(scope.members)
+ if(node.data.loopVersion===3&&!scope.entry&&!members.size)return {nodes,edges}
  const continuing=edges.filter(e=>e.source===scope.loopId&&e.sourceHandle==='continue')
  if(continuing.length!==1||continuing[0].target!==scope.entry||externalExit(node.data,'continue'))throw new Error('继续执行出口必须连接指定的循环体起点。')
  const bodyEdges=activeEdges(nodes,edges).filter(e=>e.source!==scope.loopId&&members.has(e.source)&&(members.has(e.target)||e.target===scope.loopId))
- if(!reachable(scope.entry,bodyEdges,null).has(scope.loopId))throw new Error('所选循环范围没有返回循环判定的路径。')
+ if(node.data.loopVersion!==3&&!reachable(scope.entry,bodyEdges,null).has(scope.loopId))throw new Error('所选循环范围没有返回循环判定的路径。')
  // A second path to the body entry is ambiguous unless it is an authored rest path.
  const restTarget=edges.find(e=>e.source===scope.loopId&&e.sourceHandle==='rest')?.target
  const restNodes=restTarget&&restTarget!==scope.entry?reachable(restTarget,edges.filter(e=>e.source!==scope.loopId),scope.entry):new Set()
  if(edges.some(e=>e.target===scope.entry&&members.has(e.source)&&!restNodes.has(e.source)))throw new Error('循环体内部存在直接返回起点的路径，请先改为返回循环判定。')
  const changes=edges.filter(e=>e.target===scope.entry&&e.source!==scope.loopId)
  const nextEdges=edges.map(e=>changes.includes(e)?{...e,target:scope.loopId,targetHandle:undefined}:e)
+ if(node.data.loopVersion===3){
+  // Scope confirmation supplies bookkeeping returns; the structure view never draws them.
+  for(const n of nodes.filter(n=>members.has(n.id)&&['result','wait'].includes(n.type)))
+   if(!edges.some(e=>e.source===n.id)&&!externalExit(n.data,''))nextEdges.push({id:crypto.randomUUID(),source:n.id,target:scope.loopId})
+ }
  return {nodes:nodes.map(n=>n.id===scope.loopId?{...n,data:{...n.data,checkTiming:'before',legacyLoopRouting:node.data.legacyLoopRouting||{checkTiming:node.data.checkTiming||'unspecified',edges:changes.map(e=>({...e}))}}}:n),edges:nextEdges}
 }
 export function resolveScopes(nodes,edges,layout){
@@ -79,7 +87,7 @@ export function resolveScopes(nodes,edges,layout){
   try{
    const saved=layout?.scopes?.find(s=>s.loopId===node.id)
    const scope=checkScope(nodes,edges,saved||inferLoopScope(nodes,edges,node.id))
-   if(!edges.some(e=>e.source===node.id&&e.sourceHandle==='continue'&&e.target===scope.entry)||externalExit(node.data,'continue'))throw new Error('循环体起点与继续执行出口不一致，请重新确认范围。')
+   if(scope.entry&&(!edges.some(e=>e.source===node.id&&e.sourceHandle==='continue'&&e.target===scope.entry)||externalExit(node.data,'continue')))throw new Error('循环体起点与继续执行出口不一致，请重新确认范围。')
    if(node.data.checkTiming!=='before')warnings.push({id:node.id,message:'旧循环：尚未确认先判定，请在右侧设置循环范围并转换。'})
    else if(edges.some(e=>scope.members.includes(e.target)&&!scope.members.includes(e.source)&&e.source!==scope.loopId))warnings.push({id:node.id,message:'仍有入口绕过循环判定，请重新确认先判定。'})
    scopes.push({...scope,confirmed:!!saved})

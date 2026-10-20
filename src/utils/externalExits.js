@@ -6,7 +6,7 @@ export function supportsExit(node, handle) {
   if (!node) return false
   if (node.type === 'result') return !handle
   if (node.type === 'judge') return node.data.branches?.some(b => b.id === handle) || false
-  return node.type === 'loop' && isLoopOutput(handle)
+  return node.type === 'loop' && isLoopOutput(handle) && (node.data.loopVersion!==3||['complete','continue'].includes(handle))
 }
 export const exitEnabled = (node, handle) => supportsExit(node, handle) && (node.type !== 'loop' || isLoopOutputEnabled(node.data, handle))
 export const clearExit = (data, handle) => ({...data, externalExits:(data.externalExits || []).filter(r => r.handle !== portKey(handle))})
