@@ -15,7 +15,7 @@ test('structure selection, collapse, raw view, isolated expanded PNG and persist
  await page.getByRole('tab',{name:'连线视图',exact:true}).click()
  await expect(page.locator('.react-flow__node')).toHaveCount(7)
  expect(await state(page)).toEqual(before)
- await page.getByRole('tab',{name:'结构视图',exact:true}).click()
+ await page.getByRole('tab',{name:'工程视图',exact:true}).click()
  await page.getByLabel('折叠循环 template_loop').click()
  await expect(page.locator('.react-flow__node')).toHaveCount(3)
  const expanded=await page.evaluate(async()=>{
