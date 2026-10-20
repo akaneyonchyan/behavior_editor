@@ -1,3 +1,4 @@
+import {useDisplayGraph} from '../store/graphDisplay'
 import React, { useEffect } from 'react'
 import { useBehaviorStore } from '../store/behaviorStore'
 import { useContentLibrary, ruleSummary } from '../store/contentLibrary'
@@ -11,7 +12,7 @@ import './LoopEditor.css'
 
 export function LoopNodeStages({id,data}) {
   const library=useContentLibrary(s=>s.library)
-  const legacy=useBehaviorStore(s=>s.edges.some(e=>e.source===id&&!e.sourceHandle))
+  const legacy=useDisplayGraph(s=>s.edges.some(e=>e.source===id&&!e.sourceHandle))
   const updateInternals=useUpdateNodeInternals()
   useEffect(()=>{updateInternals(id)},[id,legacy,data,library,updateInternals])
   const enabled=data.restEnabled!==false,admission=data.admissionEnabled!==false

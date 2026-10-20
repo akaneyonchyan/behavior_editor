@@ -6,6 +6,7 @@
 |---|---|
 | 了解工具用途、能力和边界 | [产品说明](product.md) |
 | 绘制行为、保存文件、恢复草稿 | [使用方法](usage.md) |
+| 在线查看、下载、上传与 PR 审核 | [在线文件说明](online-files.md) |
 | 本地运行、改代码、测试、部署 | [开发与协作](development.md) |
 | 维护下拉框中的对象、属性、Buff | [公共内容库说明](../content-library/README.md) |
 | 通过 Skill 使用和维护工具 | [behavior-editor Skill](skills/behavior-editor/SKILL.md) |

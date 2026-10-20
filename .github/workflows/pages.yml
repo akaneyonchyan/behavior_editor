@@ -25,6 +25,8 @@ jobs:
           enablement: true
       - run: npm ci
       - run: npm test
+      - name: Validate shared behavior files
+        run: node scripts/validate-behaviors.mjs
       - name: Install Chromium for PNG regression tests
         if: github.event_name == 'push'
         run: npx playwright install --with-deps chromium

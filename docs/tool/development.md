@@ -160,3 +160,13 @@ SortableList 使用 dnd-kit PointerSensor/KeyboardSensor，仅 handle 启动拖�
 循环第二步改为“准入检查”，填写“准入条件检查”，分为满足和不满足。默认启用；关闭时隐藏第二步及不满足连线，跳转至已启用的稍息判定，若稍息也关闭则直接继续执行。原配置和连线保留，重新开启恢复。
 
 兼容旧文件：admissionEnabled 缺省视为 true；resourceCheck、resourceRules 与 insufficient 出口标识保持不变。禁用出口不参与结束节点占用追溯；禁用规则不计入需求汇总。
+
+## GitHub 在线行为文件（2026-10-20）
+
+onlineBehaviors.js 使用固定仓库与 behaviors 路径。列表沿 ref→commit→tree 读取一致快照，文件按 blob SHA 获取，拒绝截断树、符号链接及超限文件。上传先校验所有文件并显示新增/替换清单；提交前复核 SHA，以最新一致 main 快照创建 tree、commit、新 ref，再创建 PR。绝不 PATCH main，不自动合并。分支/PR中途失败提供固定仓库 compare 链接，避免重试导致重复提交；Token 仅组件内存，所有 API 请求发往固定 api.github.com 主机。
+
+OnlinePreview 用独立 React Flow 状态，GraphDisplayContext 只覆盖 StartNode、LoopNodeStages、ReleaseSummary 的只读查询；不 importConfig 到主编辑 store。没有写入处理器，过滤位置/删除更新，阻断编辑快捷键和 Tab 跳出。保留普通画布与本地缓存。组件的 display hook 不能用于编辑写入。
+
+downloadBehavior.js 写原始文件文本至已授权目录，检查同名确认、原文件外部变化及当前未保存状态。写完调用 openDirectoryFile 复用草稿保护、句柄和冲突基线；拒绝切换不撤销成功的下载。localStorage 的 pps-online-base:<name> 只保存已下载公开 blob SHA，帮助识别已知旧基线，不能替代 GitHub 合并审核。
+
+tests/online-behaviors.cjs、download-behavior.cjs 和 online-files.spec.cjs 以隔离数据模拟 API 与目录权限，覆盖读写分离、Unicode、冲突、失败恢复、只读草稿隔离和令牌不落盘。不使用真实用户 Token 或行为文件来测试写入。scripts/validate-behaviors.mjs 用相同校验器检查整个目录；PR 工作流不使用 pull_request_target，不读取 Secrets。

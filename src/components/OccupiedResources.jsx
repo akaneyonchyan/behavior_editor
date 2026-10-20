@@ -1,3 +1,4 @@
+import {useDisplayGraph} from '../store/graphDisplay'
 import React from 'react'
 import {ObjectNameText} from './ObjectNameInput'
 import {sourceType} from '../store/contentLibrary'
@@ -23,7 +24,7 @@ export function OccupiedSummary({data}){
  return rows.length?<div className="summary-row"><span>占用资源</span><ol>{rows.map(r=><li key={r.id}><ResourceText rule={r}/></li>)}</ol></div>:null
 }
 export function ReleaseSummary({id,panel=false}){
- const nodes=useBehaviorStore(s=>s.nodes),edges=useBehaviorStore(s=>s.edges)
+ const nodes=useDisplayGraph(s=>s.nodes),edges=useDisplayGraph(s=>s.edges)
  const rows=upstreamOccupancies(nodes,edges,id)
  return <div className={panel?'form-group':'summary-row'} aria-label="自动释放资源"><span>释放资源（自动）</span><div>
   {rows.length?<ol>{rows.map(r=><li key={r.nodeId+':'+r.id}><ResourceText rule={r}/><small> ← {r.nodeName}</small></li>)}</ol>:<div>暂无可追溯的前序占用</div>}

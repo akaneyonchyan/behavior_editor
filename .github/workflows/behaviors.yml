@@ -1,0 +1,26 @@
+name: Validate shared behaviors
+on:
+  pull_request:
+    paths:
+      - 'behaviors/**'
+      - 'src/store/documentValidation.js'
+      - 'src/utils/onlineBehaviors.js'
+      - 'scripts/validate-behaviors.mjs'
+      - '.github/workflows/behaviors.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'behaviors/**'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/validate-behaviors.mjs

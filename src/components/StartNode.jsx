@@ -1,3 +1,4 @@
+import {useDisplayGraph} from '../store/graphDisplay'
 import React,{useEffect} from 'react'
 import {Handle,Position,useUpdateNodeInternals} from 'reactflow'
 import {useBehaviorStore} from '../store/behaviorStore'
@@ -9,7 +10,7 @@ import {NODE_CONFIG} from '../constants/behaviorTypes'
 const CONDITIONS=['较低时','较高时','处于指定状态时','具有指定 Buff 时','不具有指定 Buff 时']
 function Section({title,children}){return children.length>0&&<div className="start-section"><strong>{title}</strong><ol>{children.map((child,i)=><li key={i}>{child}</li>)}</ol></div>}
 export default function StartNode({id,selected}){
-  const info=useBehaviorStore(s=>s.behaviorInfo),connected=useBehaviorStore(s=>s.edges.some(e=>e.source===id)),lib=useContentLibrary(s=>s.library),internals=useUpdateNodeInternals()
+  const info=useDisplayGraph(s=>s.behaviorInfo),connected=useDisplayGraph(s=>s.edges.some(e=>e.source===id)),lib=useContentLibrary(s=>s.library),internals=useUpdateNodeInternals()
   useEffect(()=>{internals(id)},[id,info,lib,internals])
   const p=info.preconditions||{},object=value=><ChoiceText value={lib.objects.find(o=>o.id===value)?.name||value} options={lib.objects.filter(o=>o.enabled).map(o=>o.name)}/>
   return <div className={'behavior-node '+(selected?'selected':'')} style={{'--node-color':NODE_CONFIG.start.color}}>

@@ -1,0 +1,23 @@
+.file-browser {flex:1;min-height:0;display:flex;flex-direction:column;border-top:1px solid var(--border)}
+.file-browser-tabs {display:flex;gap:4px;padding:6px 12px 0}
+.file-browser-tabs button {flex:1}
+.file-browser-tabs [aria-selected=true] {color:var(--accent);border-color:var(--accent)}
+.file-browser-page {flex:1;min-height:0;display:flex;flex-direction:column}
+.file-browser-page[hidden] {display:none}
+.file-browser .behavior-files {border-top:0}
+.online-actions {display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.online-actions .toolbar-btn {font-size:12px;padding:5px 7px}
+.online-files a {color:var(--accent);overflow-wrap:anywhere}
+.online-auth {padding:8px 0;border-bottom:1px solid var(--border)}
+.online-auth input {width:100%;margin-top:5px;background:var(--surface-2);color:var(--text-primary);border:1px solid var(--border);padding:6px;font:inherit}
+.online-preview-overlay {z-index:1100;padding:16px}
+.online-preview {width:100%;height:100%;background:var(--surface-1);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;color:var(--text-primary)}
+.online-preview header {display:flex;gap:8px;align-items:center;padding:12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.online-preview header strong {flex:1;min-width:120px;overflow-wrap:anywhere}
+.online-preview>p {padding:8px 12px;margin:0}
+.online-preview-body {display:flex;flex:1;min-height:0}
+.online-preview-body>.react-flow {flex:1;min-width:0}
+.online-preview aside {width:270px;max-width:35%;padding:12px;overflow:auto;border-left:1px solid var(--border)}
+.online-preview pre {white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin-top:10px}
+.online-preview-error {position:fixed;z-index:1101;bottom:24px;left:10%;right:10%;padding:10px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-primary)}
+@media(max-width:600px){.online-preview-overlay{padding:4px}.online-preview-body{flex-direction:column}.online-preview aside{max-width:none;width:auto;max-height:25%}}
