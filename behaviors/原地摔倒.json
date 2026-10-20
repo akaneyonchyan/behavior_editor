@@ -1,0 +1,205 @@
+{
+  "behavior": {
+    "name": "原地摔倒",
+    "description": "由位移过程监听触发，接收触发瞬间前进方向和位移续行上下文。朝前摔倒落地时一次性添加吓一跳与疼痛情绪Buff并降低伙伴清洁度。坐起后在地上呆坐一阵，循环判断精神与情绪是否都允许起身；满足则站起并结束，交回原位移流程。未满足继续坐地，不重复摔倒或重复结算。",
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "resume_movement_goal",
+        "source": "行为",
+        "objectName": "原地摔倒",
+        "attribute": "次数",
+        "influence": "执行1次"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [],
+      "consumableRules": [],
+      "attributeRules": []
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始｜位移监听触发",
+          "description": "触发时处于位移过程；冻结触发瞬间的前进方向和原位移目标，不重新选方向或寻路。原地摔跤仅允许动作所需的小范围前扑，不新增位移节点。"
+        },
+        "position": {
+          "x": 64.69168947894929,
+          "y": -29.87553435935149
+        }
+      },
+      {
+        "id": "trip_fall",
+        "type": "result",
+        "data": {
+          "name": "朝前摔倒｜落地受惊",
+          "animation": "前脚踉跄，身体沿触发瞬间的前进方向失去平衡，双手下意识向前撑，向前扑倒落地；身体一缩，露出受惊和疼痛表情。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "dirty_once",
+              "kind": "attribute",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "cleanliness",
+              "influence": "减"
+            },
+            {
+              "id": "startled_once",
+              "kind": "buff",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:emotion_startled",
+              "influence": "增"
+            },
+            {
+              "id": "pain_once",
+              "kind": "buff",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "疼痛",
+              "influence": "增"
+            }
+          ],
+          "outputs": [],
+          "description": "",
+          "occupiedResources": [
+            {
+              "id": "a312ae09-2175-44a1-992a-e3843619a43d",
+              "source": "object:environmen",
+              "attribute": "",
+              "objectName": "空地"
+            }
+          ]
+        },
+        "position": {
+          "x": 385.44829128642834,
+          "y": -145.36528115759853
+        }
+      },
+      {
+        "id": "sit_transition",
+        "type": "result",
+        "data": {
+          "name": "落地后撑着坐起",
+          "animation": "趴地缓一口气，用双手撑住身体，慢慢把腿收过来，挪到坐地姿态哭泣。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 702.5575929582974,
+          "y": -37.35529145935868
+        }
+      },
+      {
+        "id": "sit_dazed",
+        "type": "result",
+        "data": {
+          "name": "坐在地上哭泣",
+          "animation": "坐在地上，肩膀微垮，双手放在腿旁，眼神发愣；偶尔眨眼或轻轻揉一下摔疼的位置，维持坐姿缓神。",
+          "playMode": "计次",
+          "playExpectation": "坐地持续一阵；具体时长待配置，每轮必须经过此表演段",
+          "effectRules": [],
+          "outputs": [],
+          "description": "这是循环主体，不可跳过。每轮都先坐一阵再判断。"
+        },
+        "position": {
+          "x": 1041.421225313058,
+          "y": -90.34242430312833
+        }
+      },
+      {
+        "id": "get_up_loop",
+        "type": "loop",
+        "data": {
+          "name": "循环判断｜是否可以起身",
+          "loopVersion": 2,
+          "completionCondition": "疼痛buff失效后起身",
+          "completionRules": [
+            {
+              "id": "285fe47e-ed0d-43fd-b64b-16da2b2334d2",
+              "source": "object:partner",
+              "attribute": "疼痛",
+              "influence": "不具有指定 Buff 时",
+              "objectName": "item:partner/reczz28PAvx7wYyE"
+            }
+          ],
+          "resourceCheck": "未满足起身条件时，继续原地坐着缓神；不设置额外资源消耗门槛。",
+          "resourceRules": [],
+          "failureReason": "",
+          "restEnabled": false,
+          "restExpectation": "",
+          "restCondition": "",
+          "restRules": [],
+          "description": "",
+          "admissionEnabled": false
+        },
+        "position": {
+          "x": 1375.45216875282,
+          "y": -91.87292578630894
+        }
+      },
+      {
+        "id": "end_complete",
+        "type": "end",
+        "data": {
+          "name": "恢复前行姿态",
+          "animation": "回过神，双手撑地，缓缓抬起身体站直，站稳后看向原来的前进方向，放松双臂，进入可接续行走的站姿。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "结束后交回原位移流程，沿原目标继续前行；"
+        },
+        "position": {
+          "x": 1710.4225647164762,
+          "y": -107.22240332831188
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "5a8a91b1-9140-479d-be8f-6cf6ddbf269d",
+        "source": "start",
+        "target": "trip_fall"
+      },
+      {
+        "id": "b7482fba-dcab-4f06-8178-4e42d3d90ff3",
+        "source": "trip_fall",
+        "target": "sit_transition"
+      },
+      {
+        "id": "b35b5360-027e-4321-8832-35c835d773c7",
+        "source": "sit_transition",
+        "target": "sit_dazed"
+      },
+      {
+        "id": "f295c15e-5097-4af4-be33-a8da51eccb72",
+        "source": "sit_dazed",
+        "target": "get_up_loop"
+      },
+      {
+        "id": "d1195f0c-85f2-4dc0-9e86-585595ebd6ea",
+        "source": "get_up_loop",
+        "target": "sit_dazed",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "7b3126dc-e6d2-4974-b36e-ac84ff4b815a",
+        "source": "get_up_loop",
+        "target": "end_complete",
+        "sourceHandle": "complete"
+      }
+    ]
+  }
+}
