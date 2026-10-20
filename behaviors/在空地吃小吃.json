@@ -1,0 +1,436 @@
+{
+  "behavior": {
+    "name": "在空地吃小吃｜按口循环恢复饱腹",
+    "templateVersion": 4,
+    "matchTargets": [],
+    "description": "按需要恢复的饱腹度选择食物；绑定食物装备槽中的指定实例。目标饱腹期望和口数上限M由本次目标／配置给定。起手后每轮吃一口并咀嚼，按本口新鲜度表现反应，再回循环。位移、空地选择与占用、外部监听交由通用机制。食物新鲜度归零或已无食物时不得发起下一口，由通用准入监听跳出；已完成一口的效果及反应保留。只将饱腹达标与次数上限作为循环结束条件。不加稍息。",
+    "targetRules": [
+      {
+        "id": "goal",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "satiety",
+        "influence": "增加"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "space",
+          "objectType": "environmen",
+          "objectName": "空地"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "equipped",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot_food",
+          "influence": "食物"
+        },
+        {
+          "id": "fresh",
+          "source": "object:food",
+          "objectName": "食物",
+          "attribute": "freshness",
+          "influence": "大于0"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "loop",
+          "entry": "bite",
+          "members": [
+            "bite",
+            "taste",
+            "delicious",
+            "disgust",
+            "normal"
+          ]
+        }
+      ],
+      "positions": {}
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始"
+        },
+        "position": {
+          "x": 69.6637302231228,
+          "y": -10.5602581029529
+        }
+      },
+      {
+        "id": "prepare",
+        "type": "result",
+        "data": {
+          "name": "掏出小吃",
+          "animation": "站在空地上，将已装备的食物捧到胸前，低头看一眼，送近嘴边。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 403.8265656522674,
+          "y": -3.4037950931810315
+        }
+      },
+      {
+        "id": "loop",
+        "type": "loop",
+        "data": {
+          "name": "饱腹达标或吃到次数上限",
+          "loopVersion": 3,
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "completionCondition": "饱腹度达到本次期望，或完整吃一口的次数达到上限M",
+          "completionRules": [],
+          "loopConditions": [
+            {
+              "id": "satiety",
+              "kind": "goal",
+              "condition": "饱腹度达到本次目标期望",
+              "rules": [
+                {
+                  "id": "satiety_done",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "satiety",
+                  "influence": "达到期望"
+                }
+              ]
+            },
+            {
+              "id": "count",
+              "kind": "count",
+              "condition": "",
+              "rules": [
+                {
+                  "id": "bb45b7e3-03b9-4b5d-81bc-5678b4b1eb9a",
+                  "source": "object:partner",
+                  "attribute": "equipped_slot_food",
+                  "influence": "不为空"
+                }
+              ],
+              "maxIterations": "食物可食用次数"
+            }
+          ]
+        },
+        "position": {
+          "x": 760,
+          "y": 0
+        }
+      },
+      {
+        "id": "bite",
+        "type": "result",
+        "data": {
+          "name": "咬一口并咀嚼",
+          "animation": "把食物送到嘴边咬下一口，收回一点，闭嘴咀嚼并咽下。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "咽下算完整1口并计1轮；按本口实际消耗份量增加饱腹、扣减食物余量，整份耗尽后清空对应食物装备槽。饱腹恢复按食物配置分摊，不能每口结算整份恢复值。反应读取本口进食时的新鲜度，不重复进食或计次。",
+          "effectRules": [
+            {
+              "id": "satiety_up",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "satiety",
+              "influence": "增",
+              "kind": "attribute"
+            },
+            {
+              "id": "cleanliness_down",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "cleanliness",
+              "influence": "减",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": []
+        },
+        "position": {
+          "x": 1122.7476672411947,
+          "y": -4.645004963647807
+        }
+      },
+      {
+        "id": "taste",
+        "type": "judge",
+        "data": {
+          "name": "咀嚼后感受食物味道",
+          "judgeAttributes": [
+            {
+              "id": "freshness",
+              "source": "object:food",
+              "objectName": "",
+              "attribute": "freshness"
+            }
+          ],
+          "description": "按本口进食时的新鲜度选择反应；新鲜度是剩余保鲜时间，不是固定百分比。嫌弃分支可发生于尚未归零但已不新鲜的食物。",
+          "branches": [
+            {
+              "id": "delicious",
+              "name": "细品美食",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "id": "freshness",
+                  "source": "object:food",
+                  "objectName": "",
+                  "attribute": "freshness",
+                  "version": 2,
+                  "attributeId": "freshness",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高",
+                  "influence": "数值高 · 概率越高"
+                }
+              ]
+            },
+            {
+              "id": "disgust",
+              "name": "嫌弃食物",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "id": "freshness",
+                  "source": "object:food",
+                  "objectName": "",
+                  "attribute": "freshness",
+                  "version": 2,
+                  "attributeId": "freshness",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高",
+                  "influence": "数值低 · 概率越高"
+                }
+              ]
+            },
+            {
+              "id": "normal",
+              "name": "普通进食",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "id": "freshness",
+                  "source": "object:food",
+                  "objectName": "",
+                  "attribute": "freshness",
+                  "version": 2,
+                  "attributeId": "freshness",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                }
+              ]
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1499.4320402193778,
+          "y": -1.7634369287018785
+        }
+      },
+      {
+        "id": "delicious",
+        "type": "result",
+        "data": {
+          "name": "细品美食",
+          "animation": "咽下后眯起眼睛，回味地抿抿嘴，满足地连连点头，身边冒出小花瓣。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "happy",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:mood_enraptured",
+              "influence": "增",
+              "kind": "buff"
+            }
+          ],
+          "outputs": [],
+          "description": "高兴情绪Buff按用户原词保留为自定义需求，待公共库映射；不替换为超开心。"
+        },
+        "position": {
+          "x": 1841.8083502049876,
+          "y": 0.8110897597489952
+        }
+      },
+      {
+        "id": "disgust",
+        "type": "result",
+        "data": {
+          "name": "嫌弃食物",
+          "animation": "咽下后眉头皱起，嘴角往下撇，将食物拿远一点，低头嫌弃地看着它。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "disgust_buff",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:emotion_disgust",
+              "influence": "增",
+              "kind": "buff"
+            },
+            {
+              "id": "sick_chance",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "sick",
+              "influence": "有概率提升",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "description": "保留用户要求的生病属性概率＋1；与当前生病枚举定义存在差异，需明确数值规则或对应生病Buff映射后实现，不自动改库。"
+        },
+        "position": {
+          "x": 1844.5649457023987,
+          "y": 373.03497488667983
+        }
+      },
+      {
+        "id": "normal",
+        "type": "result",
+        "data": {
+          "name": "普通进食反应",
+          "animation": "平静地看一眼手中的食物，放松嘴角，保持捧着食物的姿势。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 1838.05125381416,
+          "y": 828.2301917518444
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "data": {
+          "name": "擦嘴结束进食",
+          "animation": "手擦擦嘴，再摸摸肚子，恢复放松站姿；食物已吃完时自然收回双手。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "食物吃完/到达期望饱腹值都结束"
+        },
+        "position": {
+          "x": 1496.1750693796023,
+          "y": 520.7918892464884
+        }
+      },
+      {
+        "id": "c5ef59ea-c59e-4f37-8990-18c3a378951a",
+        "type": "result",
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "扣除装备槽食物",
+          "externalExits": [],
+          "effectRules": [
+            {
+              "id": "322eceeb-8d7f-414c-82f9-b4a532ab7bbf",
+              "source": "object:partner",
+              "attribute": "equipped_slot_food",
+              "influence": "减",
+              "kind": "attribute"
+            }
+          ]
+        },
+        "position": {
+          "x": 1122.8432197265097,
+          "y": 441.67269083023916
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e12b588f-45e9-491c-9249-e4dd39e73cff",
+        "source": "start",
+        "target": "prepare"
+      },
+      {
+        "id": "19d3038c-53e5-43b3-b811-b774001dc5d2",
+        "source": "prepare",
+        "target": "loop"
+      },
+      {
+        "id": "6d124625-a649-455e-a809-0e0578d70c59",
+        "source": "loop",
+        "target": "bite",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "03d66b79-6609-4a1e-968b-ef89f44ff246",
+        "source": "bite",
+        "target": "taste"
+      },
+      {
+        "id": "d7327d88-a935-4414-98a0-08890dd23a02",
+        "source": "taste",
+        "target": "delicious",
+        "sourceHandle": "delicious"
+      },
+      {
+        "id": "c63f9e88-9563-45f3-9d12-4e2039c1718d",
+        "source": "delicious",
+        "target": "loop"
+      },
+      {
+        "id": "bed55fad-8fb1-4b34-aed3-d3e4300a89a1",
+        "source": "taste",
+        "target": "disgust",
+        "sourceHandle": "disgust"
+      },
+      {
+        "id": "0a41a8aa-df6e-4e97-9524-1e5783e0598d",
+        "source": "disgust",
+        "target": "loop"
+      },
+      {
+        "id": "5641a09d-16fa-4e70-9305-9cbaed1e55fc",
+        "source": "taste",
+        "target": "normal",
+        "sourceHandle": "normal"
+      },
+      {
+        "id": "c206aa76-93eb-4102-ac42-9e9b8ba9f39b",
+        "source": "normal",
+        "target": "loop"
+      },
+      {
+        "id": "75d0ceb2-df5e-4990-8c66-bdc05eca5112",
+        "source": "loop",
+        "target": "c5ef59ea-c59e-4f37-8990-18c3a378951a",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "8fd3ae18-abbc-4f0b-a695-a96c6370f510",
+        "source": "c5ef59ea-c59e-4f37-8990-18c3a378951a",
+        "target": "end"
+      }
+    ]
+  }
+}
