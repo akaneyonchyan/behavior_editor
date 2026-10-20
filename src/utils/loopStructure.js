@@ -74,11 +74,7 @@ export function convertToPrecheck(nodes,edges,scope){
  if(node.data.loopVersion!==3&&edges.some(e=>e.target===scope.entry&&members.has(e.source)&&!restNodes.has(e.source)))throw new Error('循环体内部存在直接返回起点的路径，请先改为返回循环判定。')
  const changes=edges.filter(e=>e.target===scope.entry&&e.source!==scope.loopId)
  const nextEdges=edges.map(e=>changes.includes(e)?{...e,target:scope.loopId,targetHandle:undefined}:e)
- if(node.data.loopVersion===3){
-  // Scope confirmation supplies bookkeeping returns; the structure view never draws them.
-  for(const n of nodes.filter(n=>members.has(n.id)&&['result','wait'].includes(n.type)))
-   if(!edges.some(e=>e.source===n.id)&&!externalExit(n.data,''))nextEdges.push({id:crypto.randomUUID(),source:n.id,target:scope.loopId})
- }
+
  return {nodes:nodes.map(n=>n.id===scope.loopId?{...n,data:{...n.data,checkTiming:'before',legacyLoopRouting:node.data.legacyLoopRouting||{checkTiming:node.data.checkTiming||'unspecified',edges:changes.map(e=>({...e}))}}}:n),edges:nextEdges}
 }
 export function resolveScopes(nodes,edges,layout){
@@ -100,3 +96,4 @@ export function resolveScopes(nodes,edges,layout){
  for(const id of invalid)warnings.push({id,message:'循环范围交叉，保留普通连线；请调整范围后再分组。'})
  return {scopes:scopes.filter(s=>!invalid.has(s.loopId)),warnings}
 }
+

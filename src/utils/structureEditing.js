@@ -65,7 +65,7 @@ export function moveStructureNode(graph,id,targetLoopId,positions){
    }
   }
  }
- // A terminal execution/wait completes an iteration in its new owner. Never reconnect an old branch.
- if(targetLoopId&&['result','wait'].includes(node.type)&&!externalExit(node.data,'')&&!edges.some(e=>e.source===id))edges.push({id:crypto.randomUUID(),source:id,target:targetLoopId})
+
  return {nodes,edges,layout}
 }
+

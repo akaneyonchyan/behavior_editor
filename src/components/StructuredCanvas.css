@@ -45,3 +45,7 @@
 .loop-portal.exit {width:24px;height:24px;font-size:14px;}
 
 .scope-boundary>span {position:relative;top:-18px;}
+
+.loop-portal.repeat {position:relative;font-size:23px;}
+.repeat-label {position:absolute;top:36px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:#f3bbd7;}
+

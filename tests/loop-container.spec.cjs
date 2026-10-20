@@ -5,7 +5,7 @@ test.beforeEach(async({page})=>{
  await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await expect(page.locator('.loop-scope')).toHaveCount(1)
 })
-test('single loop header, sidebar conditions, centered execution port and no placeholder or return wires',async({page},info)=>{
+test('single loop header, sidebar conditions, centered execution port and repeat glyph instead of long return wires',async({page},info)=>{
  await expect(page.getByRole('tablist',{name:'画布视图'}).getByRole('tab').first()).toHaveText('连线视图')
  await expect(page.locator('.react-flow__node-loop')).toHaveCount(0)
  await expect(page.locator('.loop-scope input,.loop-scope select,.loop-scope textarea')).toHaveCount(0)
@@ -18,7 +18,7 @@ test('single loop header, sidebar conditions, centered execution port and no pla
  await expect(page.getByLabel('启用准入检查')).toHaveCount(0);await expect(page.getByLabel('启用稍息判定')).toHaveCount(0)
  await page.locator('.property-panel').getByLabel('结束条件 1 类型',{exact:true}).selectOption('goal')
  await expect(page.locator('.loop-scope .loop-condition-summary')).toContainText('1. 目标满足')
- await expect(page.locator('.react-flow__edge[data-id="template_wait_next"]')).toHaveCount(0)
+ await expect(page.locator('.loop-portal.repeat')).toHaveCount(1)
  const result=page.locator('[data-id=template_result_1]')
  await expect(result.locator('.node-branch')).toHaveCount(0)
  await expect.poll(async()=>result.evaluate(el=>{
@@ -77,3 +77,4 @@ test('external wires attach to the boundary and internal start glyph survives PN
  expect(await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return g.getState().exportConfig()})).toEqual(source)
  expect(errors).toEqual([])
 })
+

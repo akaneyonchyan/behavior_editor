@@ -1,3 +1,4 @@
+import {migrateLoopReturns} from './loopReturns'
 import {normalizeInfluences} from './influenceRules'
 import {loopConditions} from './loopConditions'
 import {separateLoopLogic} from './loopMigration'
@@ -23,7 +24,7 @@ export function normalizeBehavior(input){
   }
  }
  if(scopes.length||g.layout)g.layout={version:1,scopes,positions:g.layout?.positions||{}}
- g.edges=g.edges.map(e=>{
+ g.edges=migrateLoopReturns(g.nodes,g.edges,scopes).map(e=>{
   const target=containerTarget(scopes,e.source,e.target,e.sourceHandle)
   return target===e.target?e:{...e,target,targetHandle:undefined}
  })

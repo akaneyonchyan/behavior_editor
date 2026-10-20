@@ -95,7 +95,7 @@ export const useBehaviorStore = create((set, get) => {
         if(params.sourceHandle==='unreachable'&&get().nodes.find(n=>n.id===params.target)?.type!=='end')return
         commit({edges:addEdge({...params,id:crypto.randomUUID(),type:'default'},get().edges.filter(e=>!(e.source===source.id&&(e.sourceHandle||'')===(params.sourceHandle||''))))});return
       }
-      commit({ edges: addEdge({ ...params, id: crypto.randomUUID(), type: 'default' }, get().edges) })
+      commit({ edges: addEdge({ ...params, id: crypto.randomUUID(), type: 'default' }, get().edges.filter(e=>!(e.source===source.id&&(e.sourceHandle||'')===(params.sourceHandle||'')))) })
     },
     setMoveEndTarget: (id,target) => {
       const s=get();if(s.nodes.find(n=>n.id===id)?.type!=='move'||(target&&!s.nodes.some(n=>n.id===target&&n.type==='end')))return

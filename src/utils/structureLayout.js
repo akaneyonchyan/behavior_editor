@@ -19,6 +19,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
  }
  const active=activeEdges(nodes,edges).map((e,i)=>({...e,id:e.id||'edge_'+i})),boxes=new Map(),positions=new Map(),output=[]
  const entryId=id=>groupId(id)+'__entry'
+ const repeatId=id=>groupId(id)+'__repeat'
  const exitId=(scope,edge)=>groupId(scope)+'__exit_'+edge
  const boundaries=new Map(scopes.map(s=>[s.loopId,[]]))
  const leaving=e=>{
@@ -31,7 +32,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
   return result
  }
  const isReturn=e=>scopes.some(s=>s.loopId===e.target&&s.members.includes(e.source))
- for(const e of active.filter(e=>!isReturn(e)))for(const id of leaving(e))boundaries.get(id).push({edgeId:e.id,handle:'exit:'+e.id,label:byId.get(e.source)?.data.name||'分支出口'})
+ for(const e of active)for(const id of leaving(e))boundaries.get(id).push({edgeId:e.id,handle:'exit:'+e.id,label:byId.get(e.source)?.data.name||'分支出口'})
  const rep=(id,scope)=>{
   let owner=owners.get(id)
   if(owner===scope||!owner)return id
@@ -96,6 +97,9 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
      const y=pos.y+(first.startsWith(prefix)?28:size.height/2)-16
      output.push({id:entryId(child.loopId),type:'loopPortal',parentNode:id,position:{x:32,y},data:{kind:'entry'},draggable:false,selectable:false,deletable:false})
     }
+    const first=child.entry?rep(child.entry,child.loopId):null,firstPos=first?positionFor(first,child.loopId):{y:(sizes['header:'+child.loopId]?.height||150)+32}
+    const repeatY=Math.max(firstPos.y+((boxes.get(first)?.height||140)/2)-16,(sizes['header:'+child.loopId]?.height||150)+32+boundaries.get(child.loopId).length*48)
+    output.push({id:repeatId(child.loopId),type:'loopPortal',parentNode:id,position:{x:size.width-64,y:repeatY},data:{kind:'repeat',loopId:child.loopId,label:'继续循环'},draggable:false,selectable:false,deletable:false})
     boundaries.get(child.loopId).forEach((exit,i)=>output.push({id:exitId(child.loopId,exit.edgeId),type:'loopPortal',parentNode:id,position:{x:size.width-64,y:(sizes['header:'+child.loopId]?.height||150)+32+i*48},data:{kind:'exit',label:exit.label},draggable:false,selectable:false,deletable:false}))
    }
   }
@@ -116,10 +120,10 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
   if(source!==target)lines.push({...e,id:e.id+suffix,data:{...e.data,originalEdgeId:e.id},source,sourceHandle,target,targetHandle,type:'default'})
  }
  for(const e of active){
-  // Completing an iteration needs no visible return wire.
-  if(isReturn(e))continue
+  const returning=isReturn(e)
+  if(returning&&!visible.has(repeatId(e.target)))continue
   const targetId=containerTarget(scopes,e.source,e.target,e.sourceHandle)
-  const target=endpoint(targetId)
+  const target=returning?repeatId(e.target):endpoint(targetId)
   let source=endpoint(e.source),sourceHandle=e.sourceHandle
   const targetHandle=target!==e.target?'in':e.targetHandle
   // Body entry originates at the play glyph, never the container header.
@@ -139,3 +143,4 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
  }
  return {nodes:output,edges:lines,warnings,scopes}
 }
+
