@@ -165,7 +165,7 @@ SortableList 使用 dnd-kit PointerSensor/KeyboardSensor，仅 handle 启动拖�
 
 onlineBehaviors.js 使用固定仓库与 behaviors 路径。列表沿 ref→commit→tree 读取一致快照，文件按 blob SHA 获取，拒绝截断树、符号链接及超限文件。上传先校验所有文件并显示新增/替换清单；提交前复核 SHA，以最新一致 main 快照创建 tree、commit、新 ref，再创建 PR。绝不 PATCH main，不自动合并。分支/PR中途失败提供固定仓库 compare 链接，避免重试导致重复提交；Token 仅组件内存，所有 API 请求发往固定 api.github.com 主机。
 
-OnlinePreview 用独立 React Flow 状态，GraphDisplayContext 只覆盖 StartNode、LoopNodeStages、ReleaseSummary 的只读查询；不 importConfig 到主编辑 store。没有写入处理器，过滤位置/删除更新，阻断编辑快捷键和 Tab 跳出。保留普通画布与本地缓存。组件的 display hook 不能用于编辑写入。
+OnlinePreview 用独立 React Flow 状态，GraphDisplayContext 只覆盖 StartNode、LoopNodeStages、ReleaseSummary 的只读查询；不 importConfig 到主编辑 store。没有写入处理器，过滤位置/删除更新，阻断编辑快捷键。fileView 管理本地／在线页签与在线文件，App 按页签切换主画布，保留本地 store 和持久化；在线时 Toolbar/DocumentControls 禁用本地写入入口，节点面板 inert。只有上传确认弹窗使用焦点陷阱。保留普通画布与本地缓存。组件的 display hook 不能用于编辑写入。
 
 downloadBehavior.js 写原始文件文本至已授权目录，检查同名确认、原文件外部变化及当前未保存状态。写完调用 openDirectoryFile 复用草稿保护、句柄和冲突基线；拒绝切换不撤销成功的下载。localStorage 的 pps-online-base:<name> 只保存已下载公开 blob SHA，帮助识别已知旧基线，不能替代 GitHub 合并审核。
 

@@ -3,6 +3,7 @@ import {useDocumentSession,getSaveDirectory,getCurrentFileHandle,openDirectoryFi
 import {listBehaviorFiles} from '../utils/behaviorFiles'
 import './BehaviorFiles.css'
 import OnlineFiles from './OnlineFiles'
+import {useFileView} from '../store/fileView'
 
 function LocalBehaviorFiles(){
  const session=useDocumentSession(),[view,setView]=useState({files:[],permission:'missing'}),[busy,setBusy]=useState(false),[error,setError]=useState(''),[query,setQuery]=useState('')
@@ -39,9 +40,9 @@ function LocalBehaviorFiles(){
 }
 
 export default function BehaviorFiles(){
- const [tab,setTab]=useState('local'),[visited,setVisited]=useState(false)
+ const {tab,setTab}=useFileView(),[visited,setVisited]=useState(false)
  const change=next=>{setTab(next);if(next==='online')setVisited(true)}
- return <div className="file-browser"><div className="file-browser-tabs" role="tablist" aria-label="行为文件来源"><button className="toolbar-btn" role="tab" aria-selected={tab==='local'} onClick={()=>change('local')}>本地</button><button className="toolbar-btn" role="tab" aria-selected={tab==='online'} onClick={()=>change('online')}>在线</button></div>
+ return <div className="file-browser"><div className="palette-header file-browser-title">行为图文件</div><div className="file-browser-tabs" role="tablist" aria-label="行为文件来源"><button className="file-browser-tab" role="tab" aria-selected={tab==='local'} onClick={()=>change('local')}>本地</button><button className="file-browser-tab" role="tab" aria-selected={tab==='online'} onClick={()=>change('online')}>在线</button></div>
  <div className="file-browser-page" hidden={tab!=='local'}><LocalBehaviorFiles/></div>
  <div className="file-browser-page" hidden={tab!=='online'}>{visited&&<OnlineFiles onLocal={()=>change('local')}/>}</div></div>
 }

@@ -58,7 +58,7 @@ description: 使用与维护 PPS 行为编辑器（akaneyonchyan/behavior_editor
 
 ## 在线行为共享
 
-在线文件按 docs/tool/online-files.md 使用：公开仓库 behaviors/main 只读预览，下载后本地编辑，选定文件上传经分支和 PR 审核。不要自动上传用户本地行为；不写 main、不自动合并；Token 仅网页内存，不落盘。预览使用隔离状态，不改本地缓存；覆盖需保留本地未保存保护与线上 SHA 核验。功能维护同时核对 API、下载、浏览器回归及 behaviors 校验工作流。
+在线文件按 docs/tool/online-files.md 使用：公开仓库 behaviors/main 只读预览，下载后本地编辑，选定文件上传经分支和 PR 审核。不要自动上传用户本地行为；不写 main、不自动合并；Token 仅网页内存，不落盘。在线文件在主画布直接只读加载，不用预览弹窗；文件区使用独立标题与平直页签。预览使用隔离状态，不改本地缓存；覆盖需保留本地未保存保护与线上 SHA 核验。功能维护同时核对 API、下载、浏览器回归及 behaviors 校验工作流。
 
 ## 维护公共库
 
