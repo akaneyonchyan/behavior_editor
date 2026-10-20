@@ -15,7 +15,7 @@ import './App.css'
 export default function App() {
   useEffect(()=>{if(publishedMode)return startPublishedLibrary();connectTeamLibrary()},[])
   const { addNode } = useBehaviorStore()
-  const {tab,file}=useFileView(),readOnly=tab==='online'
+  const {tab,file,selected}=useFileView(),readOnly=tab==='online'
 
   const handleAddNode = (type) => {
     if(readOnly)return
@@ -42,7 +42,8 @@ export default function App() {
           <div className="palette-container" inert={readOnly?'':undefined} aria-disabled={readOnly}><NodePalette onAddNode={handleAddNode} /></div>
           <BehaviorFiles/>
         </aside>
-        {readOnly?(file?<OnlinePreview key={file.sha+file.name} file={file}/>:<div className="online-empty">从左侧选择在线行为文件，在这里只读查看。<br/>下载到本地保存目录后即可编辑。</div>):<><Canvas /><PropertyPanel /></>}
+        {readOnly?(file?<OnlinePreview key={file.sha+file.name} file={file}/>:<div className="online-empty">从左侧选择在线行为文件，在这里只读查看。<br/>下载到本地保存目录后即可编辑。</div>):<><Canvas /></>}
+        {readOnly?<aside className="property-panel online-properties"><div className="panel-header">在线只读 · {selected?(selected.data.name||NODE_CONFIG[selected.type].label):'行为准入数据'}</div><div className="panel-content">{file?<pre>{JSON.stringify(selected&&selected.type!=='start'?selected.data:file.config.behavior,null,2)}</pre>:<p>选择在线文件查看。另存为到本地后可编辑。</p>}</div></aside>:<PropertyPanel/>}
       </div>
     </div>
   )

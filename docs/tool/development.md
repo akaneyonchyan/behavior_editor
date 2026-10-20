@@ -170,3 +170,5 @@ OnlinePreview 用独立 React Flow 状态，GraphDisplayContext 只覆盖 StartN
 downloadBehavior.js 写原始文件文本至已授权目录，检查同名确认、原文件外部变化及当前未保存状态。写完调用 openDirectoryFile 复用草稿保护、句柄和冲突基线；拒绝切换不撤销成功的下载。localStorage 的 pps-online-base:<name> 只保存已下载公开 blob SHA，帮助识别已知旧基线，不能替代 GitHub 合并审核。
 
 tests/online-behaviors.cjs、download-behavior.cjs 和 online-files.spec.cjs 以隔离数据模拟 API 与目录权限，覆盖读写分离、Unicode、冲突、失败恢复、只读草稿隔离和令牌不落盘。不使用真实用户 Token 或行为文件来测试写入。scripts/validate-behaviors.mjs 用相同校验器检查整个目录；PR 工作流不使用 pull_request_target，不读取 Secrets。
+
+2026-10-20 更新：publishedBehaviors.js 从 BASE_URL/data/behaviors/index.json 和 blob SHA 命名的静态 JSON 读取公开行为，不传 Token。export-behaviors.mjs 在校验后生成发布目录，使用 Git blob SHA1（含 blob 长度头）保持下载基线与上传 Git API SHA 一致。只提交脚本，不提交生成快照。在线右侧面板固定 360px，与本地相同；状态区在同一 document-bar，PNG 等按钮保留原位。

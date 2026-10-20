@@ -44,6 +44,8 @@ jobs:
           FEISHU_BUFF_TABLE: ${{ secrets.FEISHU_BUFF_TABLE }}
       - name: Validate public library before publishing
         run: node scripts/validate-public-library.mjs
+      - name: Export public behavior files
+        run: node scripts/export-behaviors.mjs
       - name: Build read-only editor
         run: npm run build
         env:

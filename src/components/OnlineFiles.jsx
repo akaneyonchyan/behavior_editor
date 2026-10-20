@@ -1,5 +1,6 @@
 import React,{useEffect,useRef,useState} from 'react'
 import {listOnlineFiles,readOnlineFile,prepareUpload,submitUpload,REPO_URL} from '../utils/onlineBehaviors'
+import {listPublishedBehaviors,readPublishedBehavior} from '../utils/publishedBehaviors'
 import {useFileView} from '../store/fileView'
 import './OnlineFiles.css'
 import useModalFocus from './useModalFocus'
@@ -10,15 +11,15 @@ export default function OnlineFiles({onLocal}){
  const input=useRef(null),alive=useRef(true),lock=useRef(false)
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
  const run=async(task)=>{if(lock.current)return;lock.current=true;setBusy(true);setError('');try{await task()}catch(e){if(alive.current){setError(e.message);if(e.recoveryUrl)setLink({url:e.recoveryUrl,label:'核对上传分支／继续创建 PR'})}}finally{lock.current=false;if(alive.current)setBusy(false)}}
- const refresh=()=>run(async()=>{const result=await listOnlineFiles(token);if(alive.current){setFiles(result.files);setLoaded(true)}})
+ const refresh=()=>run(async()=>{const result=await listPublishedBehaviors();if(alive.current){setFiles(result.files);setLoaded(true)}})
  useEffect(()=>{void refresh()},[])
- const open=file=>run(async()=>{const result=await readOnlineFile(file,token);if(alive.current&&useFileView.getState().tab==='online')openOnline(result)})
+ const open=file=>run(async()=>{const result=await readPublishedBehavior(file);if(alive.current&&useFileView.getState().tab==='online')openOnline(result)})
  const choose=async e=>{const picked=Array.from(e.target.files);e.target.value='';if(!picked.length)return;void run(async()=>{const prepared=await prepareUpload(picked,token);if(alive.current){setPlan(prepared);setLink(null);setNotice('')}})}
- const upload=()=>run(async()=>{const active=plan;setPlan(null);const result=await submitUpload(active,token);if(alive.current){setLink({url:result.url,label:'查看并审核 PR #'+result.number});setNotice('已提交审核，尚未更新在线目录；合并后点击刷新即可查看。')}})
+ const upload=()=>run(async()=>{const active=plan;setPlan(null);const result=await submitUpload(active,token);if(alive.current){setLink({url:result.url,label:'查看并审核 PR #'+result.number});setNotice('已提交审核，尚未更新在线目录；合并且网页发布完成后，点击刷新即可查看。')}})
  const shown=files.filter(f=>f.name.toLowerCase().includes(query.toLowerCase()))
  return <section className="behavior-files online-files" aria-label="在线行为文件">
   <div className="behavior-files-header"><span className="behavior-files-directory" title="akaneyonchyan/behavior_editor / behaviors">behaviors / main</span><button className="toolbar-btn" disabled={busy} onClick={refresh}>刷新</button></div>
-  <div className="online-actions"><button className="toolbar-btn" disabled={busy} onClick={()=>{if(!token){setAuth(true);setNotice('上传前请填写自己的 GitHub Token。')}else input.current.click()}}>上传文件</button><button className="toolbar-btn" disabled={busy} onClick={()=>setAuth(!auth)}>{token?'授权设置':'上传授权'}</button></div>
+  <div className="online-actions"><button className="toolbar-btn" disabled={busy} onClick={()=>{if(!token){setAuth(true);setNotice('上传前请填写自己的 GitHub Token。')}else input.current.click()}}>上传文件</button><button className="toolbar-btn" disabled={busy} onClick={()=>setAuth(!auth)}>上传授权</button></div>
   <input aria-label="选择上传行为文件" ref={input} type="file" accept=".json,application/json" multiple hidden onChange={choose}/>
   {auth&&<div className="online-auth"><label>GitHub Token<input aria-label="GitHub Token" type="password" value={token} autoComplete="off" spellCheck={false} onChange={e=>setToken(e.target.value.trim())}/></label><p>仅保留在本页内存，刷新即清除。需此仓库的 Contents、Pull requests 读写权限，账号也需拥有仓库写入权限。</p><a href={REPO_URL+'/blob/main/docs/tool/online-files.md'} target="_blank" rel="noreferrer">查看授权与审核说明</a><button className="toolbar-btn" onClick={()=>{setToken('');setAuth(false)}}>清除授权</button></div>}
   <p>公开文件 · 在线只读 · 上传经 PR 审核合并</p>

@@ -36,3 +36,9 @@
 .online-preview .online-preview-body {min-width:0}
 .online-empty {flex:1;padding:32px;color:var(--text-secondary);line-height:1.8}
 .save-status[hidden] {display:none}
+
+.document-bar {min-height:82px;box-sizing:border-box}
+.online-properties pre {white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+.online-properties .panel-content {overflow:auto;padding:16px}
+.online-preview .online-preview-body {height:100%}
+.document-actions [aria-disabled=true] {opacity:.5}

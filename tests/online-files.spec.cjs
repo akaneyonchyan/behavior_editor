@@ -5,6 +5,8 @@ test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
  await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  config=await page.evaluate(async()=>{const {blankTemplate}=await import('/src/utils/blankTemplate.js');const c=blankTemplate();c.behavior.name='线上独立行为';c.graph.nodes.find(n=>n.type==='result').data.animation='仅线上表演';return c})
+ await page.route('**/data/behaviors/index.json',r=>r.fulfill({json:{version:1,files:[{name:'线上行为.json',sha:'a'.repeat(40),size:100}]}}))
+ await page.route('**/data/behaviors/'+ 'a'.repeat(40)+'.json',r=>r.fulfill({body:JSON.stringify(config),contentType:'application/json'}))
  await page.route('https://api.github.com/repos/akaneyonchyan/behavior_editor/**',async r=>{
   const route=r.request().url().split('/behavior_editor')[1]
   let json
@@ -25,7 +27,10 @@ async function online(page){await page.getByRole('tab',{name:'在线',exact:true
 async function localState(page){return page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return {config:g.getState().exportConfig(),past:g.getState().past}})}
 test('online preview is isolated and read-only, including keyboard, drag and start metadata',async({page})=>{
  await page.getByLabel('行为名称',{exact:true}).fill('本地未保存行为')
- const before=await localState(page),panel=await online(page)
+ const before=await localState(page)
+ const localBoxes=await Promise.all(['.behavior-sidebar','.canvas','.property-panel'].map(sel=>page.locator(sel).boundingBox()))
+ const calls=[];page.on('request',r=>{if(r.url().startsWith('https://api.github.com/'))calls.push(r.url())})
+ const panel=await online(page)
  await expect(page.getByText('行为图文件',{exact:true})).toBeVisible()
  expect(await page.getByRole('tab',{name:'在线',exact:true}).evaluate(e=>getComputedStyle(e).borderRadius)).toBe('0px')
  await expect(page.getByRole('button',{name:'保存',exact:true})).toBeDisabled()
@@ -41,6 +46,9 @@ test('online preview is isolated and read-only, including keyboard, drag and sta
  const side=await page.locator('.behavior-sidebar').boundingBox(),canvas=await modal.boundingBox()
  expect(canvas.x).toBeGreaterThanOrEqual(side.x+side.width-1)
  expect(Math.abs(canvas.y-side.y)).toBeLessThan(2)
+ const boxes=await Promise.all(['.behavior-sidebar','.online-preview','.property-panel'].map(sel=>page.locator(sel).boundingBox()))
+ boxes.forEach((box,i)=>{for(const key of ['x','y','width','height'])expect(Math.abs(box[key]-localBoxes[i][key])).toBeLessThan(2)})
+ expect(calls).toHaveLength(0)
  await expect(modal.locator('[data-id=behavior_start]')).toContainText('线上独立行为')
  await expect(modal.locator('[data-id=template_result_1]')).toContainText('仅线上表演')
  await modal.locator('[data-id=template_result_1]').click();await page.keyboard.press('Delete');await page.keyboard.press('Control+z');await page.keyboard.press('Control+d')
