@@ -124,7 +124,9 @@
                   "source": "object:partner",
                   "attribute": "energy",
                   "influence": "越低，概率越大",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 }
               ]
             },
@@ -142,7 +144,9 @@
                   "source": "object:partner",
                   "attribute": "energy",
                   "influence": "越高，概率越大",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
                 }
               ]
             },
@@ -160,7 +164,9 @@
                   "source": "object:partner",
                   "attribute": "energy",
                   "influence": "越高，概率越大",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
                 }
               ]
             },
@@ -178,7 +184,9 @@
                   "source": "object:partner",
                   "attribute": "energy",
                   "influence": "越高，概率越大",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
                 }
               ]
             },
@@ -194,7 +202,9 @@
                   "source": "object:partner",
                   "attribute": "energy",
                   "influence": "大于指定值才允许被触发",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "",
+                  "influenceRule": "大于指定值才允许被触发"
                 }
               ]
             }
@@ -411,3 +421,4 @@
     ]
   }
 }
+

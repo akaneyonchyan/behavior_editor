@@ -149,7 +149,9 @@
                   "source": "object:partner",
                   "attribute": "personality_passion",
                   "influence": "指定值，概率降低",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越低"
                 }
               ],
               "nextNode": "remove_buff"
@@ -167,7 +169,9 @@
                   "source": "object:partner",
                   "attribute": "personality_passion",
                   "influence": "不影响",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 }
               ],
               "nextNode": "keep_buff"
@@ -321,3 +325,4 @@
     ]
   }
 }
+
