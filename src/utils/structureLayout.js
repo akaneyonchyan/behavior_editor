@@ -113,7 +113,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
  }
  const lines=[]
  const segment=(e,suffix,source,sourceHandle,target,targetHandle)=>{
-  if(source!==target)lines.push({...e,id:e.id+suffix,source,sourceHandle,target,targetHandle,type:'default'})
+  if(source!==target)lines.push({...e,id:e.id+suffix,data:{...e.data,originalEdgeId:e.id},source,sourceHandle,target,targetHandle,type:'default'})
  }
  for(const e of active){
   // Completing an iteration needs no visible return wire.

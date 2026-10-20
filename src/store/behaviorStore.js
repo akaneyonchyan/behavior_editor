@@ -124,7 +124,7 @@ export const useBehaviorStore = create((set, get) => {
       const s = get(), removed = new Set(ids || s.nodes.filter(n => n.selected).map(n => n.id))
       s.nodes.filter(n=>n.type==='start').forEach(n=>removed.delete(n.id))
       if (!removed.size && !s.edges.some(e => e.selected)) return
-      const layout=s.layout?{...s.layout,scopes:s.layout.scopes.filter(x=>!removed.has(x.loopId)&&!removed.has(x.entry)).map(x=>({...x,members:x.members.filter(id=>!removed.has(id))})),positions:{}}:null
+      const layout=!removed.size?s.layout:s.layout?{...s.layout,scopes:s.layout.scopes.filter(x=>!removed.has(x.loopId)&&!removed.has(x.entry)).map(x=>({...x,members:x.members.filter(id=>!removed.has(id))})),positions:{}}:null
       commit({ layout,nodes: s.nodes.filter(n => !removed.has(n.id)), edges: s.edges.filter(e => !e.selected && !removed.has(e.source) && !removed.has(e.target)), selectedNode: removed.has(s.selectedNode?.id) ? null : s.selectedNode })
     },
     copy: () => {
