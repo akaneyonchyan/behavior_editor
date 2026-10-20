@@ -19,7 +19,7 @@
         "influence": ""
       }
     ],
-    "templateVersion": 3
+    "templateVersion": 4
   },
   "graph": {
     "nodes": [
@@ -99,24 +99,12 @@
           "y": 180
         },
         "data": {
-          "loopVersion": 2,
+          "loopVersion": 3,
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
           "completionCondition": "",
-          "completionRules": [],
-          "resourceCheck": "",
-          "resourceRules": [],
-          "failureReason": "",
-          "admissionEnabled": true,
-          "restEnabled": true,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": [],
-          "externalExits": [
-            {
-              "handle": "insufficient",
-              "note": ""
-            }
-          ],
-          "checkTiming": "before"
+          "completionRules": []
         }
       },
       {
@@ -163,19 +151,13 @@
       {
         "id": "template_result_1_next",
         "source": "template_result_1",
-        "target": "template_loop"
+        "target": "template_wait"
       },
       {
         "id": "template_loop_complete",
         "source": "template_loop",
         "target": "template_end",
         "sourceHandle": "complete"
-      },
-      {
-        "id": "template_loop_rest",
-        "source": "template_loop",
-        "target": "template_wait",
-        "sourceHandle": "rest"
       },
       {
         "id": "template_loop_continue",

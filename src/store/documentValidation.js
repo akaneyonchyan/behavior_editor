@@ -42,7 +42,9 @@ export function validateConfig(config, types) {
     if(n.data.admissionEnabled!==undefined&&typeof n.data.admissionEnabled!=='boolean')fail('准入检查启用状态必须为布尔值')
     if(n.data.restEnabled!==undefined&&typeof n.data.restEnabled!=='boolean')fail('稍息启用状态必须为布尔值')
     if(n.data.checkTiming!==undefined&&n.data.checkTiming!=='before')fail('循环判定时机只支持 before；旧图可不填')
-    if(n.data.loopVersion!==undefined&&n.data.loopVersion!==2)fail('不支持的循环节点版本')
+    if(n.data.loopVersion!==undefined&&![2,3].includes(n.data.loopVersion))fail('不支持的循环节点版本')
+    if(n.data.loopMode!==undefined&&!['count','goal'].includes(n.data.loopMode))fail('循环执行条件只支持最大次数或目标满足情况')
+    if(n.data.maxIterations!==undefined&&typeof n.data.maxIterations!=='string')fail('最大次数必须是文字')
     if(n.data.objectType!==undefined&&typeof n.data.objectType!=='string')fail('对象类型必须是文字标识')
     if (n.data.outputs !== undefined && !Array.isArray(n.data.outputs)) fail('产出必须是列表')
     for(const key of ['playMode','playExpectation','endReason','targetCondition'])if(n.data[key]!==undefined&&typeof n.data[key]!=='string')fail(key+' 必须是文字')
@@ -92,6 +94,7 @@ export function validateConfig(config, types) {
     if(!layout||layout.version!==1||!Array.isArray(layout.scopes)||!layout.positions||typeof layout.positions!=='object'||Array.isArray(layout.positions))fail('结构布局格式无效')
     const seen=new Set()
     for(const scope of layout.scopes){
+      if(scope&&ids.get(scope.loopId)?.type==='loop'&&ids.get(scope.loopId)?.data.loopVersion===3&&scope.entry===''&&Array.isArray(scope.members)&&scope.members.length===0&&!seen.has(scope.loopId)){seen.add(scope.loopId);continue}
       if(!scope||ids.get(scope.loopId)?.type!=='loop'||seen.has(scope.loopId)||typeof scope.entry!=='string'||!Array.isArray(scope.members)||!scope.members.includes(scope.entry)||scope.members.includes(scope.loopId)||new Set(scope.members).size!==scope.members.length||scope.members.some(id=>typeof id!=='string'||!ids.has(id)||ids.get(id).type==='start'))fail('循环范围引用无效')
       seen.add(scope.loopId)
     }
@@ -106,6 +109,7 @@ export function validateConfig(config, types) {
     if(externalExit(ids.get(e.source).data,e.sourceHandle))fail('同一出口不能同时连接节点和跳出行为')
     if(ids.get(e.target).type==='start')fail('开始节点不能作为连线终点')
     if(ids.get(e.source).type==='loop'){
+      if(ids.get(e.source).data.loopVersion===3&&!['continue','complete'].includes(e.sourceHandle))fail('循环容器仅支持进入循环体和循环结束出口')
       if(e.sourceHandle){
         if(!isLoopOutput(e.sourceHandle))fail('连线引用了不存在的循环出口')
         const key=JSON.stringify([e.source,e.sourceHandle])

@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),{buildSync}=require('esbuild'),Module=require('node:module'),path=require('node:path')
 const file=path.join(process.cwd(),'exit-tests.cjs'),m=new Module(file,module);m.filename=file;m.paths=module.paths
-m._compile(buildSync({stdin:{contents:"export * from './src/utils/externalExits';export {blankTemplate} from './src/utils/blankTemplate';export {useBehaviorStore as graph} from './src/store/behaviorStore';export {validateConfig} from './src/store/documentValidation';export {NODE_CONFIG} from './src/constants/behaviorTypes';export {upstreamOccupancies} from './src/utils/occupiedResources'",resolveDir:process.cwd()},bundle:true,platform:'node',format:'cjs',write:false}).outputFiles[0].text,file)
+m._compile(buildSync({stdin:{contents:"export * from './src/utils/externalExits';export {blankTemplate} from './tests/fixtures/legacyTemplate';export {useBehaviorStore as graph} from './src/store/behaviorStore';export {validateConfig} from './src/store/documentValidation';export {NODE_CONFIG} from './src/constants/behaviorTypes';export {upstreamOccupancies} from './src/utils/occupiedResources'",resolveDir:process.cwd()},bundle:true,platform:'node',format:'cjs',write:false}).outputFiles[0].text,file)
 const {graph,blankTemplate,externalExit,validateConfig,NODE_CONFIG,upstreamOccupancies,bypassLegacyMove}=m.exports,s=()=>graph.getState()
 const fresh=blankTemplate();validateConfig(fresh,NODE_CONFIG)
 assert.equal(fresh.graph.nodes.length,7);assert.equal(fresh.graph.nodes.filter(n=>n.type==='end').length,1)

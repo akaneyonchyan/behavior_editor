@@ -2,7 +2,8 @@
 const {test,expect}=require('@playwright/test')
 test('admission and rest switches retain edges and show exactly one continue output',async({page})=>{
  await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
- await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().setBranchDestination('template_loop','insufficient','node','template_end');g.getState().selectNode(g.getState().nodes.find(n=>n.id==='template_loop'))})
+ await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const {blankTemplate}=await import('/tests/fixtures/legacyTemplate.js');g.getState().importConfig(blankTemplate());g.getState().setBranchDestination('template_loop','insufficient','node','template_end');g.getState().selectNode(g.getState().nodes.find(n=>n.id==='template_loop'))})
+ await page.getByText('旧版兼容配置（迁移前核对）',{exact:true}).click()
  const node=page.locator('[data-id=template_loop]')
  const edges=()=>page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return g.getState().edges})
  const before=await edges()

@@ -16,7 +16,7 @@ async function boot(){const m=new Module(filename,module);m.filename=filename;m.
 const state=a=>a.useDocumentSession.getState(),config=a=>a.graph.getState().exportConfig()
 async function main(){
   const a=await boot();assert.equal(state(a).firstRun,true);assert.equal(localStorage.getItem('pps-behavior-v2:latest'),null)
-  await a.chooseDirectory();assert.equal(config(a).graph.nodes.length,7);assert.equal(config(a).graph.edges.length,9);assert.equal(state(a).fileName,'');assert.equal(state(a).dirty,false)
+  await a.chooseDirectory();assert.equal(config(a).graph.nodes.length,7);assert.equal(config(a).graph.edges.length,8);assert.equal(state(a).fileName,'');assert.equal(state(a).dirty,false)
   assert.equal(config(a).behavior.targetRules[0].influence,'');a.validateConfig(config(a),a.NODE_CONFIG)
   assert.equal(cache.size,2);assert.ok(cache.has(a.TEMPLATE_FILE));assert.equal(JSON.parse(cache.get(a.TEMPLATE_FILE).text).graph.nodes.length,7);assert.ok(localStorage.getItem('pps-behavior-v2:latest'))
   assert.ok(config(a).graph.nodes.filter(n=>n.type==='result').every(n=>n.data.animation===''&&n.data.playMode===''))

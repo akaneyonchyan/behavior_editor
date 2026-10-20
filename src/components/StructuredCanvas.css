@@ -22,3 +22,16 @@
 .scope-settings input[type=checkbox] {width:auto;margin-right:6px;}
 .scope-settings .scope-members {max-height:180px;overflow:auto;}
 .scope-settings button {font-size:12px;margin:5px 5px 0 0;}
+
+.loop-scope header {position:relative;padding-right:150px;min-height:140px;}
+.scope-output {position:absolute;right:0;width:140px;font-size:11px;color:#f3bbd7;text-align:right;padding-right:12px;}
+.scope-output .react-flow__handle {background:#f472b6;}
+.scope-condition-controls {display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:12px;}
+.scope-condition-controls label {display:flex;gap:8px;align-items:center;}
+.scope-condition-controls select,.scope-condition-controls input {background:#20252d;color:#e5e7eb;border:1px solid #5b4054;border-radius:4px;padding:5px;font-size:12px;max-width:190px;}
+.scope-condition-controls input {width:90px;}
+.loop-condition-summary {display:flex;gap:10px;font-size:12px;margin-top:10px;line-height:1.6;}
+.loop-condition-summary small {display:block;color:#f6c785;}
+.scope-flow-note {font-size:11px;color:#aaa0ad;margin-top:6px;}
+.scope-toggle {position:absolute;right:150px;top:10px;}
+.loop-goal-summary {font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px;}

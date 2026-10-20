@@ -10,7 +10,7 @@ test.beforeEach(async({page})=>{
  await page.goto('/')
  await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await expect(page.locator('.react-flow__node')).toHaveCount(7)
- await expect(page.locator('.react-flow__edge-path')).toHaveCount(9)
+ await expect(page.locator('.react-flow__edge-path')).toHaveCount(8)
  await page.waitForTimeout(500)
 })
 test('full and visible PNG downloads preserve graph, selection, viewport and save state',async({page},info)=>{

@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),{buildSync}=require('esbuild'),Module=require('node:module'),path=require('node:path')
 const filename=path.join(process.cwd(),'requirements-tests.cjs'),m=new Module(filename,module);m.filename=filename;m.paths=module.paths
-m._compile(buildSync({stdin:{contents:"export * from './src/utils/requirements.js';export {blankTemplate} from './src/utils/blankTemplate.js'",resolveDir:process.cwd()},bundle:true,external:['react','react-dom'],platform:'node',format:'cjs',write:false,logLevel:'silent'}).outputFiles[0].text,filename)
+m._compile(buildSync({stdin:{contents:"export * from './src/utils/requirements.js';export {blankTemplate} from './tests/fixtures/legacyTemplate.js'",resolveDir:process.cwd()},bundle:true,external:['react','react-dom'],platform:'node',format:'cjs',write:false,logLevel:'silent'}).outputFiles[0].text,filename)
 const {collectRequirements:scan,requirementsMarkdown,blankTemplate}=m.exports
 const lib={version:1,objects:[{id:'partner',name:'伙伴角色',enabled:true},{id:'food',name:'食物',enabled:true}],attributes:[{id:'energy',name:'精力',enabled:true,objectTypes:['partner']},{id:'old',name:'旧属性',enabled:false,objectTypes:['partner']}],buffs:[{id:'happy',name:'开心',enabled:true,objectTypes:['partner']}],items:[{id:'food/apple',name:'苹果',objectType:'food',enabled:true}]}
 const graph=blankTemplate(),nodes=graph.graph.nodes,info=graph.behavior

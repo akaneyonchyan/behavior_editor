@@ -6,7 +6,7 @@ test('new uses complete blank template, cancel preserves old draft, reload resto
  await expect(page.locator('.react-flow__node')).toHaveCount(1)
  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'新建',exact:true}).click();await expect(page.locator('.react-flow__node')).toHaveCount(1)
  page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'新建',exact:true}).click();await expect(page.locator('.react-flow__node')).toHaveCount(7)
- await expect(page.locator('.react-flow__edge')).toHaveCount(9)
+ await expect(page.locator('.react-flow__edge')).toHaveCount(8)
  const data=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const s=await import('/src/store/documentSession.js');return {config:g.getState().exportConfig(),session:s.useDocumentSession.getState(),oldDraft:s.recoveryDrafts().some(d=>d.config.behavior.name==='旧的单节点草稿')}})
  expect(data.session.fileName).toBe('');expect(data.session.dirty).toBe(false);expect(data.oldDraft).toBe(true)
  expect(data.config.graph.nodes.filter(n=>n.type==='result').every(n=>n.data.animation===''&&n.data.effectRules.length===0)).toBe(true)

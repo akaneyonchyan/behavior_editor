@@ -61,7 +61,7 @@ export default function Canvas() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
-  if(mode==='structure')return <StructuredCanvas graph={{nodes:s.nodes,edges:s.edges,behaviorInfo:s.behaviorInfo,layout:s.layout}} revision={s.documentRevision} onSelect={n=>{s.selectNode(n);s.changeNodes(s.nodes.map(x=>({id:x.id,type:'select',selected:x.id===n?.id})))}} onPositions={s.setStructurePositions} onAdd={s.addNode}/>
+  if(mode==='structure')return <StructuredCanvas graph={{nodes:s.nodes,edges:s.edges,behaviorInfo:s.behaviorInfo,layout:s.layout}} revision={s.documentRevision} onSelect={n=>{s.selectNode(n);s.changeNodes(s.nodes.map(x=>({id:x.id,type:'select',selected:x.id===n?.id})))}} onPositions={s.setStructurePositions} onAdd={s.addNode} onUpdate={s.updateNode}/>
   return <div className="canvas"
     onDragEnter={e=>{if(Array.from(e.dataTransfer.types).includes('Files')){e.preventDefault();dragDepth.current++;setFileHover(true)}}}
     onDragLeave={()=>{dragDepth.current=Math.max(0,dragDepth.current-1);if(!dragDepth.current)setFileHover(false)}}>
