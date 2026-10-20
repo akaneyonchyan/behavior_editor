@@ -1,3 +1,4 @@
+import {normalizeInfluences} from './influenceRules'
 import {loopConditions} from './loopConditions'
 import {separateLoopLogic} from './loopMigration'
 import {inferLoopScope} from './loopStructure'
@@ -27,7 +28,7 @@ export function normalizeBehavior(input){
   return target===e.target?e:{...e,target,targetHandle:undefined}
  })
  config.graph=g
- return config
+ return normalizeInfluences(config)
 }
 
 // Enter the outermost crossed container, never a child halfway through its body.
@@ -35,3 +36,4 @@ export function containerTarget(scopes,source,target,handle){
  const crossed=(scopes||[]).filter(s=>s.members.includes(target)&&s.loopId!==source&&!s.members.includes(source))
  return crossed.sort((a,b)=>b.members.length-a.members.length)[0]?.loopId||target
 }
+

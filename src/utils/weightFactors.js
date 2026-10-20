@@ -1,10 +1,11 @@
-export const SOURCES = [
+import {splitInfluence} from './influenceRules'
+﻿export const SOURCES = [
   ['actor','执行伙伴'], ['partner','互动伙伴'], ['interactObject','交互对象'],
   ['handheld','手持物'], ['consumable','消耗品'], ['custom','指定对象']
 ]
 export const INFLUENCES = ['越高，越容易触发', '越高，越不容易触发', '处于指定状态时，更容易触发', '处于指定状态时，更不容易触发']
 export const EXPECTATIONS = ['待定','很少发生','较少发生','通常发生','较容易发生','优先发生']
-export const newFactor = () => ({ version:2, id:crypto.randomUUID(), source:'', attribute:'', influence:INFLUENCES[0] })
+export const newFactor = () => splitInfluence({ version:2, id:crypto.randomUUID(), source:'', attribute:'', influence:INFLUENCES[0] })
 export function designFactor(f) {
   if(f.version===2)return f
   const source = (SOURCES.find(([v])=>v===f.source)?.[1] || f.source || '待指定来源') + (f.objectRef ? ' · '+f.objectRef : '')
@@ -14,6 +15,7 @@ export function designFactor(f) {
 export function validateFactor(f) {
   if (!f || typeof f !== 'object' || Array.isArray(f)) return '属性影响规则必须是对象'
   if(f.objectName!==undefined&&typeof f.objectName!=='string')return '对象名必须是文字'
+  for(const key of ['influenceType','influenceRule'])if(f[key]!==undefined&&typeof f[key]!=='string')return '影响类型和影响规则必须是文字'
   if(f.version!==2)return '' // Old numeric configuration is preserved without reinterpreting its calculation.
   if(typeof f.source!=='string'||typeof f.attribute!=='string'||typeof f.influence!=='string')return '属性规则需要来源、属性名、影响方式三项文字'
   return ''
@@ -24,4 +26,5 @@ export function factorSummary(f, attributes=[]) {
   const attribute=attributes.find(a=>a.value===rule.attribute)?.label||rule.attribute||'待指定属性'
   return source+' · '+attribute+' · '+(rule.influence||'待说明影响方式')
 }
+
 

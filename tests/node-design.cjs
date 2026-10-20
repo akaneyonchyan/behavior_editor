@@ -16,6 +16,7 @@ assert.equal(resultRules(effects,'attribute').length,1);assert.equal(resultRules
 const html=render(React.createElement(ResultFields,{node:{id:'r',data:effects}}));assert.ok(html.includes('Buff名'));assert.ok(html.includes('时长期望'));assert.ok(html.includes('产物名'));assert.ok(!html.includes('属性 / Buff'))
 assert.ok(render(React.createElement(TextChoice,{label:'test',value:'未知',options:['中'],onChange:()=>{}})).includes('custom-choice'))
 assert.ok(!render(React.createElement(TextChoice,{label:'test',value:'中',options:['中'],onChange:()=>{}})).includes('class="custom-choice"'))
-const judge=render(React.createElement(JudgeFields,{node:{id:'j',data}}));assert.ok(judge.indexOf('参与判断的属性')<judge.indexOf('分支设置'));assert.equal((judge.match(/aria-label="对象来源"/g)||[]).length,2);assert.equal((judge.match(/aria-label="影响方式"/g)||[]).length,4)
+const judge=render(React.createElement(JudgeFields,{node:{id:'j',data}}));assert.ok(judge.indexOf('参与判断的属性')<judge.indexOf('分支设置'));assert.equal((judge.match(/aria-label="对象大类"/g)||[]).length,2);assert.equal((judge.match(/aria-label="影响规则"/g)||[]).length,4)
 const invalid=structuredClone(config);invalid.graph.nodes[0].data.judgeAttributes=[{id:'x',source:42,attribute:''}];assert.throws(()=>validateConfig(invalid,NODE_CONFIG))
 console.log('PASS: shared attributes, legacy union, inherited branches, edits/removal, custom values, result kinds, playback, round trip, undo, invalid file rejection')
+

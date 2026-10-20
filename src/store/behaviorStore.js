@@ -1,3 +1,4 @@
+import {normalizeInfluences} from '../utils/influenceRules'
 import {moveStructureNode} from '../utils/structureEditing'
 import {checkScope,convertToPrecheck} from '../utils/loopStructure'
 import {separateLoopLogic} from '../utils/loopMigration'
@@ -150,7 +151,7 @@ export const useBehaviorStore = create((set, get) => {
     },
     exportConfig: () => {
       const s = get()
-      return clone({ behavior: s.behaviorInfo, graph: { ...(s.layout?{layout:s.layout}:{}), nodes: s.nodes.map(({ id, type, data, position }) => ({ id, type, data, position })), edges: s.edges.map(({ id, source, target, sourceHandle, targetHandle }) => ({ id, source, target, sourceHandle, targetHandle })) } })
+      return normalizeInfluences(clone({ behavior: s.behaviorInfo, graph: { ...(s.layout?{layout:s.layout}:{}), nodes: s.nodes.map(({ id, type, data, position }) => ({ id, type, data, position })), edges: s.edges.map(({ id, source, target, sourceHandle, targetHandle }) => ({ id, source, target, sourceHandle, targetHandle })) } }))
     },
     importConfig: config => {
       validateConfig(config, NODE_CONFIG)
@@ -171,3 +172,4 @@ export const useBehaviorStore = create((set, get) => {
     }
   }
 })
+

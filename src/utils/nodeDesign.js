@@ -1,3 +1,4 @@
+import {splitInfluence} from './influenceRules'
 import { designFactor } from './weightFactors'
 export const PROBABILITIES = ['极高','高','中','低','极低']
 export const EFFECTS = ['越高，概率越大','越低，概率越大','指定值，概率提高','指定值，概率降低','不影响']
@@ -16,7 +17,7 @@ export function judgeAttributes(data) {
 export function branchFactors(branch,attributes) {
   return attributes.map(a=>{
     const old=(branch.weightFactors||[]).map(designFactor).find(f=>f.attributeId===a.id||(!f.attributeId&&f.source===a.source&&(f.objectName||'')===(a.objectName||'')&&f.attribute===a.attribute))
-    return {...old,version:2,id:old?.id||a.id,attributeId:a.id,source:a.source,attribute:a.attribute,...(a.objectName!==undefined?{objectName:a.objectName}:{}),influence:old?.influence||'不影响'}
+    return splitInfluence({...old,version:2,id:old?.id||a.id,attributeId:a.id,source:a.source,attribute:a.attribute,...(a.objectName!==undefined?{objectName:a.objectName}:{}),influence:old?.influence||'不影响'})
   })
 }
 export function setJudgeAttributes(data,attributes) {
@@ -27,3 +28,4 @@ export function setJudgeAttributes(data,attributes) {
 export function resultRules(data,kind) {
   return (data.effectRules||[]).filter(r=> (r.kind||(r.attribute?.startsWith('buff:')?'buff':'attribute'))===kind)
 }
+
