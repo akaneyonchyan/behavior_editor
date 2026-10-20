@@ -4,10 +4,13 @@ import { useDocumentSession, startPersistence, supportsDirectory, authorizeStore
 import example from '../../examples/eat-snack.json'
 import PngExport from './PngExport'
 import {useFileView} from '../store/fileView'
+import {downloadBehavior} from '../utils/downloadBehavior'
 
 export default function DocumentControls() {
   const s = useDocumentSession(), name = useBehaviorStore(state => state.behaviorInfo.name)
   const {tab,file}=useFileView(),readOnly=tab==='online'
+  const [onlineSaving,setOnlineSaving]=useState(false)
+  const saveOnline=async()=>{if(onlineSaving||!file)return;setOnlineSaving(true);try{const result=await downloadBehavior(file);if(result)useFileView.getState().setTab('local')}catch(e){useDocumentSession.setState({error:e.message})}finally{setOnlineSaving(false)}}
   const input = useRef(null), [drafts, setDrafts] = useState(null)
   useEffect(startPersistence, [])
   useEffect(() => {
@@ -27,7 +30,7 @@ export default function DocumentControls() {
         <button className="toolbar-btn" disabled={s.busy||readOnly} onClick={newDocument}>新建</button>
         <button className="toolbar-btn" disabled={s.busy||readOnly} onClick={() => openDocument(input.current)}>打开</button>
         <button className="toolbar-btn" disabled={s.busy||readOnly} onClick={() => saveDocument()} title="Ctrl+S">保存</button>
-        <button className="toolbar-btn" disabled={s.busy||readOnly} onClick={() => saveDocument(true)} title="Ctrl+Shift+S">另存为</button>
+        <button className="toolbar-btn" disabled={s.busy||onlineSaving||(readOnly&&!file)} onClick={() => readOnly?saveOnline():saveDocument(true)} title="Ctrl+Shift+S">另存为</button>
         {!readOnly&&<PngExport />}
         <button className="toolbar-btn" disabled={s.busy} onClick={chooseDirectory}>保存目录</button>
         {s.needsAuthorization&&<button className="toolbar-btn" disabled={s.busy||readOnly} onClick={authorizeStoredAccess}>恢复访问授权</button>}
@@ -44,7 +47,7 @@ export default function DocumentControls() {
     {(s.error || s.notice) && <div className={'document-message ' + (s.error ? 'error' : '')} role={s.error ? 'alert' : 'status'}>
       {s.error || s.notice}<button onClick={() => useDocumentSession.setState({ error: '', notice: '' })} aria-label="关闭保存提示">×</button>
     </div>}
-    {readOnly&&<div className="save-status"><strong>在线只读：{file?.name||'请选择文件'}</strong><span>下载到本地保存目录后编辑。本地草稿保留，切回“本地”继续。</span></div>}
+    {readOnly&&<div className="save-status"><strong>在线只读：{file?.name||'请选择文件'}</strong><span>点击“另存为”保存到本地后编辑。</span></div>}
     {s.ready && s.firstRun && <div className="dialog-overlay"><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="setup-title">
       <div className="dialog-header"><h3 id="setup-title">首次使用：设置本地保存目录</h3></div>
       <div className="dialog-content setup-copy">
