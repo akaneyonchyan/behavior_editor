@@ -24,7 +24,7 @@ test('empty wrappers do not lock free nodes; drag into, between and out of loops
   const box=await target.boundingBox(),header=await target.locator('header').boundingBox();const before=await state(page)
   await dragCenter(page,free,{x:box.x+box.width/2,y:header.y+header.height+(box.height-header.height)/2})
   let after=await state(page);expect(after.graph.layout.scopes.find(s=>s.loopId===id).members).toContain('free')
-  expect(after.graph.edges.filter(e=>e.source==='free').map(e=>e.target)).toEqual([id])
+  expect(after.graph.edges.filter(e=>e.source==='free').map(e=>e.target)).toEqual([])
   expect(after.graph.edges.filter(e=>e.target==='free').map(e=>e.source)).toEqual([id])
   await page.getByRole('button',{name:'撤销',exact:true}).click();expect(await state(page)).toEqual(before)
   await page.getByRole('button',{name:'重做',exact:true}).click();expect(await state(page)).toEqual(after)

@@ -187,7 +187,7 @@
         "type": "loop",
         "data": {
           "name": "判断清洁目标是否达成",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "目标交互物清洁度已满足本次上游目标期望",
           "completionRules": [
             {
@@ -198,14 +198,91 @@
               "influence": "达到本次目标期望"
             }
           ],
-          "resourceCheck": "当前打扫可继续；工具装备与交互物可用性由准入及外部监听维护，不新增资源不足分支。",
-          "resourceRules": [],
-          "failureReason": "被插入行为中断",
-          "restEnabled": false,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": [],
-          "description": "三种擦拭均汇入这里；未达目标直接回到动作选择，已达目标收尾。不开启稍息。"
+          "description": "三种擦拭均汇入这里；未达目标直接回到动作选择，已达目标收尾。不开启稍息。",
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "判断清洁目标是否达成",
+              "loopVersion": 2,
+              "completionCondition": "目标交互物清洁度已满足本次上游目标期望",
+              "completionRules": [
+                {
+                  "id": "target_clean",
+                  "source": "object:interactObject",
+                  "objectName": "目标交互物",
+                  "attribute": "cleanliness",
+                  "influence": "达到本次目标期望"
+                }
+              ],
+              "resourceCheck": "当前打扫可继续；工具装备与交互物可用性由准入及外部监听维护，不新增资源不足分支。",
+              "resourceRules": [],
+              "failureReason": "被插入行为中断",
+              "restEnabled": false,
+              "restExpectation": "",
+              "restCondition": "",
+              "restRules": [],
+              "description": "三种擦拭均汇入这里；未达目标直接回到动作选择，已达目标收尾。不开启稍息。"
+            },
+            "edges": [
+              {
+                "id": "700d4851-7390-49ad-beb9-bacd918ada50",
+                "source": "wipe_back_forth",
+                "target": "clean_loop"
+              },
+              {
+                "id": "088f23d0-97a1-4cda-9d3b-cc49f22439d6",
+                "source": "wipe_circles",
+                "target": "clean_loop"
+              },
+              {
+                "id": "19132d35-d059-4947-8be2-deedf98b6214",
+                "source": "clean_loop",
+                "target": "end",
+                "sourceHandle": "complete"
+              },
+              {
+                "id": "444c14b5-32ec-415b-bf77-8a7f12ea3b64",
+                "source": "clean_loop",
+                "target": "choose_wipe",
+                "sourceHandle": "continue"
+              },
+              {
+                "id": "8b64f75f-c88e-4977-8c28-65ba9b43a341",
+                "source": "clean_loop",
+                "target": "3dcdc05a-f257-4750-8401-d0286cebd23d",
+                "sourceHandle": "insufficient"
+              }
+            ],
+            "scope": {
+              "loopId": "clean_loop",
+              "entry": "choose_wipe",
+              "members": [
+                "choose_wipe",
+                "wipe_back_forth",
+                "wipe_circles",
+                "wipe_corners"
+              ]
+            }
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "目标交互物清洁度已满足本次上游目标期望",
+              "rules": [
+                {
+                  "id": "target_clean",
+                  "source": "object:interactObject",
+                  "objectName": "目标交互物",
+                  "attribute": "cleanliness",
+                  "influence": "达到本次目标期望"
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 1316.1050861643198,
@@ -258,6 +335,39 @@
           "x": 1654.8200814459462,
           "y": 343.40547033035443
         }
+      },
+      {
+        "id": "clean_loop_admission",
+        "type": "judge",
+        "position": {
+          "x": 1676.1050861643198,
+          "y": 8.77918835700575
+        },
+        "data": {
+          "name": "准入判断",
+          "description": "当前打扫可继续；工具装备与交互物可用性由准入及外部监听维护，不新增资源不足分支。\n不满足原因：被插入行为中断",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "admission_0",
+              "name": "满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": []
+            },
+            {
+              "id": "admission_1",
+              "name": "不满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": []
+            }
+          ],
+          "legacyGate": {
+            "kind": "admission",
+            "condition": "当前打扫可继续；工具装备与交互物可用性由准入及外部监听维护，不新增资源不足分支。\n不满足原因：被插入行为中断",
+            "rules": [],
+            "failureReason": "被插入行为中断"
+          }
+        }
       }
     ],
     "edges": [
@@ -303,7 +413,7 @@
       {
         "id": "444c14b5-32ec-415b-bf77-8a7f12ea3b64",
         "source": "clean_loop",
-        "target": "choose_wipe",
+        "target": "clean_loop_admission",
         "sourceHandle": "continue"
       },
       {
@@ -316,22 +426,14 @@
       {
         "id": "7ef13cd7-b1d2-4323-bf7c-dc34e2ef2e20",
         "source": "8cdb8cd8-d4ef-467c-94ed-9daf196f8488",
-        "target": "choose_wipe",
-        "sourceHandle": null,
-        "targetHandle": null
+        "target": "clean_loop",
+        "sourceHandle": null
       },
       {
         "id": "2f8bbfca-bd23-4567-906a-7c5c66467cef",
         "source": "wipe_corners",
-        "target": "choose_wipe",
-        "sourceHandle": null,
-        "targetHandle": null
-      },
-      {
-        "id": "8b64f75f-c88e-4977-8c28-65ba9b43a341",
-        "source": "clean_loop",
-        "target": "3dcdc05a-f257-4750-8401-d0286cebd23d",
-        "sourceHandle": "insufficient"
+        "target": "clean_loop",
+        "sourceHandle": null
       },
       {
         "id": "c15b4f5b-dcfc-41e8-a272-a1ad3dc5f6a5",
@@ -339,7 +441,37 @@
         "target": "3dcdc05a-f257-4750-8401-d0286cebd23d",
         "sourceHandle": "unreachable",
         "targetHandle": null
+      },
+      {
+        "id": "clean_loop_admission:admission_0",
+        "source": "clean_loop_admission",
+        "sourceHandle": "admission_0",
+        "target": "choose_wipe"
+      },
+      {
+        "id": "clean_loop_admission:admission_1",
+        "source": "clean_loop_admission",
+        "sourceHandle": "admission_1",
+        "target": "3dcdc05a-f257-4750-8401-d0286cebd23d"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "clean_loop",
+          "entry": "clean_loop_admission",
+          "members": [
+            "choose_wipe",
+            "wipe_back_forth",
+            "wipe_circles",
+            "wipe_corners",
+            "clean_loop_admission"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
+

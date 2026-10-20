@@ -881,16 +881,96 @@
         "type": "loop",
         "data": {
           "name": "一轮完成，是否继续",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "完整抛竿—等鱼—提竿轮数达到目标N。上鱼/空军均计一次，半轮中断不计（建议口径）。",
           "completionRules": [],
-          "resourceCheck": "鱼竿仍可用且由伙伴持有，钓鱼场所及点位仍有效；鱼饵可选，耗尽不阻断。",
-          "resourceRules": [],
-          "failureReason": "鱼竿或钓鱼点位不再可用。",
-          "restEnabled": true,
-          "restExpectation": "通常发生",
-          "restCondition": "完整一轮后、目标未完成且资源可用时。",
-          "restRules": []
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "一轮完成，是否继续",
+              "loopVersion": 2,
+              "completionCondition": "完整抛竿—等鱼—提竿轮数达到目标N。上鱼/空军均计一次，半轮中断不计（建议口径）。",
+              "completionRules": [],
+              "resourceCheck": "鱼竿仍可用且由伙伴持有，钓鱼场所及点位仍有效；鱼饵可选，耗尽不阻断。",
+              "resourceRules": [],
+              "failureReason": "鱼竿或钓鱼点位不再可用。",
+              "restEnabled": true,
+              "restExpectation": "通常发生",
+              "restCondition": "完整一轮后、目标未完成且资源可用时。",
+              "restRules": []
+            },
+            "edges": [
+              {
+                "id": "0fc3817d-15be-4282-a370-49c6b727c3e8",
+                "source": "fish",
+                "target": "loop"
+              },
+              {
+                "id": "f6f3320e-796d-4097-bc3a-e22dc923d2e6",
+                "source": "empty",
+                "target": "loop"
+              },
+              {
+                "id": "d837f4be-075d-4cf6-8c59-07a470f3b2b3",
+                "source": "loop",
+                "target": "end_complete",
+                "sourceHandle": "complete"
+              },
+              {
+                "id": "a3a9dff2-17d0-440b-b52a-b87a1b0a6138",
+                "source": "loop",
+                "target": "end_interrupted",
+                "sourceHandle": "insufficient"
+              },
+              {
+                "id": "bfd1435a-613e-4ed3-99ee-5522f2f3c742",
+                "source": "loop",
+                "target": "rest",
+                "sourceHandle": "rest"
+              },
+              {
+                "id": "71a35ffe-ca8b-4306-a515-6cf83cfa719f",
+                "source": "loop",
+                "target": "cast",
+                "sourceHandle": "continue"
+              }
+            ],
+            "scope": {
+              "loopId": "loop",
+              "entry": "cast",
+              "members": [
+                "cast",
+                "cast_broken",
+                "cast_fly",
+                "best",
+                "normal",
+                "wait_judge",
+                "early",
+                "sleep",
+                "ignore",
+                "waiting",
+                "lift",
+                "lift_broken",
+                "lift_fly",
+                "catch_judge",
+                "fish",
+                "empty",
+                "rest",
+                "ba3cf311-f3ee-452b-8d8e-7ed4479a8231"
+              ]
+            }
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "完整抛竿—等鱼—提竿轮数达到目标N。上鱼/空军均计一次，半轮中断不计（建议口径）。",
+              "rules": []
+            }
+          ]
         },
         "position": {
           "x": 2439.4311804803865,
@@ -985,6 +1065,72 @@
           "x": -19.843260054736447,
           "y": 2227.3438949438837
         }
+      },
+      {
+        "id": "loop_rest",
+        "type": "judge",
+        "position": {
+          "x": 2799.4311804803865,
+          "y": 2067.014119290423
+        },
+        "data": {
+          "name": "稍息判断",
+          "description": "完整一轮后、目标未完成且资源可用时。",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "rest_0",
+              "name": "稍息",
+              "weightExpectation": "通常发生",
+              "weightFactors": []
+            },
+            {
+              "id": "rest_1",
+              "name": "继续执行",
+              "weightExpectation": "其余情况",
+              "weightFactors": []
+            }
+          ],
+          "legacyGate": {
+            "kind": "rest",
+            "condition": "完整一轮后、目标未完成且资源可用时。",
+            "rules": [],
+            "expectation": "通常发生"
+          }
+        }
+      },
+      {
+        "id": "loop_admission",
+        "type": "judge",
+        "position": {
+          "x": 2799.4311804803865,
+          "y": 2067.014119290423
+        },
+        "data": {
+          "name": "准入判断",
+          "description": "鱼竿仍可用且由伙伴持有，钓鱼场所及点位仍有效；鱼饵可选，耗尽不阻断。\n不满足原因：鱼竿或钓鱼点位不再可用。",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "admission_0",
+              "name": "满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": []
+            },
+            {
+              "id": "admission_1",
+              "name": "不满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": []
+            }
+          ],
+          "legacyGate": {
+            "kind": "admission",
+            "condition": "鱼竿仍可用且由伙伴持有，钓鱼场所及点位仍有效；鱼饵可选，耗尽不阻断。\n不满足原因：鱼竿或钓鱼点位不再可用。",
+            "rules": [],
+            "failureReason": "鱼竿或钓鱼点位不再可用。"
+          }
+        }
       }
     ],
     "edges": [
@@ -996,7 +1142,7 @@
       {
         "id": "15fe757d-8cc9-4bf6-8731-591559cebf21",
         "source": "move",
-        "target": "cast"
+        "target": "loop"
       },
       {
         "id": "44fbbd09-9d0d-49cf-9734-566a2fef9ffb",
@@ -1111,27 +1257,15 @@
         "sourceHandle": "complete"
       },
       {
-        "id": "a3a9dff2-17d0-440b-b52a-b87a1b0a6138",
-        "source": "loop",
-        "target": "end_interrupted",
-        "sourceHandle": "insufficient"
-      },
-      {
-        "id": "bfd1435a-613e-4ed3-99ee-5522f2f3c742",
-        "source": "loop",
-        "target": "rest",
-        "sourceHandle": "rest"
-      },
-      {
         "id": "71a35ffe-ca8b-4306-a515-6cf83cfa719f",
         "source": "loop",
-        "target": "cast",
+        "target": "loop_admission",
         "sourceHandle": "continue"
       },
       {
         "id": "a884497b-88b3-4880-a511-428a326bcdf4",
         "source": "rest",
-        "target": "cast"
+        "target": "loop"
       },
       {
         "id": "606660a2-db89-4b3b-9376-c8023f7c17a3",
@@ -1188,8 +1322,64 @@
         "target": "end_interrupted",
         "sourceHandle": "unreachable",
         "targetHandle": null
+      },
+      {
+        "id": "loop_rest:rest_0",
+        "source": "loop_rest",
+        "sourceHandle": "rest_0",
+        "target": "rest"
+      },
+      {
+        "id": "loop_rest:rest_1",
+        "source": "loop_rest",
+        "sourceHandle": "rest_1",
+        "target": "cast"
+      },
+      {
+        "id": "loop_admission:admission_0",
+        "source": "loop_admission",
+        "sourceHandle": "admission_0",
+        "target": "loop_rest"
+      },
+      {
+        "id": "loop_admission:admission_1",
+        "source": "loop_admission",
+        "sourceHandle": "admission_1",
+        "target": "end_interrupted"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "loop",
+          "entry": "loop_admission",
+          "members": [
+            "cast",
+            "cast_broken",
+            "cast_fly",
+            "best",
+            "normal",
+            "wait_judge",
+            "early",
+            "sleep",
+            "ignore",
+            "waiting",
+            "lift",
+            "lift_broken",
+            "lift_fly",
+            "catch_judge",
+            "fish",
+            "empty",
+            "rest",
+            "ba3cf311-f3ee-452b-8d8e-7ed4479a8231",
+            "loop_rest",
+            "loop_admission"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
 

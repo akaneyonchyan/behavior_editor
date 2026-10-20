@@ -11,14 +11,14 @@ assert.equal(s().layout.positions.free.y,700);assert.equal(s().layout.scopes.fin
 const freeState=s().exportConfig();s().moveStructureNode('free','empty',{free:{x:120,y:450}})
 assert.equal(directOwner(s().layout.scopes,'free'),'empty');assert.equal(s().layout.scopes.find(x=>x.loopId==='empty').entry,'free')
 assert.ok(s().edges.some(e=>e.source==='empty'&&e.sourceHandle==='continue'&&e.target==='free'))
-assert.ok(s().edges.some(e=>e.source==='free'&&e.target==='empty'))
+assert.ok(!s().edges.some(e=>e.source==='free'&&e.target==='empty'))
 s().undo();assert.deepEqual(s().exportConfig(),freeState);s().redo()
 // Transferring a connected member discards all incident old-range edges and preserves every unrelated edge.
 const old=s().exportConfig(),unrelated=old.graph.edges.filter(e=>e.source!=='template_result_1'&&e.target!=='template_result_1')
 s().moveStructureNode('template_result_1','empty',{})
 assert.equal(directOwner(s().layout.scopes,'template_result_1'),'empty')
 assert.ok(!s().edges.some(e=>e.target==='template_result_1'))
-assert.deepEqual(s().edges.filter(e=>e.source==='template_result_1').map(e=>e.target),['empty'])
+assert.deepEqual(s().edges.filter(e=>e.source==='template_result_1').map(e=>e.target),[])
 for(const e of unrelated)assert.ok(s().edges.some(n=>n.id===e.id))
 validateConfig(s().exportConfig(),NODE_CONFIG);s().undo();assert.deepEqual(s().exportConfig(),old)
 // Move the entry out, then the final node out: repair the old entry and leave a valid empty container.
@@ -50,3 +50,4 @@ for(const bad of [null,[{id:'x',kind:'bad'}],[{id:'x',kind:'count',maxIterations
  const config=structuredClone(current);config.graph.nodes.find(n=>n.type==='loop').data.loopConditions=bad;assert.throws(()=>validateConfig(config,NODE_CONFIG))
 }
 console.log('PASS: independent movement, drop ownership, entry repair, discarded stale edges, nested guards, one-step undo, resizing, ordered OR, migration and condition validation')
+

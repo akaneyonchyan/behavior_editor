@@ -1,3 +1,4 @@
+import {loopReturnConnection} from '../utils/loopReturns'
 import {absolutePosition,dropContainer} from '../utils/structureEditing'
 import React,{useMemo,useState,useEffect,useRef} from 'react'
 import ReactFlow,{Background,Controls,MiniMap,Handle,Position,MarkerType,useReactFlow,useUpdateNodeInternals} from 'reactflow'
@@ -24,7 +25,7 @@ function ScopeNode({id,data}){
    <button className="nodrag scope-toggle" data-export-ignore="true" aria-label={(collapsed?'展开':'折叠')+'循环 '+scope.loopId} onClick={()=>data.toggle(scope.loopId)}>{collapsed?'展开':'折叠'}</button>
    <LoopConditionSummary data={node.data}/>
    <small>{data.count} 个内部节点{data.exits?' · 含 '+data.exits+' 处跳出行为':''}</small>
-   <div className="scope-flow-note">{collapsed?'内部节点已折叠':'内部流程完成一轮后自动重新判定，无需回线'}</div>
+   <div className="scope-flow-note">{collapsed?'内部节点已折叠':'连接右侧 ↻ 标记后重新判定循环条件'}</div>
   </header>
   <Handle type="target" position={Position.Left} id="in" style={{top:28}} title="循环入口"/>
   <div className="scope-output" style={{top:24}}>{externalExit(node.data,'complete')?<span title={externalExit(node.data,'complete').note}>循环结束 ↗ 跳出行为</span>:<><span>循环出口</span><Handle type="source" position={Position.Right} id="complete"/></>}</div>
@@ -33,8 +34,8 @@ function ScopeNode({id,data}){
  </div>
 }
 function LoopPortal({data}){
- return <div className={'loop-portal '+data.kind} title={data.kind==='entry'?'本轮开始':data.label} aria-label={data.kind==='entry'?'循环内部起点':'循环内部出口'}>
-  {data.kind==='entry'?<><span>▶</span><Handle type="source" position={Position.Right} id="out"/></>:<><Handle type="target" position={Position.Left} id="in"/><span>↗</span></>}
+ return <div className={'loop-portal '+data.kind} title={data.kind==='entry'?'本轮开始':data.kind==='repeat'?'本轮结束，重新检查循环条件':data.label} aria-label={data.kind==='entry'?'循环内部起点':data.kind==='repeat'?'继续循环':'循环内部出口'}>
+  {data.kind==='entry'?<><span>▶</span><Handle type="source" position={Position.Right} id="out"/></>:<><Handle type="target" position={Position.Left} id="in"/><span>{data.kind==='repeat'?'↻':'↗'}</span>{data.kind==='repeat'&&<small className="repeat-label">继续循环</small>}</>}
  </div>
 }
 const nodeTypes={loopPortal:LoopPortal,...Object.fromEntries(Object.keys(NODE_CONFIG).map(t=>[t,BehaviorNode])),start:StartNode,loopScope:ScopeNode}
@@ -44,7 +45,7 @@ function FitStructure({geometry,revision}){
  useEffect(()=>{const timer=setTimeout(()=>fitView({padding:.12,maxZoom:1}),80);return()=>clearTimeout(timer)},[geometry,revision,fitView])
  return null
 }
-export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositions,onAdd,onUpdate,onMove,onAddStructure,onSelectEdge,revision=0}){
+export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositions,onAdd,onUpdate,onMove,onAddStructure,onSelectEdge,onConnect,revision=0}){
  const [sizes,setSizes]=useState({}),[collapsed,setCollapsed]=useState([]),[dragged,setDragged]=useState({}),[previewPositions,setPreviewPositions]=useState(null)
  const dragStart=useRef(null),flow=useRef(null),selectRef=useRef(onSelect);selectRef.current=onSelect
  useEffect(()=>{setDragged({})},[graph.layout])
@@ -89,7 +90,7 @@ export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositi
    const {targetLoopId,positions}=placement(visual,[...nodes,visual]);onAddStructure?.(node,targetLoopId,positions)
   }}}>
 
-  <CanvasViewTabs><button onClick={()=>readOnly?setPreviewPositions({}):onPositions?.({})}>重新排布</button><button onClick={()=>setCollapsed([])}>全部展开</button><span>顺序从左向右；连线编辑可切换连线视图</span></CanvasViewTabs>
+  <CanvasViewTabs><button onClick={()=>readOnly?setPreviewPositions({}):onPositions?.({})}>重新排布</button><button onClick={()=>setCollapsed([])}>全部展开</button><span>拖线到 ↻ 继续循环；其他连线可切换连线视图</span></CanvasViewTabs>
   {computed.warnings.length>0&&<details className="structure-warnings" data-export-ignore="true"><summary>结构核对（{computed.warnings.length}）</summary>{computed.warnings.map((w,i)=><button key={i} onClick={()=>{const n=graph.nodes.find(n=>n.id===w.id);if(n)onSelect(n)}}>{graph.nodes.find(n=>n.id===w.id)?.data.name||w.id||'流程'}：{w.message}</button>)}</details>}
   <GraphDisplayContext.Provider value={graph}>
   <ReactFlow nodes={nodes} edges={computed.edges.map(e=>({...e,selectable:!readOnly,selected:!readOnly&&e.selected}))} nodeTypes={nodeTypes} edgeTypes={edgeTypes}
@@ -98,7 +99,7 @@ export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositi
    onNodeClick={(_,n)=>{if(n.type!=='loopPortal')onSelect(graph.nodes.find(x=>x.id===(n.data?.scope?.loopId||n.id)))}}
    onPaneClick={()=>onSelect(null)}
    nodeDragThreshold={3} onNodeDragStart={(_,n)=>{dragStart.current={...n.position}}} onNodeDragStop={finishMove}
-   nodesConnectable={false} edgesUpdatable={false} deleteKeyCode={null} minZoom={.05} maxZoom={2}
+   nodesConnectable={!readOnly} isValidConnection={c=>!readOnly&&!!loopReturnConnection(c,graph.nodes,computed.scopes,nodes)} onConnect={c=>{if(!readOnly){const connection=loopReturnConnection(c,graph.nodes,computed.scopes,nodes);if(connection)onConnect?.(connection)}}} edgesUpdatable={false} deleteKeyCode={null} minZoom={.05} maxZoom={2}
    defaultEdgeOptions={{markerEnd:{type:MarkerType.ArrowClosed,color:'#94A3B8'}}}>
    <Background color="#29313d" gap={20}/><Controls showInteractive={false}/><MiniMap nodeColor={n=>n.type==='loopScope'?'#372536':n.type==='loopPortal'?NODE_CONFIG.loop.color:NODE_CONFIG[n.type]?.color||'#94A3B8'}/>
    <FitStructure geometry={geometry} revision={revision}/>
@@ -106,3 +107,4 @@ export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositi
   </GraphDisplayContext.Provider>
  </div>
 }
+

@@ -271,7 +271,7 @@
         "type": "loop",
         "data": {
           "name": "循环判断｜恢复或继续趴地",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "",
           "completionRules": [
             {
@@ -282,15 +282,98 @@
               "objectName": "item:partner/reczz28PAvx7wYyE"
             }
           ],
-          "resourceCheck": "未恢复时继续原地趴地表现并等待救援；本行为无额外消耗资源门槛。",
-          "resourceRules": [],
-          "failureReason": "",
-          "restEnabled": false,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": [],
           "description": "",
-          "admissionEnabled": false
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "循环判断｜恢复或继续趴地",
+              "loopVersion": 2,
+              "completionCondition": "",
+              "completionRules": [
+                {
+                  "id": "e5eca5bb-786c-4a65-a309-231a2ee71217",
+                  "source": "object:partner",
+                  "attribute": "dizzy",
+                  "influence": "为0时",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "resourceCheck": "未恢复时继续原地趴地表现并等待救援；本行为无额外消耗资源门槛。",
+              "resourceRules": [],
+              "failureReason": "",
+              "restEnabled": false,
+              "restExpectation": "",
+              "restCondition": "",
+              "restRules": [],
+              "description": "",
+              "admissionEnabled": false
+            },
+            "edges": [
+              {
+                "id": "13478bc6-985b-4451-905b-0226c7803c16",
+                "source": "weak_variation",
+                "target": "recovery",
+                "sourceHandle": "none"
+              },
+              {
+                "id": "c7b05a8d-d66e-4290-b4ee-77e72db088be",
+                "source": "weak_hand",
+                "target": "recovery"
+              },
+              {
+                "id": "cde87175-c04f-409e-af5d-12a71b3cc4c4",
+                "source": "weak_push",
+                "target": "recovery"
+              },
+              {
+                "id": "ec75661e-34fe-484c-a94c-260d450b3c05",
+                "source": "weak_look",
+                "target": "recovery"
+              },
+              {
+                "id": "9cfa50f2-74a5-4572-b36d-88a8430fc290",
+                "source": "recovery",
+                "target": "ground_base",
+                "sourceHandle": "continue"
+              },
+              {
+                "id": "794af158-94f5-48f6-915e-c5f70290c8bd",
+                "source": "recovery",
+                "target": "recover",
+                "sourceHandle": "complete"
+              }
+            ],
+            "scope": {
+              "loopId": "recovery",
+              "entry": "ground_base",
+              "members": [
+                "ground_base",
+                "weak_variation",
+                "weak_hand",
+                "weak_push",
+                "weak_look"
+              ]
+            }
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "",
+              "rules": [
+                {
+                  "id": "e5eca5bb-786c-4a65-a309-231a2ee71217",
+                  "source": "object:partner",
+                  "attribute": "dizzy",
+                  "influence": "为0时",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 1889.2989079786544,
@@ -348,7 +431,7 @@
       {
         "id": "16107bf8-cc91-4e60-b826-3d4c68790331",
         "source": "fall_upright",
-        "target": "ground_base"
+        "target": "recovery"
       },
       {
         "id": "f5f8838e-fdef-4560-807c-5794c1cf23d7",
@@ -418,7 +501,24 @@
         "target": "recover",
         "sourceHandle": "complete"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "recovery",
+          "entry": "ground_base",
+          "members": [
+            "ground_base",
+            "weak_variation",
+            "weak_hand",
+            "weak_push",
+            "weak_look"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
 

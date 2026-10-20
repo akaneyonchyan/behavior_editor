@@ -43,7 +43,8 @@ export default function LoopFields({node}){
   <LoopConditionsEditor node={node}/>
   <BranchDestination node={node} handle="continue" label="进入循环体"/>
   <BranchDestination node={node} handle="complete" label="循环结束后去向"/>
-  <p className="form-hint">准入用内部判断节点，个性待机用内部待机节点。末尾不用画回线，确认范围时自动补齐返回关系。</p>
+  <p className="form-hint">准入用内部判断节点，个性待机用内部待机节点。末尾需要继续循环时，连接容器右侧的 ↻ 标记。</p>
   <LoopScopeSettings key={node.id} node={node}/>
  </div>
 }
+

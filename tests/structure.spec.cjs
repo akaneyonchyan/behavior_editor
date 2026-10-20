@@ -3,7 +3,7 @@ test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
  await page.addInitScript(()=>{localStorage.setItem('pps-canvas-view','structure');window.showSaveFilePicker=undefined})
  await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
- await expect(page.locator('.react-flow__node')).toHaveCount(8)
+ await expect(page.locator('.react-flow__node')).toHaveCount(9)
 })
 const state=page=>page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return g.getState().exportConfig()})
 test('structure selection, collapse, raw view, isolated expanded PNG and persistent layout',async({page},info)=>{
@@ -24,7 +24,7 @@ test('structure selection, collapse, raw view, isolated expanded PNG and persist
   const {captureCanvas}=await import('/src/utils/pngExport.js')
   try{const {clone}=captureCanvas(snap.source,{scale:1});return {nodes:clone.querySelectorAll('.react-flow__node').length,buttons:clone.querySelectorAll('[data-export-ignore]').length}}finally{snap.dispose()}
  })
- expect(expanded).toEqual({nodes:8,buttons:0})
+ expect(expanded).toEqual({nodes:9,buttons:0})
  await expect(page.locator('.react-flow__node')).toHaveCount(3)
  expect(await state(page)).toEqual(before)
  await page.getByRole('button',{name:'导出 PNG',exact:true}).click()
@@ -42,7 +42,7 @@ test('structure selection, collapse, raw view, isolated expanded PNG and persist
  await page.mouse.move(box.x+box.width/2,box.y+8);await page.mouse.down();await page.mouse.move(box.x+box.width/2+50,box.y+35,{steps:10});await page.mouse.up()
  const moved=await state(page);expect(moved.graph.layout.positions.__scope_template_loop).toBeDefined()
  await page.evaluate(async()=>{const {flushDraft}=await import('/src/store/documentSession.js');flushDraft()})
- await page.reload();await expect(page.locator('.react-flow__node')).toHaveCount(8)
+ await page.reload();await expect(page.locator('.react-flow__node')).toHaveCount(9)
  expect((await state(page)).graph.layout.positions).toEqual(moved.graph.layout.positions)
  expect(errors).toEqual([])
 })
@@ -62,3 +62,5 @@ test('files convert automatically; online structure remains readonly',async({pag
  await expect(page.locator('.property-panel select')).toHaveCount(0)
  await page.keyboard.press('Delete');expect(await state(page)).toEqual(old)
 })
+
+

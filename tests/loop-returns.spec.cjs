@@ -1,0 +1,28 @@
+const {test,expect}=require('@playwright/test')
+test('repeat glyph supports delete, reload, drag reconnect, undo, collapse and PNG',async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('pps-canvas-view','structure'))
+ await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ const read=()=>page.evaluate(async()=>{const {useBehaviorStore:s}=await import('/src/store/behaviorStore.js');return s.getState().exportConfig()})
+ await expect(page.locator('.loop-portal.repeat')).toHaveCount(1);await page.waitForTimeout(400)
+ const returning=(await read()).graph.edges.find(e=>e.source==='template_wait')
+ const edge=page.getByTestId('rf__edge-'+returning.id+':outside')
+ await edge.locator('.react-flow__edge-interaction').dispatchEvent('click',{bubbles:true});await page.keyboard.press('Delete')
+ expect((await read()).graph.edges.some(e=>e.source==='template_wait')).toBe(false)
+ await page.evaluate(async()=>{const {useBehaviorStore:s}=await import('/src/store/behaviorStore.js');s.getState().importConfig(s.getState().exportConfig())})
+ expect((await read()).graph.edges.some(e=>e.source==='template_wait')).toBe(false)
+ await page.waitForTimeout(350)
+ const from=await page.locator('[data-id=template_wait] .react-flow__handle.source').boundingBox(),to=await page.locator('.loop-portal.repeat .react-flow__handle.target').boundingBox()
+ await page.mouse.move(from.x+from.width/2,from.y+from.height/2);await page.mouse.down();await page.mouse.move(to.x+to.width/2,to.y+to.height/2,{steps:20});await page.mouse.up()
+ expect((await read()).graph.edges.filter(e=>e.source==='template_wait').map(e=>e.target)).toEqual(['template_loop'])
+ await page.getByRole('button',{name:'撤销',exact:true}).click();expect((await read()).graph.edges.some(e=>e.source==='template_wait')).toBe(false)
+ await page.getByRole('button',{name:'重做',exact:true}).click()
+ await page.getByRole('button',{name:'折叠循环 template_loop',exact:true}).click();await expect(page.locator('.loop-portal.repeat')).toHaveCount(0)
+ const snapshot=await page.evaluate(async()=>{
+  const {useBehaviorStore:s}=await import('/src/store/behaviorStore.js'),{structureSnapshot}=await import('/src/components/structureSnapshot.jsx')
+  const shot=await structureSnapshot(s.getState())
+  try{return shot.source.querySelectorAll('.loop-portal.repeat').length}finally{shot.dispose()}
+ })
+ expect(snapshot).toBe(1)
+ await page.getByRole('button',{name:'展开循环 template_loop',exact:true}).click();await expect(page.locator('.loop-portal.repeat')).toHaveCount(1)
+})
+

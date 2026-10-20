@@ -55,7 +55,7 @@
         "type": "loop",
         "data": {
           "name": "检查Buff与下一名伙伴",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "本行为伙伴已没有【炫耀】Buff",
           "completionRules": [
             {
@@ -66,14 +66,92 @@
               "influence": "不具有指定 Buff 时"
             }
           ],
-          "resourceCheck": "Buff仍存在时，每轮重新查找视野内任意其他伙伴，不沿用旧锁定。排除自身；优先不同于上一轮，不增加全程去重名单。找到并锁定可进行展示的伙伴则继续；视野内找不到可选伙伴则中断。",
-          "resourceRules": [],
-          "failureReason": "本行为伙伴仍有炫耀Buff，但视野内找不到可选伙伴",
-          "restEnabled": false,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": [],
-          "description": "首次进入也做此检查。严格先判断Buff已消除，再判断有没有下一名伙伴。无听众时保留Buff并结束本次行为，不无限原地搜索。重选听众属于本行为循环的必要差异。"
+          "description": "首次进入也做此检查。严格先判断Buff已消除，再判断有没有下一名伙伴。无听众时保留Buff并结束本次行为，不无限原地搜索。重选听众属于本行为循环的必要差异。",
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "检查Buff与下一名伙伴",
+              "loopVersion": 2,
+              "completionCondition": "本行为伙伴已没有【炫耀】Buff",
+              "completionRules": [
+                {
+                  "id": "buff_absent",
+                  "source": "object:partner",
+                  "objectName": "本行为伙伴",
+                  "attribute": "buff:buff_showoff",
+                  "influence": "不具有指定 Buff 时"
+                }
+              ],
+              "resourceCheck": "Buff仍存在时，每轮重新查找视野内任意其他伙伴，不沿用旧锁定。排除自身；优先不同于上一轮，不增加全程去重名单。找到并锁定可进行展示的伙伴则继续；视野内找不到可选伙伴则中断。",
+              "resourceRules": [],
+              "failureReason": "本行为伙伴仍有炫耀Buff，但视野内找不到可选伙伴",
+              "restEnabled": false,
+              "restExpectation": "",
+              "restCondition": "",
+              "restRules": [],
+              "description": "首次进入也做此检查。严格先判断Buff已消除，再判断有没有下一名伙伴。无听众时保留Buff并结束本次行为，不无限原地搜索。重选听众属于本行为循环的必要差异。"
+            },
+            "edges": [
+              {
+                "id": "03ba69db-bfc3-44a8-b490-0c1390ef2afc",
+                "source": "showoff_loop",
+                "target": "end_complete",
+                "sourceHandle": "complete"
+              },
+              {
+                "id": "e0d5f2fd-efb5-4dc3-9bcb-136fc72b5158",
+                "source": "showoff_loop",
+                "target": "end_interrupted",
+                "sourceHandle": "insufficient"
+              },
+              {
+                "id": "5417555c-7b29-4e03-9e74-f8de097bedda",
+                "source": "showoff_loop",
+                "target": "move_audience",
+                "sourceHandle": "continue"
+              },
+              {
+                "id": "61256d93-cbea-4f66-8125-850f97d75d76",
+                "source": "remove_buff",
+                "target": "showoff_loop"
+              },
+              {
+                "id": "612c7b72-c96f-4b71-aa36-3be48556513b",
+                "source": "keep_buff",
+                "target": "showoff_loop"
+              }
+            ],
+            "scope": {
+              "loopId": "showoff_loop",
+              "entry": "move_audience",
+              "members": [
+                "move_audience",
+                "show_equipment",
+                "satisfaction",
+                "remove_buff",
+                "keep_buff"
+              ]
+            }
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "本行为伙伴已没有【炫耀】Buff",
+              "rules": [
+                {
+                  "id": "buff_absent",
+                  "source": "object:partner",
+                  "objectName": "本行为伙伴",
+                  "attribute": "buff:buff_showoff",
+                  "influence": "不具有指定 Buff 时"
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 2461.8851729880057,
@@ -255,6 +333,39 @@
           "x": 2798.7917550396037,
           "y": 982.2274049472736
         }
+      },
+      {
+        "id": "showoff_loop_admission",
+        "type": "judge",
+        "position": {
+          "x": 2821.8851729880057,
+          "y": 453.5337453027254
+        },
+        "data": {
+          "name": "准入判断",
+          "description": "Buff仍存在时，每轮重新查找视野内任意其他伙伴，不沿用旧锁定。排除自身；优先不同于上一轮，不增加全程去重名单。找到并锁定可进行展示的伙伴则继续；视野内找不到可选伙伴则中断。\n不满足原因：本行为伙伴仍有炫耀Buff，但视野内找不到可选伙伴",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "admission_0",
+              "name": "满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": []
+            },
+            {
+              "id": "admission_1",
+              "name": "不满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": []
+            }
+          ],
+          "legacyGate": {
+            "kind": "admission",
+            "condition": "Buff仍存在时，每轮重新查找视野内任意其他伙伴，不沿用旧锁定。排除自身；优先不同于上一轮，不增加全程去重名单。找到并锁定可进行展示的伙伴则继续；视野内找不到可选伙伴则中断。\n不满足原因：本行为伙伴仍有炫耀Buff，但视野内找不到可选伙伴",
+            "rules": [],
+            "failureReason": "本行为伙伴仍有炫耀Buff，但视野内找不到可选伙伴"
+          }
+        }
       }
     ],
     "edges": [
@@ -265,15 +376,9 @@
         "sourceHandle": "complete"
       },
       {
-        "id": "e0d5f2fd-efb5-4dc3-9bcb-136fc72b5158",
-        "source": "showoff_loop",
-        "target": "end_interrupted",
-        "sourceHandle": "insufficient"
-      },
-      {
         "id": "5417555c-7b29-4e03-9e74-f8de097bedda",
         "source": "showoff_loop",
-        "target": "move_audience",
+        "target": "showoff_loop_admission",
         "sourceHandle": "continue"
       },
       {
@@ -311,9 +416,8 @@
       {
         "id": "6f6dc810-c85c-4a54-a05a-ab24cdfedaa7",
         "source": "start",
-        "target": "move_audience",
-        "sourceHandle": null,
-        "targetHandle": null
+        "target": "showoff_loop",
+        "sourceHandle": null
       },
       {
         "id": "c339456f-b93a-4fc6-aa63-58c121d8a266",
@@ -321,8 +425,38 @@
         "target": "end_interrupted",
         "sourceHandle": "unreachable",
         "targetHandle": null
+      },
+      {
+        "id": "showoff_loop_admission:admission_0",
+        "source": "showoff_loop_admission",
+        "sourceHandle": "admission_0",
+        "target": "move_audience"
+      },
+      {
+        "id": "showoff_loop_admission:admission_1",
+        "source": "showoff_loop_admission",
+        "sourceHandle": "admission_1",
+        "target": "end_interrupted"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "showoff_loop",
+          "entry": "showoff_loop_admission",
+          "members": [
+            "move_audience",
+            "show_equipment",
+            "satisfaction",
+            "remove_buff",
+            "keep_buff",
+            "showoff_loop_admission"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
 

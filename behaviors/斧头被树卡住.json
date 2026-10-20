@@ -244,7 +244,7 @@
         "data": {
           "name": "未解卡就稍息后再试",
           "description": "未解卡时允许继续，每轮必定稍息。未使用的资源不足出口不连线；不稍息出口同样接稍息节点，确保重试前稍息。",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "监听到的树上的【卡住】Buff已经移除",
           "completionRules": [
             {
@@ -255,20 +255,104 @@
               "influence": "不具有指定 Buff 时"
             }
           ],
-          "resourceCheck": "可以继续尝试；本版不设置额外资源不足分支、精力阈值或次数上限。",
-          "resourceRules": [
-            {
-              "id": "bd574731-4b3a-4dc3-9c5d-ced0f99d3924",
-              "source": "object:partner",
-              "attribute": "energy",
-              "influence": "较低时"
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "未解卡就稍息后再试",
+              "description": "未解卡时允许继续，每轮必定稍息。未使用的资源不足出口不连线；不稍息出口同样接稍息节点，确保重试前稍息。",
+              "loopVersion": 2,
+              "completionCondition": "监听到的树上的【卡住】Buff已经移除",
+              "completionRules": [
+                {
+                  "id": "buff_removed",
+                  "source": "object:interactObject",
+                  "objectName": "监听到的树",
+                  "attribute": "卡住",
+                  "influence": "不具有指定 Buff 时"
+                }
+              ],
+              "resourceCheck": "可以继续尝试；本版不设置额外资源不足分支、精力阈值或次数上限。",
+              "resourceRules": [
+                {
+                  "id": "bd574731-4b3a-4dc3-9c5d-ced0f99d3924",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "较低时"
+                }
+              ],
+              "failureReason": "精力过低",
+              "restEnabled": true,
+              "restExpectation": "每次都稍息（必定）",
+              "restCondition": "目标尚未达成且可以继续时，必定稍息后再试。",
+              "restRules": []
+            },
+            "edges": [
+              {
+                "id": "5db03f3e-f683-4bf5-aa5d-0e58eaca984e",
+                "source": "axe_normal",
+                "target": "retry_loop"
+              },
+              {
+                "id": "5594d32a-0845-4274-b58e-4dff6ce78e49",
+                "source": "axe_tired",
+                "target": "retry_loop"
+              },
+              {
+                "id": "26802960-554a-452b-82c4-281e2f2c60b8",
+                "source": "retry_loop",
+                "target": "end_normal",
+                "sourceHandle": "complete"
+              },
+              {
+                "id": "8d4ced60-d0ab-4c72-b504-9540539f21de",
+                "source": "retry_loop",
+                "target": "retry_rest",
+                "sourceHandle": "rest"
+              },
+              {
+                "id": "d130239b-2bc0-4e52-ad19-9584c9b6bdca",
+                "source": "retry_loop",
+                "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08",
+                "sourceHandle": "insufficient"
+              },
+              {
+                "id": "f91cd0f2-5a8f-4b6f-a4d9-63e9dd8c9548",
+                "source": "retry_loop",
+                "target": "axe_try",
+                "sourceHandle": "continue"
+              }
+            ],
+            "scope": {
+              "loopId": "retry_loop",
+              "entry": "axe_try",
+              "members": [
+                "axe_try",
+                "axe_outcome",
+                "axe_normal",
+                "axe_tired",
+                "retry_rest"
+              ]
             }
-          ],
-          "failureReason": "精力过低",
-          "restEnabled": true,
-          "restExpectation": "每次都稍息（必定）",
-          "restCondition": "目标尚未达成且可以继续时，必定稍息后再试。",
-          "restRules": []
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "监听到的树上的【卡住】Buff已经移除",
+              "rules": [
+                {
+                  "id": "buff_removed",
+                  "source": "object:interactObject",
+                  "objectName": "监听到的树",
+                  "attribute": "卡住",
+                  "influence": "不具有指定 Buff 时"
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 1709.9687222663201,
@@ -324,13 +408,108 @@
           "x": 43.950646043050256,
           "y": 75.44533447370503
         }
+      },
+      {
+        "id": "retry_loop_rest",
+        "type": "judge",
+        "position": {
+          "x": 2069.96872226632,
+          "y": -329.5990335832249
+        },
+        "data": {
+          "name": "稍息判断",
+          "description": "目标尚未达成且可以继续时，必定稍息后再试。",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "rest_0",
+              "name": "稍息",
+              "weightExpectation": "每次都稍息（必定）",
+              "weightFactors": []
+            },
+            {
+              "id": "rest_1",
+              "name": "继续执行",
+              "weightExpectation": "其余情况",
+              "weightFactors": []
+            }
+          ],
+          "legacyGate": {
+            "kind": "rest",
+            "condition": "目标尚未达成且可以继续时，必定稍息后再试。",
+            "rules": [],
+            "expectation": "每次都稍息（必定）"
+          }
+        }
+      },
+      {
+        "id": "retry_loop_admission",
+        "type": "judge",
+        "position": {
+          "x": 2069.96872226632,
+          "y": -329.5990335832249
+        },
+        "data": {
+          "name": "准入判断",
+          "description": "可以继续尝试；本版不设置额外资源不足分支、精力阈值或次数上限。\n不满足原因：精力过低",
+          "judgeAttributes": [
+            {
+              "id": "admission_0",
+              "source": "object:partner",
+              "attribute": "energy"
+            }
+          ],
+          "branches": [
+            {
+              "id": "admission_0",
+              "name": "满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": [
+                {
+                  "id": "admission_0",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "满足条件：较低时",
+                  "attributeId": "admission_0"
+                }
+              ]
+            },
+            {
+              "id": "admission_1",
+              "name": "不满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": [
+                {
+                  "id": "admission_0",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "不满足条件：较低时",
+                  "attributeId": "admission_0"
+                }
+              ]
+            }
+          ],
+          "legacyGate": {
+            "kind": "admission",
+            "condition": "可以继续尝试；本版不设置额外资源不足分支、精力阈值或次数上限。\n不满足原因：精力过低",
+            "rules": [
+              {
+                "id": "bd574731-4b3a-4dc3-9c5d-ced0f99d3924",
+                "source": "object:partner",
+                "attribute": "energy",
+                "influence": "较低时"
+              }
+            ],
+            "failureReason": "精力过低"
+          }
+        }
       }
     ],
     "edges": [
       {
         "id": "5b65daa2-a07e-4b47-824b-1b2e7b24c83d",
         "source": "notice",
-        "target": "axe_try"
+        "target": "retry_loop"
       },
       {
         "id": "987cbe41-f509-4238-99a5-bf7d8e85c3af",
@@ -366,26 +545,14 @@
         "sourceHandle": "complete"
       },
       {
-        "id": "8d4ced60-d0ab-4c72-b504-9540539f21de",
-        "source": "retry_loop",
-        "target": "retry_rest",
-        "sourceHandle": "rest"
-      },
-      {
         "id": "eb990f7c-c68f-4f76-98c1-a7f4a26b9347",
         "source": "retry_rest",
-        "target": "axe_try"
-      },
-      {
-        "id": "d130239b-2bc0-4e52-ad19-9584c9b6bdca",
-        "source": "retry_loop",
-        "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08",
-        "sourceHandle": "insufficient"
+        "target": "retry_loop"
       },
       {
         "id": "f91cd0f2-5a8f-4b6f-a4d9-63e9dd8c9548",
         "source": "retry_loop",
-        "target": "axe_try",
+        "target": "retry_loop_admission",
         "sourceHandle": "continue"
       },
       {
@@ -408,8 +575,51 @@
         "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08",
         "sourceHandle": "unreachable",
         "targetHandle": null
+      },
+      {
+        "id": "retry_loop_rest:rest_0",
+        "source": "retry_loop_rest",
+        "sourceHandle": "rest_0",
+        "target": "retry_rest"
+      },
+      {
+        "id": "retry_loop_rest:rest_1",
+        "source": "retry_loop_rest",
+        "sourceHandle": "rest_1",
+        "target": "axe_try"
+      },
+      {
+        "id": "retry_loop_admission:admission_0",
+        "source": "retry_loop_admission",
+        "sourceHandle": "admission_0",
+        "target": "retry_loop_rest"
+      },
+      {
+        "id": "retry_loop_admission:admission_1",
+        "source": "retry_loop_admission",
+        "sourceHandle": "admission_1",
+        "target": "ea89f382-7da9-466a-8d53-f4d6540a7d08"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "retry_loop",
+          "entry": "retry_loop_admission",
+          "members": [
+            "axe_try",
+            "axe_outcome",
+            "axe_normal",
+            "axe_tired",
+            "retry_rest",
+            "retry_loop_rest",
+            "retry_loop_admission"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
 

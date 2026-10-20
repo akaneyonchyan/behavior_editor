@@ -10,7 +10,7 @@ validateConfig(fresh,NODE_CONFIG)
 const picture=structureLayout(fresh.graph.nodes,fresh.graph.edges,fresh.graph.layout)
 assert.equal(picture.nodes.filter(n=>n.type==='loop').length,0)
 assert.equal(picture.nodes.filter(n=>n.type==='loopScope').length,1)
-assert.equal(picture.nodes.length,fresh.graph.nodes.length+1)
+assert.equal(picture.nodes.length,fresh.graph.nodes.length+2)
 assert.ok(!picture.edges.some(e=>e.source==='template_wait'&&e.target==='__scope_template_loop'))
 assert.ok(picture.edges.some(e=>e.source==='__scope_template_loop__entry'&&e.sourceHandle==='out'&&e.target==='template_judge'))
 const old=legacyTemplate(),d=old.graph.nodes.find(n=>n.type==='loop').data
@@ -31,14 +31,15 @@ assert.ok(!migrated.graph.edges.some(e=>e.source==='template_loop'&&['rest','ins
 s().updateNode('template_loop',{maxIterations:'5'});s().undo();assert.deepEqual(s().exportConfig(),migrated)
 s().updateNode('template_loop',{loopConditions:[{id:'count',kind:'count',maxIterations:'3'}]});validateConfig(s().exportConfig(),NODE_CONFIG)
 assert.equal(s().exportConfig().graph.nodes.find(n=>n.id==='template_loop').data.loopConditions[0].maxIterations,'3')
-// New ranges do not require the designer to manually close the loop.
+// Empty outputs remain disconnected until the designer connects them.
 const open=blankTemplate();open.graph.edges=open.graph.edges.filter(e=>e.source!=='template_wait')
 s().importConfig(open);s().confirmLoopScope(open.graph.layout.scopes[0])
-assert.ok(s().edges.some(e=>e.source==='template_wait'&&e.target==='template_loop'))
+assert.ok(!s().edges.some(e=>e.source==='template_wait'&&e.target==='template_loop'))
 const wrong=blankTemplate();wrong.graph.nodes.find(n=>n.type==='loop').data.loopMode='unknown';assert.throws(()=>validateConfig(wrong,NODE_CONFIG))
 const empty={id:'empty',type:'loop',position:{x:0,y:0},data:structuredClone(NODE_CONFIG.loop.defaultData)}
 const emptyPicture=structureLayout([empty],[])
-assert.equal(emptyPicture.nodes.length,1);assert.equal(emptyPicture.nodes[0].type,'loopScope')
-console.log('PASS: loop-only conditions, single container, hidden returns, explicit gate migration, preserved destinations/rules/archive, undo and automatic return bookkeeping')
+assert.equal(emptyPicture.nodes.length,2);assert.equal(emptyPicture.nodes[0].type,'loopScope')
+console.log('PASS: loop-only conditions, single container, repeat glyph returns, explicit gate migration, preserved destinations/rules/archive, undo and explicit return connections')
 
 const invalidPort=blankTemplate();invalidPort.graph.edges.push({id:'bad',source:'template_loop',sourceHandle:'rest',target:'template_wait'});assert.throws(()=>validateConfig(invalidPort,NODE_CONFIG),/仅支持/)
+

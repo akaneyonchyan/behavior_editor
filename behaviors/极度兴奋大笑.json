@@ -33,7 +33,19 @@
   "graph": {
     "layout": {
       "version": 1,
-      "scopes": [],
+      "scopes": [
+        {
+          "loopId": "laugh_loop",
+          "entry": "laugh_default",
+          "members": [
+            "laugh_default",
+            "laugh_variation",
+            "laugh_clap",
+            "laugh_belly",
+            "laugh_steps"
+          ]
+        }
+      ],
       "positions": {}
     },
     "nodes": [
@@ -363,7 +375,7 @@
         "type": "loop",
         "data": {
           "name": "循环判断是否到循环上限",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "本次连续大笑段可以结束，不再追加一次欢笑；具体结束条件待配置，与极度兴奋Buff是否缓解分开判断",
           "completionRules": [
             {
@@ -373,15 +385,90 @@
               "influence": ""
             }
           ],
-          "resourceCheck": "当前允许继续欢笑；不额外新增精力阈值或资源消耗门槛。",
-          "resourceRules": [],
-          "failureReason": "",
-          "restEnabled": false,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": [],
           "description": "",
-          "admissionEnabled": false
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "循环判断是否到循环上限",
+              "loopVersion": 2,
+              "completionCondition": "本次连续大笑段可以结束，不再追加一次欢笑；具体结束条件待配置，与极度兴奋Buff是否缓解分开判断",
+              "completionRules": [
+                {
+                  "id": "fd783733-f264-46a4-8528-fdbf03a44ec3",
+                  "source": "",
+                  "attribute": "",
+                  "influence": ""
+                }
+              ],
+              "resourceCheck": "当前允许继续欢笑；不额外新增精力阈值或资源消耗门槛。",
+              "resourceRules": [],
+              "failureReason": "",
+              "restEnabled": false,
+              "restExpectation": "",
+              "restCondition": "",
+              "restRules": [],
+              "description": "",
+              "admissionEnabled": false
+            },
+            "edges": [
+              {
+                "id": "7a7c751d-f29b-4c89-b69b-fd06684283f6",
+                "source": "laugh_clap",
+                "target": "laugh_loop"
+              },
+              {
+                "id": "ce96273a-9da2-4e9d-a446-3a0c1cbac6de",
+                "source": "laugh_belly",
+                "target": "laugh_loop"
+              },
+              {
+                "id": "5524e6de-22a9-45f2-9339-b72263c6d509",
+                "source": "laugh_steps",
+                "target": "laugh_loop"
+              },
+              {
+                "id": "639ba122-8027-401d-8076-39542890e3ab",
+                "source": "laugh_loop",
+                "target": "laugh_default",
+                "sourceHandle": "continue"
+              },
+              {
+                "id": "6de19071-d6ff-4d89-b407-f9150a88c844",
+                "source": "laugh_loop",
+                "target": "relief_check",
+                "sourceHandle": "complete"
+              }
+            ],
+            "scope": {
+              "loopId": "laugh_loop",
+              "entry": "laugh_default",
+              "members": [
+                "laugh_default",
+                "laugh_variation",
+                "laugh_clap",
+                "laugh_belly",
+                "laugh_steps"
+              ]
+            }
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "本次连续大笑段可以结束，不再追加一次欢笑；具体结束条件待配置，与极度兴奋Buff是否缓解分开判断",
+              "rules": [
+                {
+                  "id": "fd783733-f264-46a4-8528-fdbf03a44ec3",
+                  "source": "",
+                  "attribute": "",
+                  "influence": ""
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 1687.3338605053016,
@@ -398,7 +485,7 @@
       {
         "id": "6ce49a22-a0cb-4161-9103-092f07aa297b",
         "source": "laugh_start",
-        "target": "laugh_default"
+        "target": "laugh_loop"
       },
       {
         "id": "4b326370-4985-4319-abe6-6cdeef3d2677",
