@@ -1,0 +1,690 @@
+{
+  "behavior": {
+    "name": "用斧头砍伐树木获取木材",
+    "templateVersion": 4,
+    "matchTargets": [],
+    "description": "目标木材数量N、砍伐轮次上限M由本次目标／配置提供，入场固定。本次获得量从0累计，不以已有库存代替。一次完整挥斧接触树干为1轮；本轮扣减精力、斧头耐久，实际产出数量由树木采集配置决定并受剩余可采量限制。木材转入行为伙伴的原料持有数据，原料槽／堆叠按公共规则处理。目标树木引用乔木，剩余可采量读取乔木产量。斧头损坏、脱手、砍光树木均表演后立即跳出，优先于正常循环收尾，不继续稍息；其余完成轮次均判定稍息后回循环。概率映射为建议，具体参数待数值配置。",
+    "targetRules": [
+      {
+        "id": "wood_goal",
+        "source": "object:material",
+        "objectName": "item:material/reczz28P81JmdGLh",
+        "attribute": "数量",
+        "influence": "目标值"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "tree",
+          "objectType": "environmentItem",
+          "objectName": "item:environmentItem/reczz28PAurCbpZn"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "equipped",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot_tool",
+          "influence": "斧头"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "loop",
+          "entry": "chop",
+          "members": [
+            "chop",
+            "state",
+            "broken",
+            "grip",
+            "fly",
+            "yield",
+            "wood",
+            "depleted",
+            "rest_check",
+            "rest"
+          ]
+        }
+      ],
+      "positions": {}
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始"
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "loop",
+        "type": "loop",
+        "data": {
+          "name": "木材足够或达到轮次上限",
+          "loopVersion": 3,
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "M（本次配置）",
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "本次实际获得木材≥N",
+              "rules": [
+                {
+                  "id": "wood_count",
+                  "source": "object:material",
+                  "objectName": "item:material/reczz28P81JmdGLh",
+                  "attribute": "数量",
+                  "influence": "本次实际获得量达到N"
+                }
+              ]
+            },
+            {
+              "id": "limit",
+              "kind": "count",
+              "maxIterations": "M（本次配置）",
+              "condition": "",
+              "rules": []
+            }
+          ],
+          "completionCondition": "本次木材足够，或砍伐轮次达到上限",
+          "completionRules": []
+        },
+        "position": {
+          "x": 380,
+          "y": 0
+        }
+      },
+      {
+        "id": "chop",
+        "type": "result",
+        "data": {
+          "name": "挥斧砍树",
+          "animation": "双脚站稳，双手握柄抬起斧头，朝树干砍下一斧；斧刃接触树干后衔接本轮结果。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "energy_cost",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy",
+              "influence": "减",
+              "kind": "attribute"
+            },
+            {
+              "id": "axe_cost",
+              "source": "object:equippedItem",
+              "objectName": "item:equippedItem/reczz28P8wQhomvk",
+              "attribute": "durability",
+              "influence": "减",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "description": "完成本次挥砍计1轮，耐久不低于0；产出只在结果节点结算一次。耐久沿用物件属性，斧头继承适用性由公共物件规则支持。"
+        },
+        "position": {
+          "x": 760,
+          "y": 0
+        }
+      },
+      {
+        "id": "state",
+        "type": "judge",
+        "data": {
+          "name": "检查本轮斧头是否损坏",
+          "judgeAttributes": [
+            {
+              "id": "dur",
+              "source": "object:equippedItem",
+              "objectName": "item:equippedItem/reczz28P8wQhomvk",
+              "attribute": "durability",
+              "influence": ""
+            }
+          ],
+          "branches": [
+            {
+              "id": "broken",
+              "name": "耐久归零",
+              "weightExpectation": "满足条件必选",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "dur",
+                  "attributeId": "dur",
+                  "source": "object:equippedItem",
+                  "attribute": "durability",
+                  "objectName": "item:equippedItem/reczz28P8wQhomvk",
+                  "influence": "具体值 · 允许选中",
+                  "influenceType": "具体值",
+                  "influenceRule": "允许选中"
+                }
+              ]
+            },
+            {
+              "id": "usable",
+              "name": "斧头仍可用",
+              "weightExpectation": "其余情况",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "dur",
+                  "attributeId": "dur",
+                  "source": "object:equippedItem",
+                  "attribute": "durability",
+                  "objectName": "item:equippedItem/reczz28P8wQhomvk",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            }
+          ],
+          "description": "确定判断：本轮扣减后耐久≤0走损坏，否则继续判断是否脱手。",
+          "externalExits": []
+        },
+        "position": {
+          "x": 1143.9834691738436,
+          "y": 0.9958672934608899
+        }
+      },
+      {
+        "id": "broken",
+        "type": "result",
+        "data": {
+          "name": "斧头损坏",
+          "animation": "斧头在砍击后断裂，伙伴停住动作，低头看看断口，失望地垂下手臂。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": "本轮无有效木材产出；斧头耐久已归零，交回外部流程。",
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "本轮无有效木材产出；斧头耐久已归零，交回外部流程。"
+            }
+          ]
+        },
+        "position": {
+          "x": 1510.9298576388442,
+          "y": -0.421306102055496
+        }
+      },
+      {
+        "id": "grip",
+        "type": "judge",
+        "data": {
+          "name": "本轮是否脱手",
+          "judgeAttributes": [
+            {
+              "id": "pragmatic",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_pragmatic"
+            },
+            {
+              "id": "energy",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy"
+            }
+          ],
+          "branches": [
+            {
+              "id": "fly",
+              "name": "斧头飞出手",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "id": "pragmatic",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_pragmatic",
+                  "version": 2,
+                  "attributeId": "pragmatic",
+                  "influenceType": "具有（1）",
+                  "influenceRule": "概率越低",
+                  "influence": "具有（1） · 概率越低"
+                },
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高",
+                  "influence": "数值低 · 概率越高"
+                }
+              ]
+            },
+            {
+              "id": "hold",
+              "name": "保持握持",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "id": "pragmatic",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_pragmatic",
+                  "version": 2,
+                  "attributeId": "pragmatic",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                }
+              ]
+            }
+          ],
+          "description": "务实降低脱手概率；精力越低越容易脱手。"
+        },
+        "position": {
+          "x": 1504.6786985798283,
+          "y": 357.76524802837866
+        }
+      },
+      {
+        "id": "fly",
+        "type": "result",
+        "data": {
+          "name": "斧头飞出手",
+          "animation": "砍击反弹时手掌一滑，斧头飞离双手；伙伴摊着手愣一下，视线追向斧头落点。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "unequip",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "equipped_slot_tool",
+              "influence": "清空",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "description": "本轮无有效木材产出；同一斧头实例转为场景掉落物，交由装备物脱手监听行为处理取回或放弃。",
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "本轮无有效木材产出；同一斧头实例转为场景掉落物，交由装备物脱手监听行为处理取回或放弃。"
+            }
+          ]
+        },
+        "position": {
+          "x": 1873.3796340892613,
+          "y": 5.553897658709843
+        }
+      },
+      {
+        "id": "yield",
+        "type": "judge",
+        "data": {
+          "name": "判断乔木产量",
+          "judgeAttributes": [
+            {
+              "id": "tree_yield",
+              "source": "object:environmentItem",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn",
+              "attribute": "reczz28PBhFkUjct"
+            }
+          ],
+          "description": "本轮获得木材并扣减乔木产量后判断；产量为0则产光跳出，大于0继续稍息判断。",
+          "branches": [
+            {
+              "id": "last",
+              "name": "产量为0｜产光",
+              "weightExpectation": "满足条件必选",
+              "weightFactors": [
+                {
+                  "id": "tree_yield",
+                  "source": "object:environmentItem",
+                  "objectName": "item:environmentItem/reczz28PAurCbpZn",
+                  "attribute": "reczz28PBhFkUjct",
+                  "version": 2,
+                  "attributeId": "tree_yield",
+                  "influenceType": "0",
+                  "influenceRule": "允许选中",
+                  "influence": "为0允许选中"
+                }
+              ]
+            },
+            {
+              "id": "more",
+              "name": "产量大于0｜仍可采",
+              "weightExpectation": "其余情况",
+              "weightFactors": [
+                {
+                  "id": "tree_yield",
+                  "source": "object:environmentItem",
+                  "objectName": "item:environmentItem/reczz28PAurCbpZn",
+                  "attribute": "reczz28PBhFkUjct",
+                  "version": 2,
+                  "attributeId": "tree_yield",
+                  "influenceType": "0",
+                  "influenceRule": "排除选中",
+                  "influence": "为0排除选中"
+                }
+              ]
+            }
+          ]
+        },
+        "position": {
+          "x": 2232.4700341543144,
+          "y": 8.126510516629196
+        }
+      },
+      {
+        "id": "wood",
+        "type": "result",
+        "data": {
+          "name": "获得本轮木材",
+          "animation": "斧头从砍口退出，木块掉落；伙伴收拢本轮木材，重新握好斧柄。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "gain",
+              "source": "object:material",
+              "objectName": "item:material/reczz28P81JmdGLh",
+              "attribute": "数量",
+              "influence": "增",
+              "kind": "attribute"
+            },
+            {
+              "id": "yield_cost",
+              "source": "object:environmentItem",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn",
+              "attribute": "reczz28PBhFkUjct",
+              "influence": "减",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "description": "实际获得量不超过砍伐前乔木产量；木材获得与乔木产量扣减结算一次，随后检查产量。"
+        },
+        "position": {
+          "x": 1881.2876482405018,
+          "y": 494.7124330130906
+        }
+      },
+      {
+        "id": "depleted",
+        "type": "result",
+        "data": {
+          "name": "树被砍光",
+          "animation": "看到乔木已被砍光，伙伴停下挥斧，放低斧头；乔木切换为采尽后的外观。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": "乔木产量为0，本轮木材已结算，不重复发放；跳出行为。",
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "乔木产量为0，跳出行为；保留已获得木材。"
+            }
+          ]
+        },
+        "position": {
+          "x": 2574.175867927197,
+          "y": 19.14792738762418
+        }
+      },
+      {
+        "id": "rest_check",
+        "type": "judge",
+        "data": {
+          "name": "每轮个性稍息判断",
+          "judgeAttributes": [
+            {
+              "id": "energy",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy"
+            },
+            {
+              "id": "rigorous",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_rigorous"
+            },
+            {
+              "id": "casual",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_casual"
+            }
+          ],
+          "branches": [
+            {
+              "id": "rest",
+              "name": "稍息",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高",
+                  "influence": "数值低 · 概率越高"
+                },
+                {
+                  "id": "rigorous",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_rigorous",
+                  "version": 2,
+                  "attributeId": "rigorous",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "casual",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_casual",
+                  "version": 2,
+                  "attributeId": "casual",
+                  "influenceType": "具有（1）",
+                  "influenceRule": "概率越高",
+                  "influence": "具有（1） · 概率越高"
+                }
+              ]
+            },
+            {
+              "id": "next",
+              "name": "不稍息",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "rigorous",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_rigorous",
+                  "version": 2,
+                  "attributeId": "rigorous",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "casual",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_casual",
+                  "version": 2,
+                  "attributeId": "casual",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                }
+              ]
+            }
+          ],
+          "description": "每个未跳出的完成轮次均经过本节点，包括正常最后一轮；稍息或不稍息都回循环入口，不直接再砍。"
+        },
+        "position": {
+          "x": 2566.3098536827356,
+          "y": 375.3999545437729
+        }
+      },
+      {
+        "id": "rest",
+        "type": "wait",
+        "data": {
+          "name": "个性稍息",
+          "description": "短暂垂下斧头喘口气，按个性待机库穿插擦汗、松松肩膀或左右张望；结束时双手重新握稳斧柄。期间保持持有斧头，不增加轮次或木材。"
+        },
+        "position": {
+          "x": 2910.3176855793104,
+          "y": 17.88837470328565
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "data": {
+          "name": "结束本次砍树",
+          "animation": "放低斧头，看看本次收集的木材，缓缓呼出一口气，站稳进入持斧待机。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 752.071007727729,
+          "y": 420.58116224603805
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e826b102-98be-4853-ab6d-2634dddd4cff",
+        "source": "start",
+        "target": "loop"
+      },
+      {
+        "id": "ef029c8b-a49c-46e2-8e4c-207871786a17",
+        "source": "loop",
+        "target": "chop",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "4b83dd2f-f9d7-4f79-8271-4daaeedcb9e4",
+        "source": "loop",
+        "target": "end",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "9e5ffc69-06c3-496f-b3a1-3fecf630aaeb",
+        "source": "chop",
+        "target": "state"
+      },
+      {
+        "id": "aee93c9e-ffec-4db8-8d54-4f92e6f09d1f",
+        "source": "state",
+        "target": "broken",
+        "sourceHandle": "broken"
+      },
+      {
+        "id": "f5712df9-fa74-4085-bd11-5b8f7d9db284",
+        "source": "state",
+        "target": "grip",
+        "sourceHandle": "usable"
+      },
+      {
+        "id": "22dcaee8-e2b4-4ae3-839e-69ed602c9bf6",
+        "source": "grip",
+        "target": "fly",
+        "sourceHandle": "fly"
+      },
+      {
+        "id": "af6c1ee6-0044-414d-9c20-5133078d98c3",
+        "source": "grip",
+        "target": "wood",
+        "sourceHandle": "hold"
+      },
+      {
+        "id": "d0f4e5e5-cca9-4fe4-a4b1-e84a43946a86",
+        "source": "yield",
+        "target": "depleted",
+        "sourceHandle": "last"
+      },
+      {
+        "id": "d79bc829-6d5e-4a61-890e-5176c0d61a91",
+        "source": "yield",
+        "target": "rest_check",
+        "sourceHandle": "more"
+      },
+      {
+        "id": "b5c860ab-0bc8-4201-ac78-afd26bf8fd7d",
+        "source": "wood",
+        "target": "yield"
+      },
+      {
+        "id": "2548f235-1051-456b-8c0c-cd58c8f4089c",
+        "source": "rest_check",
+        "target": "rest",
+        "sourceHandle": "rest"
+      },
+      {
+        "id": "08559ffc-36fd-49d2-816b-45078afb33fa",
+        "source": "rest_check",
+        "target": "loop",
+        "sourceHandle": "next"
+      },
+      {
+        "id": "28fa40f5-0fa0-482f-8c11-c408b522167c",
+        "source": "rest",
+        "target": "loop"
+      }
+    ]
+  }
+}
