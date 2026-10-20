@@ -88,25 +88,89 @@
         "type": "loop",
         "data": {
           "name": "制作完成或继续",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "本次累计有效制作时长达到【鱼饵】制作配置要求/到达循环通用上限",
           "completionRules": [],
-          "resourceCheck": "未完成时，搓饵台耐久度仍大于0，能够继续制作；其他可用性变化由通用监听接管。",
-          "resourceRules": [
-            {
-              "id": "table_usable",
-              "source": "object:interactObject",
-              "objectName": "搓饵台",
-              "attribute": "durability",
-              "influence": "大于0，可继续制作"
+          "description": "先判断制作时间是否完成，再判断能否继续，再选择是否稍息。",
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "制作完成或继续",
+              "loopVersion": 2,
+              "completionCondition": "本次累计有效制作时长达到【鱼饵】制作配置要求/到达循环通用上限",
+              "completionRules": [],
+              "resourceCheck": "未完成时，搓饵台耐久度仍大于0，能够继续制作；其他可用性变化由通用监听接管。",
+              "resourceRules": [
+                {
+                  "id": "table_usable",
+                  "source": "object:interactObject",
+                  "objectName": "搓饵台",
+                  "attribute": "durability",
+                  "influence": "大于0，可继续制作"
+                }
+              ],
+              "failureReason": "搓饵台耐久降至0，无法继续完成本次制作",
+              "restEnabled": false,
+              "restExpectation": "较少发生",
+              "restCondition": "未完成且台面可继续使用时，可短暂松手稍息；具体个性表现沿用通用机制。",
+              "restRules": [],
+              "description": "先判断制作时间是否完成，再判断能否继续，再选择是否稍息。"
+            },
+            "edges": [
+              {
+                "id": "21efdcbf-46e9-407c-a8ce-75da02f273da",
+                "source": "produce_bait",
+                "target": "craft_loop",
+                "sourceHandle": null,
+                "targetHandle": null
+              },
+              {
+                "id": "404d6802-f3b0-4f14-a7cf-f0a11d49553e",
+                "source": "craft_loop",
+                "target": "end_interrupted",
+                "sourceHandle": "insufficient"
+              },
+              {
+                "id": "8ebc124b-a3eb-49e0-9d43-958e9a70d5c0",
+                "source": "table_broken",
+                "target": "craft_loop",
+                "sourceHandle": null,
+                "targetHandle": null
+              },
+              {
+                "id": "20effd59-2067-404c-bbaa-1805f7e3e21e",
+                "source": "craft_loop",
+                "target": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+                "sourceHandle": "continue"
+              },
+              {
+                "id": "0aa2a001-9b93-483b-8e94-090d8a2f3aec",
+                "source": "craft_loop",
+                "target": "72d29530-174b-4e4a-8469-659a33828adf",
+                "sourceHandle": "complete"
+              }
+            ],
+            "scope": {
+              "loopId": "craft_loop",
+              "entry": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+              "members": [
+                "produce_bait",
+                "table_broken",
+                "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88"
+              ]
             }
-          ],
-          "failureReason": "搓饵台耐久降至0，无法继续完成本次制作",
-          "restEnabled": false,
-          "restExpectation": "较少发生",
-          "restCondition": "未完成且台面可继续使用时，可短暂松手稍息；具体个性表现沿用通用机制。",
-          "restRules": [],
-          "description": "先判断制作时间是否完成，再判断能否继续，再选择是否稍息。"
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "本次累计有效制作时长达到【鱼饵】制作配置要求/到达循环通用上限",
+              "rules": []
+            }
+          ]
         },
         "position": {
           "x": 1674.9116036430016,
@@ -239,6 +303,72 @@
           "x": 2054.4451558762853,
           "y": -255.03395076371
         }
+      },
+      {
+        "id": "craft_loop_admission",
+        "type": "judge",
+        "position": {
+          "x": 2034.9116036430016,
+          "y": -249.43050792871637
+        },
+        "data": {
+          "name": "准入判断",
+          "description": "未完成时，搓饵台耐久度仍大于0，能够继续制作；其他可用性变化由通用监听接管。\n不满足原因：搓饵台耐久降至0，无法继续完成本次制作",
+          "judgeAttributes": [
+            {
+              "id": "admission_0",
+              "source": "object:interactObject",
+              "objectName": "搓饵台",
+              "attribute": "durability"
+            }
+          ],
+          "branches": [
+            {
+              "id": "admission_0",
+              "name": "满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": [
+                {
+                  "id": "admission_0",
+                  "source": "object:interactObject",
+                  "objectName": "搓饵台",
+                  "attribute": "durability",
+                  "influence": "满足条件：大于0，可继续制作",
+                  "attributeId": "admission_0"
+                }
+              ]
+            },
+            {
+              "id": "admission_1",
+              "name": "不满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": [
+                {
+                  "id": "admission_0",
+                  "source": "object:interactObject",
+                  "objectName": "搓饵台",
+                  "attribute": "durability",
+                  "influence": "不满足条件：大于0，可继续制作",
+                  "attributeId": "admission_0"
+                }
+              ]
+            }
+          ],
+          "legacyGate": {
+            "kind": "admission",
+            "condition": "未完成时，搓饵台耐久度仍大于0，能够继续制作；其他可用性变化由通用监听接管。\n不满足原因：搓饵台耐久降至0，无法继续完成本次制作",
+            "rules": [
+              {
+                "id": "table_usable",
+                "source": "object:interactObject",
+                "objectName": "搓饵台",
+                "attribute": "durability",
+                "influence": "大于0，可继续制作"
+              }
+            ],
+            "failureReason": "搓饵台耐久降至0，无法继续完成本次制作"
+          }
+        }
       }
     ],
     "edges": [
@@ -264,9 +394,8 @@
       {
         "id": "b22ca8cd-af2f-4dec-8082-931b87f5cb32",
         "source": "knead",
-        "target": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
-        "sourceHandle": null,
-        "targetHandle": null
+        "target": "craft_loop",
+        "sourceHandle": null
       },
       {
         "id": "08e414cd-6ab8-41cd-91b5-f5bd3656d5fe",
@@ -290,12 +419,6 @@
         "targetHandle": null
       },
       {
-        "id": "404d6802-f3b0-4f14-a7cf-f0a11d49553e",
-        "source": "craft_loop",
-        "target": "end_interrupted",
-        "sourceHandle": "insufficient"
-      },
-      {
         "id": "8ebc124b-a3eb-49e0-9d43-958e9a70d5c0",
         "source": "table_broken",
         "target": "craft_loop",
@@ -305,7 +428,7 @@
       {
         "id": "20effd59-2067-404c-bbaa-1805f7e3e21e",
         "source": "craft_loop",
-        "target": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+        "target": "craft_loop_admission",
         "sourceHandle": "continue"
       },
       {
@@ -320,7 +443,36 @@
         "target": "end_complete",
         "sourceHandle": null,
         "targetHandle": null
+      },
+      {
+        "id": "craft_loop_admission:admission_0",
+        "source": "craft_loop_admission",
+        "sourceHandle": "admission_0",
+        "target": "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88"
+      },
+      {
+        "id": "craft_loop_admission:admission_1",
+        "source": "craft_loop_admission",
+        "sourceHandle": "admission_1",
+        "target": "end_interrupted"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "craft_loop",
+          "entry": "craft_loop_admission",
+          "members": [
+            "produce_bait",
+            "table_broken",
+            "ace060f1-ea4d-4ea1-9632-4d19ac3d5d88",
+            "craft_loop_admission"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
+

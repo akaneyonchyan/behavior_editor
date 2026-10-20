@@ -125,7 +125,7 @@
         "type": "loop",
         "data": {
           "name": "循环判断｜是否可以起身",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "疼痛buff失效后起身",
           "completionRules": [
             {
@@ -136,15 +136,78 @@
               "objectName": "item:partner/reczz28PAvx7wYyE"
             }
           ],
-          "resourceCheck": "未满足起身条件时，继续原地坐着缓神；不设置额外资源消耗门槛。",
-          "resourceRules": [],
-          "failureReason": "",
-          "restEnabled": false,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": [],
           "description": "",
-          "admissionEnabled": false
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "循环判断｜是否可以起身",
+              "loopVersion": 2,
+              "completionCondition": "疼痛buff失效后起身",
+              "completionRules": [
+                {
+                  "id": "285fe47e-ed0d-43fd-b64b-16da2b2334d2",
+                  "source": "object:partner",
+                  "attribute": "疼痛",
+                  "influence": "不具有指定 Buff 时",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ],
+              "resourceCheck": "未满足起身条件时，继续原地坐着缓神；不设置额外资源消耗门槛。",
+              "resourceRules": [],
+              "failureReason": "",
+              "restEnabled": false,
+              "restExpectation": "",
+              "restCondition": "",
+              "restRules": [],
+              "description": "",
+              "admissionEnabled": false
+            },
+            "edges": [
+              {
+                "id": "f295c15e-5097-4af4-be33-a8da51eccb72",
+                "source": "sit_dazed",
+                "target": "get_up_loop"
+              },
+              {
+                "id": "d1195f0c-85f2-4dc0-9e86-585595ebd6ea",
+                "source": "get_up_loop",
+                "target": "sit_dazed",
+                "sourceHandle": "continue"
+              },
+              {
+                "id": "7b3126dc-e6d2-4974-b36e-ac84ff4b815a",
+                "source": "get_up_loop",
+                "target": "end_complete",
+                "sourceHandle": "complete"
+              }
+            ],
+            "scope": {
+              "loopId": "get_up_loop",
+              "entry": "sit_dazed",
+              "members": [
+                "sit_dazed"
+              ]
+            }
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "疼痛buff失效后起身",
+              "rules": [
+                {
+                  "id": "285fe47e-ed0d-43fd-b64b-16da2b2334d2",
+                  "source": "object:partner",
+                  "attribute": "疼痛",
+                  "influence": "不具有指定 Buff 时",
+                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 1375.45216875282,
@@ -181,7 +244,7 @@
       {
         "id": "b35b5360-027e-4321-8832-35c835d773c7",
         "source": "sit_transition",
-        "target": "sit_dazed"
+        "target": "get_up_loop"
       },
       {
         "id": "f295c15e-5097-4af4-be33-a8da51eccb72",
@@ -200,6 +263,20 @@
         "target": "end_complete",
         "sourceHandle": "complete"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "get_up_loop",
+          "entry": "sit_dazed",
+          "members": [
+            "sit_dazed"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
+

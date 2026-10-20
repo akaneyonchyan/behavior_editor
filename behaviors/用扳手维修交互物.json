@@ -253,7 +253,7 @@
         "type": "loop",
         "data": {
           "name": "是否完成本次维修目标",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "目标交互物耐久度满足本次上游目标期望",
           "completionRules": [
             {
@@ -264,14 +264,98 @@
               "influence": "达到本次目标期望"
             }
           ],
-          "resourceCheck": "本稿未新增材料消耗，工具与目标可用性由准入及外部监听维护。",
-          "resourceRules": [],
-          "failureReason": "",
-          "restEnabled": true,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": [],
-          "description": "正常维修后汇入；目标未达成继续检查和拧紧。暂不启用稍息。"
+          "description": "正常维修后汇入；目标未达成继续检查和拧紧。暂不启用稍息。",
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "是否完成本次维修目标",
+              "loopVersion": 2,
+              "completionCondition": "目标交互物耐久度满足本次上游目标期望",
+              "completionRules": [
+                {
+                  "id": "durability_met",
+                  "source": "object:interactObject",
+                  "objectName": "目标交互物",
+                  "attribute": "durability",
+                  "influence": "达到本次目标期望"
+                }
+              ],
+              "resourceCheck": "本稿未新增材料消耗，工具与目标可用性由准入及外部监听维护。",
+              "resourceRules": [],
+              "failureReason": "",
+              "restEnabled": true,
+              "restExpectation": "",
+              "restCondition": "",
+              "restRules": [],
+              "description": "正常维修后汇入；目标未达成继续检查和拧紧。暂不启用稍息。"
+            },
+            "edges": [
+              {
+                "id": "6ee59318-133e-4cac-b063-979f9dbc1e9b",
+                "source": "repair_normal",
+                "target": "repair_loop"
+              },
+              {
+                "id": "9abb45de-0fbc-4f12-9c41-8e40c1d29b58",
+                "source": "repair_loop",
+                "target": "end_complete",
+                "sourceHandle": "complete"
+              },
+              {
+                "id": "fc49f951-f99d-47cd-9722-b995625f21e8",
+                "source": "repair_loop",
+                "target": "end_interrupted",
+                "sourceHandle": "insufficient"
+              },
+              {
+                "id": "eaf56cb6-33a7-4857-a13c-c207f485f517",
+                "source": "repair_mistake",
+                "target": "repair_loop",
+                "sourceHandle": null,
+                "targetHandle": null
+              },
+              {
+                "id": "7b0b9f42-9ead-4414-bac5-eaa9b930161a",
+                "source": "repair_loop",
+                "target": "wait_1792401413597",
+                "sourceHandle": "rest"
+              },
+              {
+                "id": "043520df-e894-429b-83b1-5270a9725ea2",
+                "source": "repair_loop",
+                "target": "repair_outcome",
+                "sourceHandle": "continue"
+              }
+            ],
+            "scope": {
+              "loopId": "repair_loop",
+              "entry": "repair_outcome",
+              "members": [
+                "repair_outcome",
+                "repair_normal",
+                "repair_mistake"
+              ]
+            }
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "目标交互物耐久度满足本次上游目标期望",
+              "rules": [
+                {
+                  "id": "durability_met",
+                  "source": "object:interactObject",
+                  "objectName": "目标交互物",
+                  "attribute": "durability",
+                  "influence": "达到本次目标期望"
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 2018.7178526372668,
@@ -318,6 +402,72 @@
           "x": 2358.8401617119516,
           "y": 399.97015726035283
         }
+      },
+      {
+        "id": "repair_loop_rest",
+        "type": "judge",
+        "position": {
+          "x": 2378.717852637267,
+          "y": -165.44665996359169
+        },
+        "data": {
+          "name": "稍息判断",
+          "description": "",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "rest_0",
+              "name": "稍息",
+              "weightExpectation": "待定",
+              "weightFactors": []
+            },
+            {
+              "id": "rest_1",
+              "name": "继续执行",
+              "weightExpectation": "其余情况",
+              "weightFactors": []
+            }
+          ],
+          "legacyGate": {
+            "kind": "rest",
+            "condition": "",
+            "rules": [],
+            "expectation": ""
+          }
+        }
+      },
+      {
+        "id": "repair_loop_admission",
+        "type": "judge",
+        "position": {
+          "x": 2378.717852637267,
+          "y": -165.44665996359169
+        },
+        "data": {
+          "name": "准入判断",
+          "description": "本稿未新增材料消耗，工具与目标可用性由准入及外部监听维护。",
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "admission_0",
+              "name": "满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": []
+            },
+            {
+              "id": "admission_1",
+              "name": "不满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": []
+            }
+          ],
+          "legacyGate": {
+            "kind": "admission",
+            "condition": "本稿未新增材料消耗，工具与目标可用性由准入及外部监听维护。",
+            "rules": [],
+            "failureReason": ""
+          }
+        }
       }
     ],
     "edges": [
@@ -334,7 +484,7 @@
       {
         "id": "de633f75-d552-4b6c-a330-cc9bb57c79bd",
         "source": "repair_attempt",
-        "target": "repair_outcome"
+        "target": "repair_loop"
       },
       {
         "id": "3fca0dba-2596-4b68-bc33-488ab0e80ac6",
@@ -360,12 +510,6 @@
         "sourceHandle": "complete"
       },
       {
-        "id": "fc49f951-f99d-47cd-9722-b995625f21e8",
-        "source": "repair_loop",
-        "target": "end_interrupted",
-        "sourceHandle": "insufficient"
-      },
-      {
         "id": "eaf56cb6-33a7-4857-a13c-c207f485f517",
         "source": "repair_mistake",
         "target": "repair_loop",
@@ -373,15 +517,9 @@
         "targetHandle": null
       },
       {
-        "id": "7b0b9f42-9ead-4414-bac5-eaa9b930161a",
-        "source": "repair_loop",
-        "target": "wait_1792401413597",
-        "sourceHandle": "rest"
-      },
-      {
         "id": "043520df-e894-429b-83b1-5270a9725ea2",
         "source": "repair_loop",
-        "target": "repair_outcome",
+        "target": "repair_loop_admission",
         "sourceHandle": "continue"
       },
       {
@@ -390,8 +528,49 @@
         "target": "end_interrupted",
         "sourceHandle": "unreachable",
         "targetHandle": null
+      },
+      {
+        "id": "repair_loop_rest:rest_0",
+        "source": "repair_loop_rest",
+        "sourceHandle": "rest_0",
+        "target": "wait_1792401413597"
+      },
+      {
+        "id": "repair_loop_rest:rest_1",
+        "source": "repair_loop_rest",
+        "sourceHandle": "rest_1",
+        "target": "repair_outcome"
+      },
+      {
+        "id": "repair_loop_admission:admission_0",
+        "source": "repair_loop_admission",
+        "sourceHandle": "admission_0",
+        "target": "repair_loop_rest"
+      },
+      {
+        "id": "repair_loop_admission:admission_1",
+        "source": "repair_loop_admission",
+        "sourceHandle": "admission_1",
+        "target": "end_interrupted"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "repair_loop",
+          "entry": "repair_loop_admission",
+          "members": [
+            "repair_outcome",
+            "repair_normal",
+            "repair_mistake",
+            "repair_loop_rest",
+            "repair_loop_admission"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
 

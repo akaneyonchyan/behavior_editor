@@ -201,7 +201,7 @@
         "type": "loop",
         "data": {
           "name": "判断是否继续清洗",
-          "loopVersion": 2,
+          "loopVersion": 3,
           "completionCondition": "伙伴清洁度已满足本次上游目标的期望",
           "completionRules": [
             {
@@ -212,22 +212,104 @@
               "influence": "处于指定状态时"
             }
           ],
-          "resourceCheck": "当前流程允许继续使用洗手池清洗；可用性由准入及外部监听维护，本图不新增资源不足分支。",
-          "resourceRules": [
-            {
-              "id": "a540d0e1-98c7-430f-bf84-5874f568ae46",
-              "source": "object:interactObject",
-              "attribute": "durability",
-              "influence": "归零",
-              "objectName": "洗手池"
+          "description": "三种清洗动作均汇入这里。达到目标后关阀；未达到就回到动作选择。不启用稍息，未使用出口不连线。",
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "legacyLoopLogic": {
+            "data": {
+              "name": "判断是否继续清洗",
+              "loopVersion": 2,
+              "completionCondition": "伙伴清洁度已满足本次上游目标的期望",
+              "completionRules": [
+                {
+                  "id": "clean_goal_met",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "cleanliness",
+                  "influence": "处于指定状态时"
+                }
+              ],
+              "resourceCheck": "当前流程允许继续使用洗手池清洗；可用性由准入及外部监听维护，本图不新增资源不足分支。",
+              "resourceRules": [
+                {
+                  "id": "a540d0e1-98c7-430f-bf84-5874f568ae46",
+                  "source": "object:interactObject",
+                  "attribute": "durability",
+                  "influence": "归零",
+                  "objectName": "洗手池"
+                }
+              ],
+              "failureReason": "洗手池损坏",
+              "restEnabled": false,
+              "restExpectation": "",
+              "restCondition": "",
+              "restRules": [],
+              "description": "三种清洗动作均汇入这里。达到目标后关阀；未达到就回到动作选择。不启用稍息，未使用出口不连线。"
+            },
+            "edges": [
+              {
+                "id": "ef2d1106-5b05-4595-b520-b118cfbe09f4",
+                "source": "wash_hands",
+                "target": "wash_loop"
+              },
+              {
+                "id": "e5cb7f64-a579-40e8-9838-af7dac5ed968",
+                "source": "wash_face",
+                "target": "wash_loop"
+              },
+              {
+                "id": "b721a9f9-1431-4df2-9ed0-22bdf25632f9",
+                "source": "wash_towel",
+                "target": "wash_loop"
+              },
+              {
+                "id": "db52e62b-fc79-40c4-9604-d6ac5ac2a79b",
+                "source": "wash_loop",
+                "target": "close_valve",
+                "sourceHandle": "complete"
+              },
+              {
+                "id": "e720622b-78c9-4726-86ec-a0168778471f",
+                "source": "wash_loop",
+                "target": "choose_wash",
+                "sourceHandle": "continue"
+              },
+              {
+                "id": "1bc94c95-124e-470f-9637-af93b8fad5e1",
+                "source": "wash_loop",
+                "target": "a30edeff-ec0a-49ee-926b-406ffb8d7fb0",
+                "sourceHandle": "insufficient"
+              }
+            ],
+            "scope": {
+              "loopId": "wash_loop",
+              "entry": "choose_wash",
+              "members": [
+                "choose_wash",
+                "wash_hands",
+                "wash_face",
+                "wash_towel"
+              ]
             }
-          ],
-          "failureReason": "洗手池损坏",
-          "restEnabled": false,
-          "restExpectation": "",
-          "restCondition": "",
-          "restRules": [],
-          "description": "三种清洗动作均汇入这里。达到目标后关阀；未达到就回到动作选择。不启用稍息，未使用出口不连线。"
+          },
+          "externalExits": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "伙伴清洁度已满足本次上游目标的期望",
+              "rules": [
+                {
+                  "id": "clean_goal_met",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "cleanliness",
+                  "influence": "处于指定状态时"
+                }
+              ]
+            }
+          ]
         },
         "position": {
           "x": 1901.7375510204083,
@@ -279,6 +361,72 @@
           "x": 2243.7468252701865,
           "y": 453.141317806752
         }
+      },
+      {
+        "id": "wash_loop_admission",
+        "type": "judge",
+        "position": {
+          "x": 2261.7375510204083,
+          "y": -39.688979591836755
+        },
+        "data": {
+          "name": "准入判断",
+          "description": "当前流程允许继续使用洗手池清洗；可用性由准入及外部监听维护，本图不新增资源不足分支。\n不满足原因：洗手池损坏",
+          "judgeAttributes": [
+            {
+              "id": "admission_0",
+              "source": "object:interactObject",
+              "attribute": "durability",
+              "objectName": "洗手池"
+            }
+          ],
+          "branches": [
+            {
+              "id": "admission_0",
+              "name": "满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": [
+                {
+                  "id": "admission_0",
+                  "source": "object:interactObject",
+                  "attribute": "durability",
+                  "influence": "满足条件：归零",
+                  "objectName": "洗手池",
+                  "attributeId": "admission_0"
+                }
+              ]
+            },
+            {
+              "id": "admission_1",
+              "name": "不满足",
+              "weightExpectation": "按条件判定",
+              "weightFactors": [
+                {
+                  "id": "admission_0",
+                  "source": "object:interactObject",
+                  "attribute": "durability",
+                  "influence": "不满足条件：归零",
+                  "objectName": "洗手池",
+                  "attributeId": "admission_0"
+                }
+              ]
+            }
+          ],
+          "legacyGate": {
+            "kind": "admission",
+            "condition": "当前流程允许继续使用洗手池清洗；可用性由准入及外部监听维护，本图不新增资源不足分支。\n不满足原因：洗手池损坏",
+            "rules": [
+              {
+                "id": "a540d0e1-98c7-430f-bf84-5874f568ae46",
+                "source": "object:interactObject",
+                "attribute": "durability",
+                "influence": "归零",
+                "objectName": "洗手池"
+              }
+            ],
+            "failureReason": "洗手池损坏"
+          }
+        }
       }
     ],
     "edges": [
@@ -295,7 +443,7 @@
       {
         "id": "ff814276-e799-4ddd-881b-4e18a434f356",
         "source": "open_valve",
-        "target": "choose_wash"
+        "target": "wash_loop"
       },
       {
         "id": "58f1ec0a-7a4c-400f-9f38-050cc36f84da",
@@ -339,7 +487,7 @@
       {
         "id": "e720622b-78c9-4726-86ec-a0168778471f",
         "source": "wash_loop",
-        "target": "choose_wash",
+        "target": "wash_loop_admission",
         "sourceHandle": "continue"
       },
       {
@@ -348,11 +496,35 @@
         "target": "end"
       },
       {
-        "id": "1bc94c95-124e-470f-9637-af93b8fad5e1",
-        "source": "wash_loop",
-        "target": "a30edeff-ec0a-49ee-926b-406ffb8d7fb0",
-        "sourceHandle": "insufficient"
+        "id": "wash_loop_admission:admission_0",
+        "source": "wash_loop_admission",
+        "sourceHandle": "admission_0",
+        "target": "choose_wash"
+      },
+      {
+        "id": "wash_loop_admission:admission_1",
+        "source": "wash_loop_admission",
+        "sourceHandle": "admission_1",
+        "target": "a30edeff-ec0a-49ee-926b-406ffb8d7fb0"
       }
-    ]
+    ],
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "wash_loop",
+          "entry": "wash_loop_admission",
+          "members": [
+            "choose_wash",
+            "wash_hands",
+            "wash_face",
+            "wash_towel",
+            "wash_loop_admission"
+          ]
+        }
+      ],
+      "positions": {}
+    }
   }
 }
+
