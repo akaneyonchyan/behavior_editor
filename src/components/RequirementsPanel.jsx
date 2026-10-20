@@ -7,6 +7,15 @@ import {loadRequirementFiles} from '../utils/onlineRequirements'
 import './ContentLibrary.css'
 import './RequirementsPanel.css'
 
+function ReferencedFile({file,locations,onOpen}){
+ const [expanded,setExpanded]=useState(false)
+ return <div className="requirement-file">
+  <button className="requirement-location" title={`在画布只读查看 ${file.name}${file.behaviorName?'\n行为名称：'+file.behaviorName:''}`} onClick={()=>onOpen(file.name)}>{file.name}</button>
+  <button className="requirement-positions-toggle" aria-expanded={expanded} onClick={()=>setExpanded(value=>!value)}>{expanded?'▾':'▸'} 使用位置（{locations.length}）</button>
+  {expanded&&<div className="requirement-positions">{locations.map(l=><small key={l.nodeId+':'+l.path}>{l.label} · {l.path}</small>)}</div>}
+ </div>
+}
+
 export default function RequirementsPanel({onClose,online=false}){
  const {behaviorInfo,nodes}=useBehaviorStore(),{library,readOnly,publishedReady,syncedAt,error}=useContentLibrary()
  const ready=!readOnly||publishedReady
@@ -48,7 +57,7 @@ export default function RequirementsPanel({onClose,online=false}){
   <div className="library-tools" role="tablist" aria-label="需求分类">{Object.entries(REQUIREMENT_TABS).map(([key,label])=><button role="tab" aria-selected={key===tab} className={'toolbar-btn '+(key===tab?'active':'')} key={key} onClick={()=>setTab(key)}>{label}（{report?.[key].length||0}）</button>)}</div>
   <div className="library-tools"><input aria-label="搜索需求清单" placeholder={online?'搜索内容、原因或行为文件':'搜索内容、原因或节点'} value={query} onChange={e=>setQuery(e.target.value)}/><button className="toolbar-btn" disabled={!complete} onClick={download}>导出完整清单</button><span>当前 {rows.length} 项 · {rows.reduce((sum,r)=>sum+r.locations.length,0)} 处使用</span></div>
   </div>
-  <div className="library-table-wrap" role="tabpanel" aria-label={REQUIREMENT_TABS[tab]}><table className="library-table"><thead><tr><th>待核对内容</th><th>对象 / 属性上下文</th><th>原因</th><th>{online?'涉及行为文件 / 使用位置':'使用位置'}</th></tr></thead><tbody>{rows.map(row=><tr key={row.key}><td><span className="custom-choice">{row.display}</span><small>{row.field}</small>{row.value!==row.display&&<small title={row.value}>{row.value}</small>}</td><td>{row.context||'—'}</td><td>{row.reason}</td><td>{online?<><small>{row.files.length} 个行为文件</small>{row.files.map(f=><div className="requirement-file" key={f.name}><button className="requirement-location" title={'在画布只读查看 '+f.name} onClick={()=>openFile(f.name)}>{f.name}</button>{f.behaviorName&&<small>行为名称：{f.behaviorName}</small>}<details><summary>使用位置（{row.locations.filter(l=>l.fileName===f.name).length}）</summary>{row.locations.filter(l=>l.fileName===f.name).map(l=><small key={l.nodeId+':'+l.path}>{l.label} · {l.path}</small>)}</details></div>)}</>:row.locations.map(l=><button className="requirement-location" key={l.nodeId+':'+l.path} title={l.nodeId||'行为准入数据'} onClick={()=>locate(l)}>{l.label} · {l.path}</button>)}</td></tr>)}</tbody></table>{!rows.length&&<p className="library-intro">{emptyText}</p>}</div>
+  <div className="library-table-wrap" role="tabpanel" aria-label={REQUIREMENT_TABS[tab]}><table className="library-table"><thead><tr><th>待核对内容</th><th>对象 / 属性上下文</th><th>原因</th><th>{online?'涉及行为文件 / 使用位置':'使用位置'}</th></tr></thead><tbody>{rows.map(row=><tr key={row.key}><td><span className="custom-choice">{row.display}</span><small>{row.field}</small>{row.value!==row.display&&<small title={row.value}>{row.value}</small>}</td><td>{row.context||'—'}</td><td>{row.reason}</td><td>{online?<details className="requirement-references"><summary>{row.files.length} 个文件引用</summary>{row.files.map(f=><ReferencedFile key={f.name} file={f} locations={row.locations.filter(l=>l.fileName===f.name)} onOpen={openFile}/>)}</details>:row.locations.map(l=><button className="requirement-location" key={l.nodeId+':'+l.path} title={l.nodeId||'行为准入数据'} onClick={()=>locate(l)}>{l.label} · {l.path}</button>)}</td></tr>)}</tbody></table>{!rows.length&&<p className="library-intro">{emptyText}</p>}</div>
   <div className="dialog-footer"><span role="status">{message||(online?'公共库更新会重新核对已读取文件；重新打开或点击重新读取，可获取最新在线发布。':'清单随行为图和公共库更新；仅用于需求整理，不修改原图或公共库。')}</span><button className="btn-secondary" onClick={onClose}>关闭</button></div>
  </div></div>
 }
