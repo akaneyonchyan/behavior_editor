@@ -1,3 +1,4 @@
+import {loopConditions} from './loopConditions'
 import {separateLoopLogic} from './loopMigration'
 import {inferLoopScope} from './loopStructure'
 
@@ -15,6 +16,7 @@ export function normalizeBehavior(input){
  for(const n of g.nodes.filter(n=>n.type==='loop')){
   n.data.checkTiming='before'
   n.data.loopMode=n.data.loopMode||'goal'
+  n.data.loopConditions=loopConditions(n.data)
   if(!scopes.some(s=>s.loopId===n.id)){
    try{scopes.push(inferLoopScope(g.nodes,g.edges,n.id))}catch{ /* Incomplete graphs remain editable with normal range validation. */ }
   }

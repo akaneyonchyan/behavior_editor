@@ -27,7 +27,7 @@ assert.equal(graph.getState().edges.filter(e=>e.source===loop.id&&ids.has(e.targ
 validateConfig(graph.getState().exportConfig(),NODE_CONFIG)
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server')
 const html=renderToStaticMarkup(React.createElement(m.exports.LoopFields,{node:loop}))
-for(const label of ['循环执行条件','按配置的最大次数','按目标满足情况','循环结束后去向'])assert.ok(html.includes(label),label)
+for(const label of ['循环结束条件','按配置的最大次数','按目标满足情况','循环结束后去向'])assert.ok(html.includes(label),label)
 for(const label of ['旧版','迁移','启用准入检查','启用稍息判定'])assert.ok(!html.includes(label),label)
 assert.ok(!html.includes('type="number"'))
 console.log('PASS: automatic loop conversion, two ports, destinations, undo/copy, invalid import isolation, qualitative single-standard editor')

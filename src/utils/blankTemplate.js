@@ -1,3 +1,4 @@
+import {defaultLoopConditions} from './loopConditions'
 import {emptyBehavior} from './behaviorMetadata'
 export function blankTemplate(){
   const config=emptyBehavior()
@@ -10,7 +11,7 @@ export function blankTemplate(){
     node('template_judge','judge',1080,180,{judgeAttributes:[],branches:[{id:'branch_1',name:'',weightExpectation:'',weightFactors:[]},{id:'branch_2',name:'',weightExpectation:'',weightFactors:[]}]}),
     node('template_result_1','result',1440,0,{animation:'',playMode:'',effectRules:[],outputs:[]}),
     node('template_result_2','result',1440,380,{animation:'',playMode:'',effectRules:[],outputs:[]}),
-    node('template_loop','loop',720,180,{loopVersion:3,checkTiming:'before',loopMode:'goal',maxIterations:'',completionCondition:'',completionRules:[]}),
+    node('template_loop','loop',720,180,{loopConditions:defaultLoopConditions(),loopVersion:3,checkTiming:'before',loopMode:'goal',maxIterations:'',completionCondition:'',completionRules:[]}),
     node('template_wait','wait',1800,560),
     node('template_end','end',1800,0,{animation:'',playMode:'单次',playExpectation:''}),
   ]

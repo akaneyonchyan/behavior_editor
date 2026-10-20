@@ -1,9 +1,10 @@
 import {activeEdges,resolveScopes} from './loopStructure'
 import {containerTarget} from './normalizeBehavior'
 // Visual-only wrappers and boundary segments; domain graph stays unchanged.
+export function scopeNodeId(nodes,id){let prefix='__scope_';while(nodes.some(n=>n.id.startsWith(prefix)))prefix+='_';return prefix+id}
 export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
  const {scopes,warnings}=resolveScopes(nodes,edges,layout),byId=new Map(nodes.map(n=>[n.id,n])),collapsedSet=new Set(collapsed)
- const prefix=(()=>{let s='__scope_';while(nodes.some(n=>n.id.startsWith(s)))s+='_';return s})()
+ const prefix=scopeNodeId(nodes,'')
  const groupId=id=>prefix+id
  const sets=new Map(scopes.map(s=>[s.loopId,new Set([s.loopId,...s.members])]))
  const owners=new Map()
@@ -36,6 +37,10 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
   if(owner===scope||!owner)return id
   while(parents.has(owner)&&parents.get(owner)!==scope)owner=parents.get(owner)
   return groupId(owner)
+ }
+ const positionFor=(id,scope)=>{
+  const p=layout?.positions?.[id]||positions.get(id)||{x:0,y:0}
+  return scope?{x:Math.max(96,p.x),y:Math.max((sizes['header:'+scope]?.height||150)+32,p.y)}:p
  }
  function place(scope){
   const children=scopes.filter(s=>(parents.get(s.loopId)||null)===scope)
@@ -72,18 +77,22 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
    }
    maxHeight=Math.max(maxHeight,y);x+=width+100
   }
-  if(scope)boxes.set(groupId(scope),collapsedSet.has(scope)?{width:440,height:Math.max((sizes['header:'+scope]?.height||150)+52,100+boundaries.get(scope).length*28)}:{width:Math.max(540,x+16),height:Math.max((sizes['header:'+scope]?.height||150)+100,maxHeight-38,(sizes['header:'+scope]?.height||150)+60+boundaries.get(scope).length*48)})
+  if(scope){
+   const bounds=items.reduce((b,id)=>{const p=positionFor(id,scope),size=boxes.get(id);return {right:Math.max(b.right,p.x+size.width),bottom:Math.max(b.bottom,p.y+size.height)}},{right:424,bottom:(sizes['header:'+scope]?.height||150)+68})
+   boxes.set(groupId(scope),collapsedSet.has(scope)?{width:540,height:Math.max((sizes['header:'+scope]?.height||150)+52,100+boundaries.get(scope).length*28)}:{width:Math.max(540,bounds.right+116),height:Math.max(bounds.bottom+32,(sizes['header:'+scope]?.height||150)+120+boundaries.get(scope).length*48)})
+  }
+
  }
  place(null)
  function emit(scope){
   const children=scopes.filter(s=>(parents.get(s.loopId)||null)===scope)
   for(const child of children){
    const id=groupId(child.loopId),size=boxes.get(id)
-   output.push({id,type:'loopScope',position:layout?.positions?.[id]||positions.get(id),...(scope?{parentNode:groupId(scope)}:{}),data:{boundaryExits:boundaries.get(child.loopId),scope:child,collapsed:collapsedSet.has(child.loopId),node:byId.get(child.loopId),count:child.members.length,exits:child.members.reduce((n,id)=>n+(byId.get(id)?.data.externalExits?.length||0),0)+(byId.get(child.loopId)?.data.externalExits?.length||0)},style:{width:size.width,height:size.height},zIndex:-1,selectable:false,deletable:false})
+   output.push({id,type:'loopScope',position:positionFor(id,scope),...(scope?{parentNode:groupId(scope)}:{}),data:{boundaryExits:boundaries.get(child.loopId),scope:child,collapsed:collapsedSet.has(child.loopId),node:byId.get(child.loopId),count:child.members.length,exits:child.members.reduce((n,id)=>n+(byId.get(id)?.data.externalExits?.length||0),0)+(byId.get(child.loopId)?.data.externalExits?.length||0)},style:{width:size.width,height:size.height},zIndex:-1,selectable:false,deletable:false})
    if(!collapsedSet.has(child.loopId)){
     emit(child.loopId)
     if(child.entry){
-     const first=rep(child.entry,child.loopId),pos=layout?.positions?.[first]||positions.get(first)||{y:180},size=boxes.get(first)||{height:260}
+     const first=rep(child.entry,child.loopId),pos=positionFor(first,child.loopId),size=boxes.get(first)||{height:260}
      const y=pos.y+(first.startsWith(prefix)?28:size.height/2)-16
      output.push({id:entryId(child.loopId),type:'loopPortal',parentNode:id,position:{x:32,y},data:{kind:'entry'},draggable:false,selectable:false,deletable:false})
     }
@@ -91,7 +100,7 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
    }
   }
   for(const n of nodes.filter(n=>n.id!==scope&&(owners.get(n.id)||null)===scope)){
-   output.push({...n,position:layout?.positions?.[n.id]||positions.get(n.id)||{x:0,y:0},...(scope?{parentNode:groupId(scope)}:{}),draggable:false,deletable:false})
+   output.push({...n,position:positionFor(n.id,scope),...(scope?{parentNode:groupId(scope)}:{}),draggable:false,deletable:false})
   }
  }
  emit(null)

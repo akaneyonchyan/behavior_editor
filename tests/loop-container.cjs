@@ -29,8 +29,8 @@ assert.ok(migrated.graph.edges.some(e=>e.source===admission.id&&e.sourceHandle==
 assert.equal(migrated.graph.layout.scopes[0].entry,admission.id)
 assert.ok(!migrated.graph.edges.some(e=>e.source==='template_loop'&&['rest','insufficient'].includes(e.sourceHandle)))
 s().updateNode('template_loop',{maxIterations:'5'});s().undo();assert.deepEqual(s().exportConfig(),migrated)
-s().updateNode('template_loop',{loopMode:'count',maxIterations:'3'});validateConfig(s().exportConfig(),NODE_CONFIG)
-assert.equal(s().exportConfig().graph.nodes.find(n=>n.id==='template_loop').data.maxIterations,'3')
+s().updateNode('template_loop',{loopConditions:[{id:'count',kind:'count',maxIterations:'3'}]});validateConfig(s().exportConfig(),NODE_CONFIG)
+assert.equal(s().exportConfig().graph.nodes.find(n=>n.id==='template_loop').data.loopConditions[0].maxIterations,'3')
 // New ranges do not require the designer to manually close the loop.
 const open=blankTemplate();open.graph.edges=open.graph.edges.filter(e=>e.source!=='template_wait')
 s().importConfig(open);s().confirmLoopScope(open.graph.layout.scopes[0])

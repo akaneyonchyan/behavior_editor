@@ -1,3 +1,5 @@
+import SortableList from './SortableList'
+import {loopConditions} from '../utils/loopConditions'
 import LoopScopeSettings from './LoopScopeSettings'
 import BranchDestination,{BranchPort} from './BranchDestination'
 import React,{useEffect} from 'react'
@@ -8,12 +10,26 @@ import LibraryRules from './LibraryRules'
 import {RuleText} from './DesignInputs'
 import './LoopEditor.css'
 
-export function LoopGoalSummary({data}){
- if(data.loopMode==='count'||(!data.completionCondition&&!data.completionRules?.length))return null
- return <div className="loop-goal-summary">{data.completionCondition}{data.completionRules?.map(r=><div key={r.id}><RuleText rule={r} kind={r.attribute?.startsWith('buff:')?'buff':'attribute'} influences={['较低时','较高时','处于指定状态时','具有指定 Buff 时','不具有指定 Buff 时']}/></div>)}</div>
-}
 export function LoopConditionSummary({data}){
- return <><div className="loop-condition-summary"><strong>执行条件</strong><span>{data.loopMode==='count'?'按最大次数 · '+(data.maxIterations||'待设置')+' 次':'按目标满足情况 · 未满足时继续'}</span></div><LoopGoalSummary data={data}/></>
+ const conditions=loopConditions(data)
+ return <div className="loop-condition-summary"><strong>结束条件 · 满足任一项</strong>{conditions.length?conditions.map((c,i)=><div key={c.id}>{i+1}. {c.kind==='count'?'达到最大次数 · '+(c.maxIterations||'待设置'):'目标满足'}{c.kind==='goal'&&<>{c.condition&&<div>{c.condition}</div>}{c.rules?.map(r=><div key={r.id}><RuleText rule={r} kind={r.attribute?.startsWith('buff:')?'buff':'attribute'} influences={['较低时','较高时','处于指定状态时','具有指定 Buff 时','不具有指定 Buff 时']}/></div>)}{!c.condition&&!c.rules?.length&&<small>引用行为目标</small>}</>}</div>):<span>未设置结束条件</span>}</div>
+}
+export function LoopConditionsEditor({node,compact=false,onUpdate}){
+ const storeUpdate=useBehaviorStore(s=>s.updateNode),conditions=loopConditions(node.data)
+ const update=next=>(onUpdate||storeUpdate)(node.id,{loopConditions:next})
+ const patch=(id,change)=>update(conditions.map(c=>c.id===id?{...c,...change}:c))
+ return <div className={'loop-conditions-editor nodrag nowheel '+(compact?'compact':'')}>
+  <div className="section-header"><label>循环结束条件</label><button className="btn-small" onClick={()=>update([...conditions,{id:crypto.randomUUID(),kind:'goal',condition:'',rules:[]}])}>+ 添加结束条件</button></div>
+  <p className="form-hint">按顺序检查，满足任一项即结束；都不满足才执行本轮。</p>
+  <SortableList items={conditions} onChange={update} label="循环结束条件">{(c,i,handle)=><section className="loop-condition-row" data-condition-id={c.id}>
+   <div className="loop-condition-heading">{handle}<strong>条件 {i+1}</strong><select aria-label={'结束条件 '+(i+1)+' 类型'} value={c.kind} onChange={e=>patch(c.id,{kind:e.target.value})}><option value="goal">按目标满足情况</option><option value="count">按配置的最大次数</option></select><button aria-label={'删除结束条件 '+(i+1)} onClick={()=>update(conditions.filter(x=>x.id!==c.id))}>×</button></div>
+   {c.kind==='count'?<label>最大次数<input aria-label={'结束条件 '+(i+1)+' 最大次数'} value={c.maxIterations||''} placeholder="填写次数或设计期望" onChange={e=>patch(c.id,{maxIterations:e.target.value})}/></label>:compact?<div className="loop-goal-summary">{c.condition}{c.rules?.map(r=><div key={r.id}><RuleText rule={r} kind={r.attribute?.startsWith('buff:')?'buff':'attribute'} influences={['较低时','较高时','处于指定状态时','具有指定 Buff 时','不具有指定 Buff 时']}/></div>)}{!c.condition&&!c.rules?.length&&<small>引用行为目标 · 可在右侧设置</small>}</div>:<>
+    <LibraryRules title="目标满足属性条件" value={c.rules||[]} onChange={rules=>patch(c.id,{rules})}/>
+    <p className="form-hint">此项内属性规则全部满足时结束；不填规则时引用行为准入数据中的满足目标。</p>
+    {c.condition&&<label>补充条件说明<textarea aria-label={'结束条件 '+(i+1)+' 说明'} value={c.condition} onChange={e=>patch(c.id,{condition:e.target.value})}/></label>}
+   </>}
+  </section>}</SortableList>
+ </div>
 }
 export function LoopNodeStages({id,data}) {
  const library=useContentLibrary(s=>s.library),updateInternals=useUpdateNodeInternals()
@@ -24,11 +40,7 @@ export default function LoopFields({node}){
  const {updateNode}=useBehaviorStore()
  const d=node.data,update=patch=>updateNode(node.id,patch)
  return <div className="loop-editor">
-  <div className="form-group"><label>循环执行条件</label><select aria-label="循环执行条件" value={d.loopMode||'goal'} onChange={e=>update({loopMode:e.target.value})}><option value="count">按配置的最大次数</option><option value="goal">按目标满足情况</option></select></div>
-  {d.loopMode==='count'?<div className="form-group"><label>最大次数</label><input aria-label="最大次数" value={d.maxIterations||''} placeholder="填写次数或设计期望" onChange={e=>update({maxIterations:e.target.value})}/><p className="form-hint">执行前检查已完成轮数；达到最大次数则离开循环。</p></div>:<>
-   <p className="form-hint">每轮执行前检查目标是否满足；满足则离开，未满足才执行内部节点。未单独配置时，引用行为准入数据中的满足目标。</p>
-   {(d.completionCondition||d.completionRules?.length>0)&&<details><summary>目标满足条件</summary><textarea aria-label="目标满足条件" value={d.completionCondition||''} onChange={e=>update({completionCondition:e.target.value})}/><LibraryRules title="目标满足属性条件" value={d.completionRules} onChange={completionRules=>update({completionRules})}/></details>}
-  </>}
+  <LoopConditionsEditor node={node}/>
   <BranchDestination node={node} handle="continue" label="进入循环体"/>
   <BranchDestination node={node} handle="complete" label="循环结束后去向"/>
   <p className="form-hint">准入用内部判断节点，个性待机用内部待机节点。末尾不用画回线，确认范围时自动补齐返回关系。</p>

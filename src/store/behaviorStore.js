@@ -1,3 +1,4 @@
+import {moveStructureNode} from '../utils/structureEditing'
 import {checkScope,convertToPrecheck} from '../utils/loopStructure'
 import {separateLoopLogic} from '../utils/loopMigration'
 import {normalizeBehavior,containerTarget} from '../utils/normalizeBehavior'
@@ -49,6 +50,15 @@ export const useBehaviorStore = create((set, get) => {
       const s=get(),{nodes,edges,archive}=bypassLegacyMove(s.nodes,s.edges,id)
       const layout=s.layout?{...s.layout,scopes:s.layout.scopes.filter(x=>x.entry!==id).map(x=>({...x,members:x.members.filter(member=>member!==id)})),positions:{}}:null
       commit({layout,nodes,edges,behaviorInfo:{...s.behaviorInfo,legacyMovement:[...(s.behaviorInfo.legacyMovement||[]),clone(archive)]},selectedNode:null,documentRevision:s.documentRevision+1})
+    },
+    moveStructureNode: (id,targetLoopId,positions) => {
+      const s=get(),patch=moveStructureNode(s,id,targetLoopId,positions)
+      commit({...patch,selectedNode:patch.nodes.find(n=>n.id===id)||null})
+    },
+    addStructureNode: (node,targetLoopId,positions) => {
+      if(['start','move'].includes(node.type))return
+      const s=get(),nodes=[...s.nodes,node],patch=moveStructureNode({...s,nodes},node.id,targetLoopId,positions)
+      commit({...patch,selectedNode:patch.nodes.find(n=>n.id===node.id)||null})
     },
     setStructurePositions: positions => commit({layout:{version:1,scopes:get().layout?.scopes||[],positions:clone(positions)}}),
     separateLoopLogic: id => {
