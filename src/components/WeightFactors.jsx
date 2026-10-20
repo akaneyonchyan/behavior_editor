@@ -1,3 +1,4 @@
+import InfluenceInputs from './InfluenceInputs'
 ﻿import React from 'react'
 import { INFLUENCES, newFactor, designFactor } from '../utils/weightFactors'
 import { RuleInputs } from './LibraryRules'
@@ -12,9 +13,10 @@ export default function WeightFactors({ branch, onChange }) {
       const f=designFactor(original)
       return <div className="weight-factor" key={f.id||i}>
         <div className="factor-actions"><strong>规则 {i+1}</strong><button className="btn-small" onClick={()=>onChange(factors.filter((_,j)=>j!==i))}>删除</button></div>
-        <RuleInputs rule={f} onChange={patch=>update(i,patch)} influences={INFLUENCES} influenceLabel="影响方式"/>
+        <InfluenceInputs factor={f} onChange={patch=>update(i,patch)}/><RuleInputs rule={f} onChange={patch=>update(i,patch)} hideInfluence/>
       </div>
     })}
   </div>
 }
+
 

@@ -39,7 +39,7 @@ export default function BehaviorNode({ id, data, type, selected }) {
     </div>
     {type === 'judge' && <div className="node-branches">{data.branches?.map(branch => <div className="node-branch" key={branch.id}>
       <div>{branch.name}<small>默认概率：<ChoiceText value={branch.weightExpectation||'待定'} options={PROBABILITIES}/>{branch.condition ? ' · ' + branch.condition : ''}</small></div>
-      {branchFactors(branch,judgeAttributes(data)).map((factor,i) => <small key={factor.id||i} className="factor-summary">{i+1}. <RuleText rule={factor} influences={EFFECTS}/></small>)}
+      {branchFactors(branch,judgeAttributes(data)).map((factor,i) => <small key={factor.id||i} className="factor-summary">{i+1}. <RuleText rule={factor} split/></small>)}
       <BranchPort data={data} handle={branch.id} className="node-handle branch-handle"/>
     </div>)}</div>}
     {type === 'result' && (data.externalExits?.some(e=>!e.handle)?<div className="execution-exit"><BranchPort data={data}/></div>:<BranchPort data={data}/>)}
@@ -48,3 +48,4 @@ export default function BehaviorNode({ id, data, type, selected }) {
     {type !== 'result' && type !== 'move' && type !== 'judge' && type !== 'end' && type !== 'loop' && <Handle type="source" position={Position.Right} className="node-handle" />}
   </div>
 }
+
