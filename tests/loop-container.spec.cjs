@@ -28,15 +28,50 @@ test('single loop header, inline conditions, centered execution port and no plac
  await expect(page.locator('[data-id=template_loop]')).toContainText('执行条件')
  await expect(page.locator('[data-id=template_loop] [data-handleid=rest]')).toHaveCount(0)
 })
-test('legacy stages become internal nodes explicitly and are undoable',async({page})=>{
+test('file opening converts loop rules automatically without migration UI',async({page})=>{
  await page.evaluate(async()=>{const {blankTemplate}=await import('/tests/fixtures/legacyTemplate.js');const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().importConfig(blankTemplate())})
  await page.locator('.scope-title').click()
- await page.getByRole('button',{name:'拆分为循环容器与内部节点'}).click()
  await expect(page.getByLabel('循环执行条件',{exact:true})).toBeVisible()
  await expect(page.locator('.react-flow__node-judge')).toHaveCount(3)
  await expect(page.locator('.react-flow__node-loop')).toHaveCount(0)
  await expect(page.locator('.loop-scope')).toHaveCount(1)
+ await expect(page.locator('.property-panel')).not.toContainText('旧版')
+ await expect(page.locator('.property-panel')).not.toContainText('迁移')
+ await expect(page.locator('.loop-portal.entry')).toHaveCount(1)
+ await expect(page.locator('.loop-scope [data-handleid=continue]')).toHaveCount(0)
+ await expect(page.locator('.loop-scope header .react-flow__handle')).toHaveCount(0)
+ await page.getByLabel('循环执行条件',{exact:true}).selectOption('count')
  await page.getByRole('button',{name:'撤销',exact:true}).click()
- await expect(page.getByRole('button',{name:'拆分为循环容器与内部节点'})).toBeVisible()
- await expect(page.locator('.react-flow__node-judge')).toHaveCount(1)
+ await expect(page.getByLabel('循环执行条件',{exact:true})).toHaveValue('goal')
+ await expect(page.locator('.react-flow__node-judge')).toHaveCount(3)
+})
+
+test('external wires attach to the boundary and internal start glyph survives PNG and collapse',async({page},info)=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.text().includes("Couldn't create edge"))errors.push(m.text())})
+ await page.evaluate(async()=>{
+  const {blankTemplate}=await import('/src/utils/blankTemplate.js'),{useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const f=blankTemplate()
+  f.graph.edges.find(e=>e.source==='template_result_1').target='template_end'
+  g.getState().importConfig(f)
+ })
+ await expect(page.locator('.loop-portal.entry')).toHaveCount(1)
+ await expect(page.locator('.loop-portal.exit')).toHaveCount(1)
+ await expect(page.locator('.scope-boundary .source')).toHaveCount(1)
+ await expect.poll(()=>page.evaluate(()=>{
+  const body=document.querySelector('[data-id=template_judge]').getBoundingClientRect(),start=document.querySelector('.loop-portal.entry').getBoundingClientRect()
+  return start.right<body.left&&Math.abs(start.top+start.height/2-(body.top+body.height/2))<3
+ })).toBe(true)
+ await page.waitForTimeout(300)
+ const source=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return g.getState().exportConfig()})
+ await page.screenshot({path:info.outputPath('loop-boundaries.png')})
+ await page.getByLabel('折叠循环 template_loop').click()
+ await expect(page.locator('.loop-portal')).toHaveCount(0)
+ await expect(page.locator('.scope-boundary .source')).toHaveCount(1)
+ const snapshot=await page.evaluate(async()=>{
+  const {structureSnapshot}=await import('/src/components/structureSnapshot.jsx'),{useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const shot=await structureSnapshot(g.getState())
+  try{return {start:shot.source.querySelectorAll('.loop-portal.entry').length,exits:shot.source.querySelectorAll('.loop-portal.exit').length,ports:shot.source.querySelectorAll('.scope-boundary').length}}finally{shot.dispose()}
+ })
+ expect(snapshot).toEqual({start:1,exits:1,ports:1})
+ await page.getByLabel('展开循环 template_loop').click()
+ expect(await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return g.getState().exportConfig()})).toEqual(source)
+ expect(errors).toEqual([])
 })

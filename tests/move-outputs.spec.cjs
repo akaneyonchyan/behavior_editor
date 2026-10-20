@@ -9,7 +9,7 @@ test('legacy movement is readable, explicitly bypassed, archived and undoable',a
  await expect(page.locator('[data-id=old_move]')).toHaveCount(0)
  await expect(page.locator('[data-id=template_end]')).toHaveCount(1)
  const state=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const s=g.getState();return {target:s.edges.find(e=>e.source==='behavior_start').target,archive:s.behaviorInfo.legacyMovement[0].node.data.description}})
- expect(state).toEqual({target:'template_judge',archive:'旧目的地说明'})
+ expect(state).toEqual({target:'template_loop',archive:'旧目的地说明'})
  await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().undo()})
  await expect(page.locator('[data-id=old_move]')).toHaveCount(1)
 })

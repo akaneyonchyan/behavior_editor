@@ -1,5 +1,6 @@
-import {validateConfig} from '../store/documentValidation'
 import {NODE_CONFIG} from '../constants/behaviorTypes'
+import {validateConfig} from '../store/documentValidation'
+import {normalizeBehavior} from './normalizeBehavior'
 export const REPO='akaneyonchyan/behavior_editor', FOLDER='behaviors', BRANCH='main'
 export const REPO_URL='https://github.com/'+REPO
 const API='https://api.github.com/repos/'+REPO
@@ -10,7 +11,7 @@ export function validateFileName(name){
 }
 export function parseBehavior(text){
  if(new TextEncoder().encode(text).length>MAX_BYTES)throw new Error('单个行为文件不能超过 2 MB')
- const config=JSON.parse(text.replace(/^\uFEFF/,''));validateConfig(config,NODE_CONFIG);return config
+ const config=JSON.parse(text.replace(/^\uFEFF/,''));validateConfig(config,NODE_CONFIG);const normalized=normalizeBehavior(config);validateConfig(normalized,NODE_CONFIG);return normalized
 }
 async function api(path,token='',body,method=body?'POST':'GET'){
  let response

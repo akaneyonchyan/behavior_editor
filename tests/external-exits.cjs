@@ -24,11 +24,10 @@ for(const [id,port] of [['template_result_1',''],['template_judge','branch_1'],[
  assert.equal(s().edges.filter(e=>e.source===id&&(e.sourceHandle||'')===port).length,0)
  s().setBranchDestination(id,port,'node',oldEdges[0].target)
 }
-// Disabled loop steps retain exits, but cannot change them.
-s().updateNode('template_loop',{admissionEnabled:false})
-const disabled=s().exportConfig();s().setBranchDestination('template_loop','insufficient','node','template_end')
-assert.deepEqual(s().exportConfig(),disabled)
-s().updateNode('template_loop',{admissionEnabled:true});assert.ok(externalExit(s().nodes.find(n=>n.type==='loop').data,'insufficient'))
+// Admission exits are preserved on the generated internal judgment.
+assert.ok(externalExit(s().nodes.find(n=>n.id==='template_loop_admission').data,'admission_1'))
+const unchanged=s().exportConfig();s().setBranchDestination('template_loop','insufficient','node','template_end')
+assert.deepEqual(s().exportConfig(),unchanged)
 // Stable branch IDs keep external destinations through sort; removal prunes stale records.
 s().setBranchDestination('template_judge','branch_1','external')
 const branches=s().nodes.find(n=>n.type==='judge').data.branches
@@ -53,6 +52,7 @@ const legacy=blankTemplate()
 legacy.graph.nodes.push({id:'old_move',type:'move',position:{x:0,y:0},data:{description:'保留说明',occupiedResources:[{id:'old',source:'object:place',attribute:'occupied'}]}})
 legacy.graph.edges.find(e=>e.source==='template_judge'&&e.sourceHandle==='branch_1').target='old_move'
 legacy.graph.edges.push({id:'next',source:'old_move',target:'template_result_1'},{id:'failed',source:'old_move',sourceHandle:'unreachable',target:'template_end'})
+legacy.graph.layout.scopes[0].members.push('old_move')
 s().importConfig(legacy);const original=s().exportConfig()
 s().removeLegacyMove('old_move')
 assert.ok(!s().nodes.some(n=>n.type==='move'));assert.equal(s().edges.find(e=>e.sourceHandle==='branch_1').target,'template_result_1')

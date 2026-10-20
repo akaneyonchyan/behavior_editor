@@ -1,3 +1,4 @@
+import {containerTarget} from '../utils/normalizeBehavior'
 import {NODE_CONFIG} from '../constants/behaviorTypes'
 import React from 'react'
 import {Handle, Position} from 'reactflow'
@@ -11,7 +12,7 @@ export function BranchPort({data, handle, className='node-handle', disabled=fals
 }
 
 export default function BranchDestination({node, handle='', label='后续去向'}) {
-  const {nodes, edges, setBranchDestination} = useBehaviorStore()
+  const {nodes, edges, layout, setBranchDestination} = useBehaviorStore()
   const exit = externalExit(node.data, handle)
   const outgoing = edges.filter(e => e.source === node.id && (e.sourceHandle || '') === handle)
   const enabled = exitEnabled(node, handle)
@@ -26,7 +27,7 @@ export default function BranchDestination({node, handle='', label='后续去向'
     </> : <>
       <select aria-label={label} disabled={!enabled} value={outgoing.length===1?outgoing[0].target:''} onChange={e => setBranchDestination(node.id,handle,'node',e.target.value)}>
         <option value="">{outgoing.length>1?'旧版多条连线，待核对':'未连接'}</option>
-        {nodes.filter(n=>n.type!=='start' && (node.type!=='loop'||n.id!==node.id)).map(n=><option key={n.id} value={n.id}>{n.data.name || NODE_CONFIG[n.type]?.label || n.type} · {n.id.slice(0,8)}</option>)}
+        {nodes.filter(n=>n.type!=='start' && (node.type!=='loop'||n.id!==node.id) && containerTarget(layout?.scopes,node.id,n.id,handle)===n.id).map(n=><option key={n.id} value={n.id}>{n.data.name || NODE_CONFIG[n.type]?.label || n.type} · {n.id.slice(0,8)}</option>)}
       </select>
       {outgoing.some(e=>nodes.find(n=>n.id===e.target)?.type==='end')&&<p className="form-hint">如需改为通用跳出，可选择“跳出行为”；原结束节点和表演不会自动删除。</p>}
     </>}

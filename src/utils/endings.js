@@ -2,7 +2,9 @@ export const END_REASONS=['完成','中断']
 export const isLegacyEnd=data=>Object.hasOwn(data,'successAnimation')||Object.hasOwn(data,'failAnimation')
 export function endLabel(data){return '结束'}
 export function inferredEndReason(edge,nodes){
-  if(nodes.find(n=>n.id===edge.source)?.type!=='loop')return ''
+  const source=nodes.find(n=>n.id===edge.source)
+  if(source?.data.legacyGate?.kind==='admission'&&edge.sourceHandle==='admission_1')return '中断'
+  if(source?.type!=='loop')return ''
   return edge.sourceHandle==='complete'?'完成':edge.sourceHandle==='insufficient'?'中断':''
 }
 export function splitLegacyEnd(nodes,edges,id,assignments={},newId=crypto.randomUUID()){
