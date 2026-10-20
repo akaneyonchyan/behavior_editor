@@ -1,0 +1,525 @@
+{
+  "behavior": {
+    "name": "坐在椅子上休息恢复精力",
+    "templateVersion": 4,
+    "matchTargets": [],
+    "description": "仅椅子坐姿休息，不含席地而坐分支。精力达到本次期望后起身结束；入场精力小于80，不将80自动当作恢复目标。找椅子、位移、占用冲突及外部监听由通用流程负责；椅子不可用或新增超级兴奋时由通用监听处理，不预设中断结束。每轮有效坐姿休息后穿插反应，未达标则换姿继续。",
+    "targetRules": [
+      {
+        "id": "goal",
+        "source": "object:partner",
+        "objectName": "item:partner/reczz28PAvx7wYyE",
+        "attribute": "energy",
+        "influence": "恢复到本次目标期望"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "chair",
+          "objectType": "interactObject",
+          "objectName": "item:interactObject/reczz28P8xJ80qwg"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "low_energy",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "energy",
+          "influence": "小于80（当前0～100范围，对应80%）"
+        },
+        {
+          "id": "no_excited",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "buff:design_super_excited",
+          "influence": "不具有指定 Buff 时"
+        },
+        {
+          "id": "usable_chair",
+          "source": "object:interactObject",
+          "objectName": "item:interactObject/reczz28P8xJ80qwg",
+          "attribute": "",
+          "influence": "策略范围有可达、可使用且坐姿交互点位可用的椅子，满足本伙伴占用空间"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "loop",
+          "entry": "rest",
+          "members": [
+            "rest",
+            "reaction",
+            "normal",
+            "yawn",
+            "dirty",
+            "continue_check",
+            "shift"
+          ]
+        }
+      ],
+      "positions": {}
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始"
+        },
+        "position": {
+          "x": 22.307030319631508,
+          "y": 0
+        }
+      },
+      {
+        "id": "sit",
+        "type": "result",
+        "data": {
+          "name": "在椅子上坐下",
+          "animation": "转身背对椅面，缓缓坐下，轻轻挪动臀部坐稳，双手放在腿上。",
+          "description": "",
+          "effectRules": [],
+          "outputs": [],
+          "playMode": "单次",
+          "playExpectation": ""
+        },
+        "position": {
+          "x": 390.49742603276775,
+          "y": 0
+        }
+      },
+      {
+        "id": "loop",
+        "type": "loop",
+        "data": {
+          "name": "精力恢复到本次期望",
+          "loopVersion": 3,
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "completionCondition": "精力达到本次目标期望",
+          "completionRules": [],
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "精力达到本次目标期望",
+              "rules": [
+                {
+                  "id": "energy_goal",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "influence": "达到本次目标期望"
+                }
+              ]
+            },
+            {
+              "id": "94655610-fae1-4e8b-bef1-e95afe9e36ab",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "默认最大次数"
+            }
+          ]
+        },
+        "position": {
+          "x": 760,
+          "y": 0
+        }
+      },
+      {
+        "id": "rest",
+        "type": "result",
+        "data": {
+          "name": "坐着休息一阵",
+          "animation": "保持椅上坐姿，肩膀慢慢放松，呼吸平稳；双手自然放在腿上，安静休息一阵。",
+          "description": "",
+          "effectRules": [
+            {
+              "id": "recover",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "playMode": "计时",
+          "playExpectation": "一段坐姿休息时长，按休息配置"
+        },
+        "position": {
+          "x": 1140,
+          "y": 0
+        }
+      },
+      {
+        "id": "reaction",
+        "type": "judge",
+        "data": {
+          "name": "本段坐姿反应",
+          "judgeAttributes": [
+            {
+              "id": "energy",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy"
+            },
+            {
+              "id": "chair_clean",
+              "source": "object:interactObject",
+              "objectName": "item:interactObject/reczz28P8xJ80qwg",
+              "attribute": "cleanliness"
+            }
+          ],
+          "description": "",
+          "branches": [
+            {
+              "id": "normal",
+              "name": "普通放松",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "chair_clean",
+                  "source": "object:interactObject",
+                  "objectName": "item:interactObject/reczz28P8xJ80qwg",
+                  "attribute": "cleanliness",
+                  "version": 2,
+                  "attributeId": "chair_clean",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                }
+              ]
+            },
+            {
+              "id": "yawn",
+              "name": "坐着打哈欠",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高",
+                  "influence": "数值低 · 概率越高"
+                },
+                {
+                  "id": "chair_clean",
+                  "source": "object:interactObject",
+                  "objectName": "item:interactObject/reczz28P8xJ80qwg",
+                  "attribute": "cleanliness",
+                  "version": 2,
+                  "attributeId": "chair_clean",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                }
+              ]
+            },
+            {
+              "id": "dirty",
+              "name": "发现椅面脏东西",
+              "condition": "本次尚未处理且椅面有可见脏污",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "chair_clean",
+                  "source": "object:interactObject",
+                  "objectName": "item:interactObject/reczz28P8xJ80qwg",
+                  "attribute": "cleanliness",
+                  "version": 2,
+                  "attributeId": "chair_clean",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高",
+                  "influence": "数值低 · 概率越高"
+                }
+              ]
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1504.9164499666147,
+          "y": -0.5584927972303149
+        }
+      },
+      {
+        "id": "normal",
+        "type": "result",
+        "data": {
+          "name": "普通放松",
+          "animation": "轻轻活动肩膀，舒展一下手指，保持放松坐姿。",
+          "description": "",
+          "effectRules": [],
+          "outputs": [],
+          "playMode": "单次",
+          "playExpectation": ""
+        },
+        "position": {
+          "x": 1847.878010948905,
+          "y": 3.0163321167883055
+        }
+      },
+      {
+        "id": "yawn",
+        "type": "result",
+        "data": {
+          "name": "坐着打哈欠",
+          "animation": "嘴巴慢慢张开，一只手抬到嘴边打个长哈欠；眯眼伸伸腰，再放下手。",
+          "description": "",
+          "effectRules": [
+            {
+              "id": "0c60a5e4-2db2-43a4-ae6b-4ee0cd0f3886",
+              "source": "object:partner",
+              "attribute": "buff:mood_weary",
+              "influence": "增",
+              "kind": "buff"
+            }
+          ],
+          "outputs": [],
+          "playMode": "单次",
+          "playExpectation": ""
+        },
+        "position": {
+          "x": 1853.3344367785558,
+          "y": 233.7575483322787
+        }
+      },
+      {
+        "id": "dirty",
+        "type": "result",
+        "data": {
+          "name": "避开椅面的脏东西",
+          "animation": "低头看到椅面边缘的脏东西，皱皱眉，抬起一侧身体，挪到干净的位置，再放松坐稳。",
+          "description": "标记本次已处理可见污物；只表现嫌弃，不额外添加未指定的Buff，不把椅子清洁度提高。",
+          "effectRules": [
+            {
+              "id": "e4b979ba-8a55-4799-9f61-f4c4c32d974e",
+              "source": "object:partner",
+              "attribute": "cleanliness",
+              "influence": "减",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "playMode": "单次",
+          "playExpectation": ""
+        },
+        "position": {
+          "x": 1852.9244335298129,
+          "y": 540.1266574618063
+        }
+      },
+      {
+        "id": "continue_check",
+        "type": "judge",
+        "data": {
+          "name": "是否还需要休息",
+          "judgeAttributes": [
+            {
+              "id": "energy",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy"
+            }
+          ],
+          "branches": [
+            {
+              "id": "done",
+              "name": "精力已达到期望",
+              "condition": "精力达到本次目标期望",
+              "weightExpectation": "满足条件必选",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "达到本次期望",
+                  "influenceRule": "允许选中",
+                  "influence": "达到本次期望 · 允许选中"
+                }
+              ]
+            },
+            {
+              "id": "more",
+              "name": "精力仍未达到期望",
+              "condition": "精力未达到本次目标期望",
+              "weightExpectation": "其余情况",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "达到本次期望",
+                  "influenceRule": "排除选中",
+                  "influence": "达到本次期望 · 排除选中"
+                }
+              ]
+            }
+          ],
+          "description": "仅决定是否要换姿；最终回循环，由循环统一判定结束。"
+        },
+        "position": {
+          "x": 2188.5952468211303,
+          "y": -4.312838882089011
+        }
+      },
+      {
+        "id": "shift",
+        "type": "result",
+        "data": {
+          "name": "换个舒服的坐姿",
+          "animation": "在椅面上轻轻挪动，调整双腿和双手的位置，重新坐稳，继续保持椅上坐姿。",
+          "description": "未达到目标时才执行；不重新站起坐下，不单独加精力。",
+          "effectRules": [],
+          "outputs": [],
+          "playMode": "单次",
+          "playExpectation": ""
+        },
+        "position": {
+          "x": 2517.3471487550705,
+          "y": 1.7163491256826546
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "data": {
+          "name": "起身结束休息",
+          "animation": "舒展肩膀，双手轻扶椅面，身体前倾站起来，站稳后自然放下双手。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": ""
+        },
+        "position": {
+          "x": 1135.316953483789,
+          "y": 340.8581745628413
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "3b44176f-08c0-4c4e-8a11-03c828f5b358",
+        "source": "start",
+        "target": "sit"
+      },
+      {
+        "id": "e174a5ee-8bbb-4b49-8d8a-680be2121601",
+        "source": "sit",
+        "target": "loop"
+      },
+      {
+        "id": "4cb43aa7-f03e-47ff-97b2-410edb37ebcb",
+        "source": "loop",
+        "target": "rest",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "7d510f62-1039-440d-9aa9-58ccd92042dc",
+        "source": "loop",
+        "target": "end",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "b8ceef2b-a2cf-4e80-8196-4156153e6884",
+        "source": "rest",
+        "target": "reaction"
+      },
+      {
+        "id": "2a32ec4f-fa32-488d-b09b-1f6eddd245b5",
+        "source": "reaction",
+        "target": "normal",
+        "sourceHandle": "normal"
+      },
+      {
+        "id": "62fb4c35-1e1d-4056-8ea3-6b15ab3e5ec8",
+        "source": "normal",
+        "target": "continue_check"
+      },
+      {
+        "id": "ecf2e411-c845-415f-9495-486a6eda97d2",
+        "source": "reaction",
+        "target": "yawn",
+        "sourceHandle": "yawn"
+      },
+      {
+        "id": "bb6d8061-c9e0-416e-808f-4ac2709b43e5",
+        "source": "yawn",
+        "target": "continue_check"
+      },
+      {
+        "id": "fd74d5a3-f7f1-4b00-87d9-830e607bac43",
+        "source": "reaction",
+        "target": "dirty",
+        "sourceHandle": "dirty"
+      },
+      {
+        "id": "d49fd4ba-b4dd-4a8c-99af-4be6099d8f59",
+        "source": "dirty",
+        "target": "continue_check"
+      },
+      {
+        "id": "befccf15-00d2-4e05-96d1-cf38a42212c6",
+        "source": "continue_check",
+        "target": "loop",
+        "sourceHandle": "done"
+      },
+      {
+        "id": "5a8b4f8e-8fa6-49a1-86cf-b4cba880654f",
+        "source": "continue_check",
+        "target": "shift",
+        "sourceHandle": "more"
+      },
+      {
+        "id": "311246b3-90fb-4f0a-9081-8d3d6cb65f53",
+        "source": "shift",
+        "target": "loop"
+      }
+    ]
+  }
+}
