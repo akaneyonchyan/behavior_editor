@@ -222,3 +222,12 @@ structureLayout 生成纯视觉 loopScope 与 loopPortal，域节点仍不新增
 整体移动嵌套循环会携带它的内部节点与内部连线，只清理与外部的连线；不能把循环放进自己或自己的子循环。位置和父子关系随 JSON 与草稿保存，重排只调整位置，不改变成员关系。
 
 实现：structureEditing.moveStructureNode 是归属变化的纯转换，store 以一次 checkpoint 提交节点、边与 layout。StructuredCanvas 使用绝对坐标命中容器正文，写入相对新父容器坐标，保留其他节点位置；普通点击不生成拖动记录。structureLayout 依据手动位置扩展容器边界。loopConditions.js 共用读取回退与有序短路语义；LoopConditionsEditor 复用 SortableList 和 LibraryRules。校验、需求清单、在线摘要与 PNG 都读取同一列表。回归见 loop-editing.cjs/spec.cjs。
+
+## 属性判断与影响规则（2026-10-20）
+
+属性选择的三个字段统一显示为「对象大类／对象子类／判断项」，对应原 source／objectName／attribute，公共库引用和 ID 不变。Buff 输出仍显示 Buff 名，执行输出增减和准入条件保持各自含义。
+
+分支属性影响拆成两个可自定义输入的选项：影响类型（数值高／数值低／具体值），影响规则（概率越高／概率越低／允许选中／排除选中／不影响）。非标准输入继续以下划线展示并纳入需求清单；只表达设计规则，不进行概率运算。具体值的比较内容尚无独立标准值字段，可通过自定义文字表达并列为需求。
+
+文件中的 influenceType 和 influenceRule 为当前生效字段；influence 保留兼容描述，编辑时同步更新。读取历史文件时按明确的标准文字映射，未知描述原样留在影响规则，影响类型留空，不推断其含义。读取转换不直接覆盖磁盘文件。画布、在线只读、PNG 和需求清单均使用拆分后的字段。
+

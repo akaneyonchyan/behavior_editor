@@ -39,8 +39,8 @@ test('ordered OR conditions can be edited in sidebar, reordered and reflected on
  await panel.getByLabel('结束条件 2 最大次数',{exact:true}).fill('最多三轮')
  await expect(header).toContainText('达到最大次数 · 最多三轮');await expect(header.locator('input,select,textarea')).toHaveCount(0)
  await panel.getByRole('button',{name:'+ 添加规则',exact:true}).click()
- await panel.getByRole('combobox',{name:'属性来源',exact:true}).fill('自定义来源')
- await panel.getByRole('combobox',{name:'属性名',exact:true}).fill('自定义属性')
+ await panel.getByRole('combobox',{name:'对象大类',exact:true}).fill('自定义来源')
+ await panel.getByRole('combobox',{name:'判断项',exact:true}).fill('自定义属性')
  await panel.getByRole('combobox',{name:'规则描述',exact:true}).fill('达到期望')
  await expect(header.locator('.custom-choice').filter({hasText:'自定义属性'})).toHaveCount(1)
  const before=await state(page),handle=panel.getByRole('button',{name:'拖动排序：循环结束条件 2',exact:true})
@@ -67,3 +67,4 @@ test('dropping a new empty loop preserves existing positions and remains indepen
  expect((await state(page)).graph.layout.positions['__scope_'+added.id]).not.toEqual(current.graph.layout.positions['__scope_'+added.id])
  expect((await state(page)).graph.layout.scopes.find(s=>s.loopId===added.id).members).toEqual([])
 })
+

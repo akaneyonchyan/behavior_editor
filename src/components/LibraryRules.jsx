@@ -4,16 +4,16 @@ import TextChoice from './TextChoice'
 import ObjectNameInput, {ObjectNameText} from './ObjectNameInput'
 import {sourceType} from '../store/contentLibrary'
 import { useContentLibrary, sourceChoices, sourceName, propertyChoices, propertyName } from '../store/contentLibrary'
-export function RuleInputs({rule,onChange,influences,influenceLabel='规则描述'}) {
+export function RuleInputs({rule,onChange,influences,influenceLabel='规则描述',hideInfluence=false}) {
   const lib=useContentLibrary(s=>s.library), sources=sourceChoices(lib), properties=propertyChoices(lib,rule.source)
   const missing=rule.attribute&&!properties.some(p=>p.id===rule.attribute||p.name===rule.attribute)
   return <>
-    <label>属性来源<TextChoice label="属性来源" options={sources.map(s=>s.name)} value={sourceName(lib,rule.source)} placeholder="选择对象类型或填写具体对象" onChange={name=>onChange({source:sources.find(s=>s.name===name)?.id||name})}/></label>
+    <label>对象大类<TextChoice label="对象大类" options={sources.map(s=>s.name)} value={sourceName(lib,rule.source)} placeholder="选择对象类型或填写具体对象" onChange={name=>onChange({source:sources.find(s=>s.name===name)?.id||name})}/></label>
     <ObjectNameInput type={sourceType(rule.source)} value={rule.objectName} onChange={objectName=>onChange({objectName})}/>
-    <label>属性名<TextChoice label="属性名" options={properties.map(p=>p.name)} value={rule.attribute?propertyName(lib,rule.attribute):''} placeholder="选择属性或 Buff" onChange={name=>onChange({attribute:properties.find(p=>p.name===name)?.id||name})}/></label>
+    <label>判断项<TextChoice label="判断项" options={properties.map(p=>p.name)} value={rule.attribute?propertyName(lib,rule.attribute):''} placeholder="选择属性或 Buff" onChange={name=>onChange({attribute:properties.find(p=>p.name===name)?.id||name})}/></label>
     {missing&&<p className="form-hint">当前条目未在该对象的可选库中，已保留原值。可改选或在公共库中补充适用对象。</p>}
     {!properties.length&&<p className="form-hint">该来源暂无候选项，可先填写文字，再到公共库补充。</p>}
-    <label>{influenceLabel}<TextChoice label={influenceLabel} options={influences} value={rule.influence||''} placeholder="描述规则和大致期望" onChange={influence=>onChange({influence})}/></label>
+    {!hideInfluence&&<label>{influenceLabel}<TextChoice label={influenceLabel} options={influences} value={rule.influence||''} placeholder="描述规则和大致期望" onChange={influence=>onChange({influence})}/></label>}
   </>
 }
 export default function LibraryRules({title,value=[],onChange,mode='condition',showEmptyRow=false}) {
@@ -24,3 +24,4 @@ export default function LibraryRules({title,value=[],onChange,mode='condition',s
     <SortableList items={value} onChange={onChange} label={title}>{(r,i,handle)=><div className="weight-factor"><div className="factor-actions">{handle}<strong>规则 {i+1}</strong><button className="btn-small" onClick={()=>onChange(value.filter((_,j)=>j!==i))}>删除</button></div><RuleInputs rule={r} influences={influences} onChange={patch=>onChange(value.map((row,j)=>j===i?{...row,...patch}:row))}/></div>}</SortableList>
   </div>
 }
+

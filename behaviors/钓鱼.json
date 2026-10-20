@@ -121,7 +121,9 @@
                   "attribute": "durability",
                   "version": 2,
                   "attributeId": "a1",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -129,7 +131,9 @@
                   "attributeId": "eefc2689-f1d5-44a6-adae-46a829eb4061",
                   "source": "object:partner",
                   "attribute": "fishing_experience",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 }
               ]
             },
@@ -145,7 +149,9 @@
                   "attribute": "durability",
                   "version": 2,
                   "attributeId": "a1",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -153,7 +159,9 @@
                   "attributeId": "eefc2689-f1d5-44a6-adae-46a829eb4061",
                   "source": "object:partner",
                   "attribute": "fishing_experience",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 }
               ]
             },
@@ -169,7 +177,9 @@
                   "attribute": "durability",
                   "version": 2,
                   "attributeId": "a1",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -177,7 +187,9 @@
                   "attributeId": "eefc2689-f1d5-44a6-adae-46a829eb4061",
                   "source": "object:partner",
                   "attribute": "fishing_experience",
-                  "influence": "越高，概率越大"
+                  "influence": "越高，概率越大",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
                 }
               ]
             },
@@ -193,7 +205,9 @@
                   "attribute": "durability",
                   "version": 2,
                   "attributeId": "a1",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -201,7 +215,9 @@
                   "attributeId": "eefc2689-f1d5-44a6-adae-46a829eb4061",
                   "source": "object:partner",
                   "attribute": "fishing_experience",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 }
               ]
             }
@@ -339,7 +355,9 @@
                   "attribute": "energy",
                   "version": 2,
                   "attributeId": "a17",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -347,7 +365,9 @@
                   "attributeId": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
                   "source": "object:partner",
                   "attribute": "fishingLevel",
-                  "influence": "越高，概率越大"
+                  "influence": "越高，概率越大",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -356,7 +376,9 @@
                   "source": "object:partner",
                   "attribute": "提前咬钩",
                   "influence": "指定值，概率提高",
-                  "objectName": "Buff"
+                  "objectName": "Buff",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越高"
                 }
               ]
             },
@@ -372,7 +394,9 @@
                   "attribute": "energy",
                   "version": 2,
                   "attributeId": "a17",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -380,7 +404,9 @@
                   "attributeId": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
                   "source": "object:partner",
                   "attribute": "fishingLevel",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -389,7 +415,9 @@
                   "source": "object:partner",
                   "attribute": "提前咬钩",
                   "influence": "不影响",
-                  "objectName": "Buff"
+                  "objectName": "Buff",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 }
               ]
             },
@@ -405,7 +433,9 @@
                   "attribute": "energy",
                   "version": 2,
                   "attributeId": "a17",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -413,7 +443,9 @@
                   "attributeId": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
                   "source": "object:partner",
                   "attribute": "fishingLevel",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -422,7 +454,9 @@
                   "source": "object:partner",
                   "attribute": "提前咬钩",
                   "influence": "不影响",
-                  "objectName": "Buff"
+                  "objectName": "Buff",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 }
               ]
             },
@@ -438,7 +472,9 @@
                   "attribute": "energy",
                   "version": 2,
                   "attributeId": "a17",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -446,7 +482,9 @@
                   "attributeId": "b80433e2-ec3b-4dd6-9caa-4e042d85e381",
                   "source": "object:partner",
                   "attribute": "fishingLevel",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -455,7 +493,9 @@
                   "source": "object:partner",
                   "attribute": "提前咬钩",
                   "influence": "不影响",
-                  "objectName": "Buff"
+                  "objectName": "Buff",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 }
               ]
             }
@@ -563,7 +603,9 @@
                   "attribute": "durability",
                   "version": 2,
                   "attributeId": "a18",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -571,7 +613,9 @@
                   "attributeId": "a641fa06-19fc-4015-82cc-eb3d8ec9212b",
                   "source": "object:partner",
                   "attribute": "fishingLevel",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 }
               ]
             },
@@ -587,7 +631,9 @@
                   "attribute": "durability",
                   "version": 2,
                   "attributeId": "a18",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -595,7 +641,9 @@
                   "attributeId": "a641fa06-19fc-4015-82cc-eb3d8ec9212b",
                   "source": "object:partner",
                   "attribute": "fishingLevel",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 }
               ]
             },
@@ -611,7 +659,9 @@
                   "attribute": "durability",
                   "version": 2,
                   "attributeId": "a18",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -619,7 +669,9 @@
                   "attributeId": "a641fa06-19fc-4015-82cc-eb3d8ec9212b",
                   "source": "object:partner",
                   "attribute": "fishingLevel",
-                  "influence": "不影响"
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 }
               ]
             }
@@ -710,7 +762,9 @@
                   "attribute": "fishingLevel",
                   "version": 2,
                   "attributeId": "a34",
-                  "influence": "越高，概率越大"
+                  "influence": "越高，概率越大",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "id": "a35",
@@ -718,7 +772,9 @@
                   "attribute": "buff:design_fishing_bait",
                   "version": 2,
                   "attributeId": "a35",
-                  "influence": "存在时提高"
+                  "influence": "存在时提高",
+                  "influenceType": "",
+                  "influenceRule": "存在时提高"
                 }
               ]
             },
@@ -734,7 +790,9 @@
                   "attribute": "fishingLevel",
                   "version": 2,
                   "attributeId": "a34",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "id": "a35",
@@ -742,7 +800,9 @@
                   "attribute": "buff:design_fishing_bait",
                   "version": 2,
                   "attributeId": "a35",
-                  "influence": "存在时降低"
+                  "influence": "存在时降低",
+                  "influenceType": "",
+                  "influenceRule": "存在时降低"
                 }
               ]
             }
@@ -1132,3 +1192,4 @@
     ]
   }
 }
+

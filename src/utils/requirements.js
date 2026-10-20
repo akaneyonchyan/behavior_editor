@@ -1,3 +1,4 @@
+import {INFLUENCE_TYPES,INFLUENCE_RULES} from './influenceRules'
 import {sourceChoices,sourceType,sourceName,propertyChoices,propertyName,objectChoices,objectName} from '../store/contentLibrary'
 import {judgeAttributes,branchFactors,PROBABILITIES,EFFECTS,CHANGES,PLAY_MODES} from './nodeDesign'
 import {GOAL_TYPES,CONSUMPTION_TYPES,normalizeMetadata} from './behaviorMetadata'
@@ -47,7 +48,8 @@ export function collectRequirements(info,nodes,lib){
     add(tab,buff?'Buff名':'属性名',r.attribute,reason,loc,context,propertyName(lib,r.attribute))
    }
   }
-  if(influences)choice(tab,'规则 / 影响方式',r.influence,influences,loc,[context,propertyName(lib,r.attribute)].filter(Boolean).join(' · '))
+  if(r.influenceType!==undefined&&r.influenceRule!==undefined){choice(tab,'影响类型',r.influenceType,INFLUENCE_TYPES,loc,context);choice(tab,'影响规则',r.influenceRule,INFLUENCE_RULES,loc,[context,propertyName(lib,r.attribute)].join(' · '))}
+  else if(influences)choice(tab,'规则 / 影响方式',r.influence,influences,loc,[context,propertyName(lib,r.attribute)].filter(Boolean).join(' · '))
  }
  const start=nodes.find(n=>n.type==='start'),loc=(node,path)=>({nodeId:node?.id||null,label:node?.type==='start'?'开始 · 行为准入数据':node?.data?.name||NODE_CONFIG[node?.type]?.label||'行为准入数据',path})
  const metadata=normalizeMetadata(info),p=metadata.preconditions
@@ -113,3 +115,4 @@ export function requirementsMarkdown(report,name,syncedAt,scope={}){
  }
  return lines.join('\n')
 }
+

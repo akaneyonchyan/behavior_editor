@@ -126,7 +126,9 @@
                   "source": "object:partner",
                   "attribute": "personality_passion",
                   "influence": "不影响",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
                 },
                 {
                   "version": 2,
@@ -135,7 +137,9 @@
                   "source": "object:partner",
                   "attribute": "personality_rigorous",
                   "influence": "指定值，概率降低",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越低"
                 }
               ],
               "nextNode": "laugh_clap"
@@ -153,7 +157,9 @@
                   "source": "object:partner",
                   "attribute": "personality_passion",
                   "influence": "指定值，概率提高",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -162,7 +168,9 @@
                   "source": "object:partner",
                   "attribute": "personality_rigorous",
                   "influence": "指定值，概率降低",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越低"
                 }
               ],
               "nextNode": "laugh_belly"
@@ -180,7 +188,9 @@
                   "source": "object:partner",
                   "attribute": "personality_passion",
                   "influence": "指定值，概率降低",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越低"
                 },
                 {
                   "version": 2,
@@ -189,7 +199,9 @@
                   "source": "object:partner",
                   "attribute": "personality_rigorous",
                   "influence": "指定值，概率提高",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越高"
                 }
               ],
               "nextNode": "laugh_steps"
@@ -281,7 +293,9 @@
                   "source": "object:partner",
                   "attribute": "超开心buff",
                   "influence": "没有该buff",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "",
+                  "influenceRule": "没有该buff"
                 }
               ],
               "nextNode": "relieve"
@@ -299,7 +313,9 @@
                   "source": "object:partner",
                   "attribute": "超开心buff",
                   "influence": "有该buff",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "",
+                  "influenceRule": "有该buff"
                 }
               ],
               "nextNode": "end_still_excited"
@@ -449,3 +465,4 @@
     ]
   }
 }
+

@@ -117,7 +117,9 @@
                   "attribute": "energy",
                   "version": 2,
                   "attributeId": "axe_energy",
-                  "influence": "越高，概率越大"
+                  "influence": "越高，概率越大",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -125,7 +127,9 @@
                   "attributeId": "00d79f27-cb05-4c72-b664-bd9bc5d88793",
                   "source": "object:partner",
                   "attribute": "body_size",
-                  "influence": "越高，概率越大"
+                  "influence": "越高，概率越大",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
                 }
               ],
               "nextNode": "axe_normal"
@@ -143,7 +147,9 @@
                   "attribute": "energy",
                   "version": 2,
                   "attributeId": "axe_energy",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -151,7 +157,9 @@
                   "attributeId": "00d79f27-cb05-4c72-b664-bd9bc5d88793",
                   "source": "object:partner",
                   "attribute": "body_size",
-                  "influence": "越低，概率越大"
+                  "influence": "越低，概率越大",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
                 }
               ],
               "nextNode": "axe_tired"
@@ -404,3 +412,4 @@
     ]
   }
 }
+

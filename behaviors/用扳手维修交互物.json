@@ -125,7 +125,9 @@
                   "source": "object:partner",
                   "attribute": "trait_ability_dexterous",
                   "influence": "指定值，概率提高",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越高"
                 },
                 {
                   "version": 2,
@@ -134,7 +136,9 @@
                   "source": "object:partner",
                   "attribute": "personality_rigorous",
                   "influence": "指定值，概率提高",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越高"
                 }
               ],
               "nextNode": "repair_normal"
@@ -152,7 +156,9 @@
                   "source": "object:partner",
                   "attribute": "trait_ability_dexterous",
                   "influence": "指定值，概率降低",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越低"
                 },
                 {
                   "version": 2,
@@ -161,7 +167,9 @@
                   "source": "object:partner",
                   "attribute": "personality_rigorous",
                   "influence": "指定值，概率降低",
-                  "objectName": "item:partner/reczz28PAvx7wYyE"
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越低"
                 }
               ],
               "nextNode": "repair_mistake"
@@ -386,3 +394,4 @@
     ]
   }
 }
+

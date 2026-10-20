@@ -34,7 +34,7 @@ const large=[a,rect('z',4200,0),...Array.from({length:300},(_,i)=>rect('o'+i,300
 verify(routeEdge({source:{x:200,y:70},target:{x:4200,y:70},sourceId:'a',targetId:'z',rects:large}),large)
 console.log('300-obstacle routing ms:',Math.round(performance.now()-started))
 const f=newFactor()
-assert.deepEqual(Object.keys(f).sort(), ['attribute','id','influence','source','version'])
+assert.deepEqual(Object.keys(f).sort(), ['attribute','id','influence','influenceRule','influenceType','source','version'])
 assert.equal(validateFactor(f),'')
 assert.ok(validateFactor({...f,influence:100}))
 const legacy={version:1,id:'old',source:'actor',attribute:'energy',rule:'negative',objectRef:'',min:0,max:98,amount:20}
@@ -57,9 +57,10 @@ console.log('PASS: obstacle curves, reverse edges, self loop, tall nodes, blocke
 
 const React=require('react'), {renderToStaticMarkup}=require('react-dom/server')
 const html=renderToStaticMarkup(React.createElement(m.exports.WeightFactors,{branch:{weightFactors:[newFactor()]},onChange:()=>{}}))
-assert.equal((html.match(/<input/g)||[]).length,4)
-for(const label of ['属性来源','属性名','影响方式'])assert.ok(html.includes(label))
+assert.equal((html.match(/<input/g)||[]).length,5)
+for(const label of ['对象大类','判断项','影响类型','影响规则'])assert.ok(html.includes(label))
 for(const removed of ['试算','属性上界','属性下界','最大增加权重','倍率'])assert.ok(!html.includes(removed))
 console.log('PASS: rule editor renders source/object/property/rule inputs without numerical controls')
+
 
 
