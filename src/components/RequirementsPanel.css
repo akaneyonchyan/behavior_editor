@@ -22,9 +22,13 @@
 .requirement-location { display:block; background:transparent; border:0; color:var(--accent); font:inherit; text-align:left; cursor:pointer; padding:3px 0; }
 .requirement-location:hover { text-decoration:underline; }
 
-.requirement-file { padding:4px 0 8px; border-bottom:1px solid var(--border); }
-.requirement-file details { font-size:12px; }
-.requirement-file summary { cursor:pointer; }
+.requirement-references > summary { cursor:pointer; color:var(--text-secondary); white-space:nowrap; }
+.requirement-file { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:0 12px; padding:3px 0; border-bottom:1px solid var(--border); }
+.requirement-file:last-child { border-bottom:0; }
+.requirement-file > .requirement-location { min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.requirement-positions-toggle { border:0; background:transparent; color:var(--text-secondary); font:inherit; cursor:pointer; padding:3px 0; white-space:nowrap; }
+.requirement-positions-toggle:hover { color:var(--accent); }
+.requirement-positions { grid-column:1 / -1; padding:2px 0 6px; }
 .requirement-file small { display:block; }
 .requirement-failures { max-height:150px; overflow:auto; }
 @media (max-width:700px) {
