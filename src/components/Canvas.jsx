@@ -1,3 +1,4 @@
+import {externalExit} from '../utils/externalExits'
 import React, { useEffect, useRef } from 'react'
 import ReactFlow, { Background, Controls, MiniMap, MarkerType, ConnectionLineType, useNodesInitialized, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
@@ -61,7 +62,7 @@ export default function Canvas() {
     {fileHover&&<div className="canvas-file-drop-hint" role="status">松开以打开行为图 JSON（替换当前画布，未保存时会先提示）</div>}
     <ReactFlow nodes={s.nodes} edges={s.edges.filter(e=>!(e.sourceHandle&&s.nodes.some(n=>n.id===e.source&&n.type==='loop'&&!isLoopOutputEnabled(n.data,e.sourceHandle))))} nodeTypes={nodeTypes} edgeTypes={edgeTypes} elevateEdgesOnSelect={false} onInit={instance => { flow.current = instance }}
       onNodesChange={s.changeNodes} onEdgesChange={s.changeEdges} onConnect={s.connect}
-      isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return !(source?.type==='move'&&connection.sourceHandle==='unreachable'&&s.nodes.find(n=>n.id===connection.target)?.type!=='end')&&!s.nodes.some(n=>n.id===connection.target&&n.type==='start')&&(source?.type!=='loop'||(isLoopOutputEnabled(source.data,connection.sourceHandle)&&connection.target!==connection.source))}}
+      isValidConnection={connection=>{const source=s.nodes.find(n=>n.id===connection.source);return !externalExit(source?.data||{},connection.sourceHandle)&&!(source?.type==='move'&&connection.sourceHandle==='unreachable'&&s.nodes.find(n=>n.id===connection.target)?.type!=='end')&&!s.nodes.some(n=>n.id===connection.target&&n.type==='start')&&(source?.type!=='loop'||(isLoopOutputEnabled(source.data,connection.sourceHandle)&&connection.target!==connection.source))}}
       onNodeDragStart={s.checkpoint} onNodeClick={(_, node) => s.selectNode(node)} onPaneClick={() => s.selectNode(null)}
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = Array.from(e.dataTransfer.types).includes('Files')?'copy':'move' }}
       onDrop={e => {
@@ -70,7 +71,7 @@ export default function Canvas() {
         if(document.querySelector('.dialog-overlay'))return
         if(Array.from(e.dataTransfer.types).includes('Files')||e.dataTransfer.files.length){void openDroppedFiles(e.dataTransfer);return}
         const type = e.dataTransfer.getData('application/reactflow')
-        if (!NODE_CONFIG[type] || type==='start' || !flow.current) return
+        if (!NODE_CONFIG[type] || type==='start' || type==='move' || !flow.current) return
         s.addNode({ id: crypto.randomUUID(), type, position: flow.current.screenToFlowPosition({ x: e.clientX, y: e.clientY }), data: { ...structuredClone(NODE_CONFIG[type].defaultData), name:NODE_CONFIG[type].label+'节点' } })
       }}
       defaultEdgeOptions={edgeOptions} connectionLineType={ConnectionLineType.Bezier}

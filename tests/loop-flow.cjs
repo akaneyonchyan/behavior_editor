@@ -33,7 +33,7 @@ assert.equal(graph.getState().edges.filter(e=>e.source===loop.id&&ids.has(e.targ
 validateConfig(graph.getState().exportConfig(),NODE_CONFIG)
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server')
 const html=renderToStaticMarkup(React.createElement(m.exports.LoopFields,{node:loop}))
-for(const label of ['① 目标达成判定','② 准入检查','③ 稍息判定','达成 → 成功结算节点','不满足 → 结束收尾节点','触发 → 待机节点','不触发 → 继续执行节点'])assert.ok(html.includes(label),label)
+for(const label of ['① 目标达成判定','② 准入检查','③ 稍息判定','达成后去向','不满足后去向','触发 → 待机节点','不触发 → 继续执行节点'])assert.ok(html.includes(label),label)
 assert.ok(!html.includes('type="number"'))
 console.log('PASS: ordered loop decisions, four outputs, rest bypass, single destination, undo, copy, JSON validation, explicit legacy mapping and qualitative editor')
 

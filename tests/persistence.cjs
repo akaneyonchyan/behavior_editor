@@ -70,7 +70,7 @@ async function main() {
   assert.equal(b.useDocumentSession.getState().dirty,true)
   assert.equal(b.useDocumentSession.getState().firstRun,false)
   const restoredKey = localStorage.getItem('pps-behavior-v2:latest'); assert.notEqual(restoredKey,key)
-  b.newDocument(); assert.equal(b.graph.getState().nodes.length,9); assert.equal(b.graph.getState().edges.length,12); assert.equal(b.useDocumentSession.getState().dirty,false)
+  b.newDocument(); assert.equal(b.graph.getState().nodes.length,7); assert.equal(b.graph.getState().edges.length,9); assert.equal(b.useDocumentSession.getState().dirty,false)
   const previous = b.recoveryDrafts().find(d=>d.config.graph.nodes.length===a.example.graph.nodes.length+1)
   assert.ok(previous); b.recoverDraft(previous); assert.equal(b.graph.getState().nodes.length,a.example.graph.nodes.length+1)
   await b.openFallback({name:'bom.json',text:async()=>String.fromCharCode(0xfeff)+JSON.stringify(b.example)})

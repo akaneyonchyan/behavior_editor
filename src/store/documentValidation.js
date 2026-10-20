@@ -1,3 +1,4 @@
+import {externalExit,supportsExit} from '../utils/externalExits'
 import { validateFactor } from '../utils/weightFactors'
 import { isLoopOutput } from '../utils/loopFlow'
 export function validateConfig(config, types) {
@@ -75,6 +76,14 @@ export function validateConfig(config, types) {
         branches.add(b.id)
       }
     }
+    if(n.data.externalExits!==undefined){
+      if(!Array.isArray(n.data.externalExits))fail('跳出行为配置必须是列表')
+      const seen=new Set()
+      for(const r of n.data.externalExits){
+        if(!r||typeof r.handle!=='string'||!supportsExit(n,r.handle)||seen.has(r.handle)||typeof r.note!=='string')fail('跳出行为出口或说明无效')
+        seen.add(r.handle)
+      }
+    }
     objectRef(n.data);ids.set(n.id, n)
   }
   const loopPorts=new Set()
@@ -83,6 +92,7 @@ export function validateConfig(config, types) {
   if(starts.length&&config.graph.edges.filter(e=>e.source===starts[0].id).length>1)fail('开始节点只能连接一个入口')
   for (const e of config.graph.edges) {
     if (!e || !ids.has(e.source) || !ids.has(e.target)) fail('连线引用了不存在的节点')
+    if(externalExit(ids.get(e.source).data,e.sourceHandle))fail('同一出口不能同时连接节点和跳出行为')
     if(ids.get(e.target).type==='start')fail('开始节点不能作为连线终点')
     if(ids.get(e.source).type==='loop'){
       if(e.sourceHandle){

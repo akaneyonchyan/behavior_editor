@@ -1,3 +1,4 @@
+import {BranchPort} from './BranchDestination'
 import React, { useEffect } from 'react'
 import { Handle, Position, useUpdateNodeInternals } from 'reactflow'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
@@ -40,10 +41,11 @@ export default function BehaviorNode({ id, data, type, selected }) {
     {type === 'judge' && <div className="node-branches">{data.branches?.map(branch => <div className="node-branch" key={branch.id}>
       <div>{branch.name}<small>默认概率：<ChoiceText value={branch.weightExpectation||'待定'} options={PROBABILITIES}/>{branch.condition ? ' · ' + branch.condition : ''}</small></div>
       {branchFactors(branch,judgeAttributes(data)).map((factor,i) => <small key={factor.id||i} className="factor-summary">{i+1}. <RuleText rule={factor} influences={EFFECTS}/></small>)}
-      <Handle type="source" position={Position.Right} id={branch.id} className="node-handle branch-handle" />
+      <BranchPort data={data} handle={branch.id} className="node-handle branch-handle"/>
     </div>)}</div>}
+    {type === 'result' && <div className="node-branch"><BranchPort data={data} className="node-handle branch-handle"/></div>}
     {type === 'loop' && <LoopNodeStages id={id} data={data}/>}
     {type === 'move' && <div className="node-branches"><div className="node-branch">目的地可达<Handle type="source" position={Position.Right} className="node-handle branch-handle" /></div><div className="node-branch">目的地不可达<Handle type="source" position={Position.Right} id="unreachable" className="node-handle branch-handle" /></div></div>}
-    {type !== 'move' && type !== 'judge' && type !== 'end' && type !== 'loop' && <Handle type="source" position={Position.Right} className="node-handle" />}
+    {type !== 'result' && type !== 'move' && type !== 'judge' && type !== 'end' && type !== 'loop' && <Handle type="source" position={Position.Right} className="node-handle" />}
   </div>
 }

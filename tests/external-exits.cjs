@@ -1,0 +1,66 @@
+const assert=require('node:assert/strict'),{buildSync}=require('esbuild'),Module=require('node:module'),path=require('node:path')
+const file=path.join(process.cwd(),'exit-tests.cjs'),m=new Module(file,module);m.filename=file;m.paths=module.paths
+m._compile(buildSync({stdin:{contents:"export * from './src/utils/externalExits';export {blankTemplate} from './src/utils/blankTemplate';export {useBehaviorStore as graph} from './src/store/behaviorStore';export {validateConfig} from './src/store/documentValidation';export {NODE_CONFIG} from './src/constants/behaviorTypes';export {upstreamOccupancies} from './src/utils/occupiedResources'",resolveDir:process.cwd()},bundle:true,platform:'node',format:'cjs',write:false}).outputFiles[0].text,file)
+const {graph,blankTemplate,externalExit,validateConfig,NODE_CONFIG,upstreamOccupancies,bypassLegacyMove}=m.exports,s=()=>graph.getState()
+const fresh=blankTemplate();validateConfig(fresh,NODE_CONFIG)
+assert.equal(fresh.graph.nodes.length,7);assert.equal(fresh.graph.nodes.filter(n=>n.type==='end').length,1)
+assert.ok(!fresh.graph.nodes.some(n=>n.type==='move'));assert.equal(fresh.graph.edges.length,9)
+assert.ok(externalExit(fresh.graph.nodes.find(n=>n.type==='loop').data,'insufficient'))
+s().importConfig(fresh)
+for(const [id,port] of [['template_result_1',''],['template_judge','branch_1'],['template_loop','complete']]){
+ const before=s().exportConfig(),oldEdges=s().edges.filter(e=>e.source===id&&(e.sourceHandle||'')===port)
+ assert.equal(oldEdges.length,1)
+ s().setBranchDestination(id,port,'external',undefined,'自定义：交回外部')
+ assert.equal(s().edges.filter(e=>e.source===id&&(e.sourceHandle||'')===port).length,0)
+ assert.equal(externalExit(s().nodes.find(n=>n.id===id).data,port).note,'自定义：交回外部')
+ const changed=s().exportConfig();validateConfig(changed,NODE_CONFIG)
+ s().connect({source:id,sourceHandle:port||undefined,target:'template_end'})
+ assert.deepEqual(s().exportConfig(),changed,'external ports reject accidental connections')
+ s().undo();assert.deepEqual(s().exportConfig(),before)
+ s().redo();assert.deepEqual(s().exportConfig(),changed)
+ s().importConfig(changed);assert.equal(externalExit(s().nodes.find(n=>n.id===id).data,port).note,'自定义：交回外部')
+ s().setBranchDestination(id,port,'node')
+ assert.ok(!externalExit(s().nodes.find(n=>n.id===id).data,port))
+ assert.equal(s().edges.filter(e=>e.source===id&&(e.sourceHandle||'')===port).length,0)
+ s().setBranchDestination(id,port,'node',oldEdges[0].target)
+}
+// Disabled loop steps retain exits, but cannot change them.
+s().updateNode('template_loop',{admissionEnabled:false})
+const disabled=s().exportConfig();s().setBranchDestination('template_loop','insufficient','node','template_end')
+assert.deepEqual(s().exportConfig(),disabled)
+s().updateNode('template_loop',{admissionEnabled:true});assert.ok(externalExit(s().nodes.find(n=>n.type==='loop').data,'insufficient'))
+// Stable branch IDs keep external destinations through sort; removal prunes stale records.
+s().setBranchDestination('template_judge','branch_1','external')
+const branches=s().nodes.find(n=>n.type==='judge').data.branches
+s().updateNode('template_judge',{branches:[...branches].reverse()})
+assert.ok(externalExit(s().nodes.find(n=>n.type==='judge').data,'branch_1'))
+s().updateNode('template_judge',{branches:branches.filter(b=>b.id!=='branch_1')})
+assert.equal(s().nodes.find(n=>n.type==='judge').data.externalExits.length,0);s().undo()
+s().changeNodes([{id:'template_judge',type:'select',selected:true}]);s().copy();s().paste()
+assert.ok(externalExit(s().nodes.find(n=>n.selected&&n.type==='judge').data,'branch_1'))
+validateConfig(s().exportConfig(),NODE_CONFIG)
+// Validator covers all ingestion paths (local, online, PR workflow).
+for(const row of [{handle:'unknown',note:''},{handle:'complete',note:3}]){
+ const bad=blankTemplate();bad.graph.nodes.find(n=>n.type==='loop').data.externalExits=[row]
+ assert.throws(()=>validateConfig(bad,NODE_CONFIG),/跳出行为/)
+}
+const conflict=blankTemplate();conflict.graph.edges.push({id:'bad',source:'template_loop',sourceHandle:'insufficient',target:'template_end'})
+assert.throws(()=>validateConfig(conflict,NODE_CONFIG),/同时/)
+const duplicate=blankTemplate();duplicate.graph.nodes.find(n=>n.type==='loop').data.externalExits.push({handle:'insufficient',note:''})
+assert.throws(()=>validateConfig(duplicate,NODE_CONFIG),/跳出行为/)
+// Explicit migration preserves incoming branch identity and archives old configuration.
+const legacy=blankTemplate()
+legacy.graph.nodes.push({id:'old_move',type:'move',position:{x:0,y:0},data:{description:'保留说明',occupiedResources:[{id:'old',source:'object:place',attribute:'occupied'}]}})
+legacy.graph.edges.find(e=>e.source==='template_judge'&&e.sourceHandle==='branch_1').target='old_move'
+legacy.graph.edges.push({id:'next',source:'old_move',target:'template_result_1'},{id:'failed',source:'old_move',sourceHandle:'unreachable',target:'template_end'})
+s().importConfig(legacy);const original=s().exportConfig()
+s().removeLegacyMove('old_move')
+assert.ok(!s().nodes.some(n=>n.type==='move'));assert.equal(s().edges.find(e=>e.sourceHandle==='branch_1').target,'template_result_1')
+assert.equal(s().behaviorInfo.legacyMovement[0].node.data.description,'保留说明')
+assert.ok(s().nodes.some(n=>n.id==='template_end'))
+assert.equal(upstreamOccupancies(s().nodes,s().edges,'template_end').length,0)
+const saved=s().exportConfig();s().importConfig(saved);assert.deepEqual(s().behaviorInfo.legacyMovement,saved.behavior.legacyMovement)
+s().importConfig(original);const reloaded=s().exportConfig();s().removeLegacyMove('old_move');s().undo();assert.deepEqual(s().exportConfig(),reloaded)
+assert.throws(()=>bypassLegacyMove(legacy.graph.nodes,legacy.graph.edges.filter(e=>e.id!=='next'),'old_move'),/唯一/)
+s().addNode({id:'forbidden',type:'move',data:{},position:{x:0,y:0}});assert.ok(!s().nodes.some(n=>n.id==='forbidden'))
+console.log('PASS: external destinations, switch/undo/redo, stable branches/copy, disabled steps, validation, new template, explicit legacy migration and preservation')

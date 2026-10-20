@@ -1,3 +1,4 @@
+import BranchDestination from './BranchDestination'
 import React from 'react'
 import SortableList from './SortableList'
 import {ObjectNameText} from './ObjectNameInput'
@@ -21,6 +22,7 @@ export default function JudgeFields({node}){
       <SortableList items={branches} onChange={branches=>updateNode(node.id,{branches})} label="判断分支" itemLabel={(b,i)=>b?.name||"分支 "+(i+1)}>{(b,i,handle)=><div className="branch-item"><div className="branch-header">{handle}<input className="branch-name-input" aria-label="分支名称" value={b.name} onChange={e=>updateBranch(i,{name:e.target.value})}/>{branches.length>2&&<button className="btn-remove" onClick={()=>updateNode(node.id,{branches:branches.filter((_,j)=>i!==j)})}>×</button>}</div>
         <label>默认概率<TextChoice label="默认概率" options={PROBABILITIES} value={b.weightExpectation||''} onChange={weightExpectation=>updateBranch(i,{weightExpectation})}/></label>
         {branchFactors(b,attrs).map((f,j)=><div className="weight-factor" key={f.attributeId}><strong>{j+1}. <ChoiceText value={sourceName(lib,f.source)} options={sourceChoices(lib).map(s=>s.name)}/>{f.objectName&&<> · <ObjectNameText type={sourceType(f.source)} value={f.objectName}/></>} · <ChoiceText value={propertyName(lib,f.attribute)} options={choicesFor(lib,f.source).map(p=>p.name)}/></strong><label>影响方式<TextChoice label="影响方式" options={EFFECTS} value={f.influence} onChange={influence=>updateBranch(i,{weightFactors:branchFactors(b,attrs).map((row,k)=>j===k?{...row,influence}:row)})}/></label></div>)}
+        <BranchDestination node={node} handle={b.id} label={(b.name||`分支${i+1}`)+'后续去向'}/>
       </div>}</SortableList>
     </div>
   </>

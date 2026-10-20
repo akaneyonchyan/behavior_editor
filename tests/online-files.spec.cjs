@@ -52,7 +52,7 @@ test('online preview is isolated and read-only, including keyboard, drag and sta
  await expect(modal.locator('[data-id=behavior_start]')).toContainText('线上独立行为')
  await expect(modal.locator('[data-id=template_result_1]')).toContainText('仅线上表演')
  await modal.locator('[data-id=template_result_1]').click();await page.keyboard.press('Delete');await page.keyboard.press('Control+z');await page.keyboard.press('Control+d')
- await expect(modal.locator('.react-flow__node')).toHaveCount(9)
+ await expect(modal.locator('.react-flow__node')).toHaveCount(7)
  expect(await localState(page)).toEqual(before)
  await page.getByRole('button',{name:'另存为',exact:true}).click();await expect(page.getByRole('alert').first()).toContainText('保存目录')
  await page.getByRole('tab',{name:'本地',exact:true}).click();expect(await localState(page)).toEqual(before)

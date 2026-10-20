@@ -4,15 +4,15 @@ const choose=async(page,label,value)=>{await page.getByRole('combobox',{name:lab
 test('object names filter by type, preserve invalid input and follow published rename/disable',async({page})=>{
  let name='苹果',enabled=true,time='2026-10-19T01:00:00Z'
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:time,library:{version:1,objects:[{id:'food',name:'食物',description:'',enabled:true},{id:'furniture',name:'家具摆件',description:'',enabled:true}],attributes:[],buffs:[],items:[{id:'food/apple',objectType:'food',name,enabled,description:''},{id:'food/hidden',objectType:'food',name:'隐藏食物',enabled:false,description:''},{id:'furniture/chair',objectType:'furniture',name:'木椅',enabled:true,description:''}]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await select(page,'template_move')
- await choose(page,'交互对象类型','食物')
+ await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await select(page,'template_result_1')
+ await page.getByRole('button',{name:'+ 添加占用资源',exact:true}).click();await choose(page,'对象来源','食物')
  const input=page.getByRole('combobox',{name:'对象名',exact:true});await input.click();await expect(page.getByRole('listbox').getByRole('option')).toHaveText(['苹果']);await page.getByRole('option',{name:'苹果',exact:true}).click()
- await expect(input).not.toHaveClass(/custom-choice/);await expect(page.locator('[data-id="template_move"]')).toContainText('苹果')
+ await expect(input).not.toHaveClass(/custom-choice/);await expect(page.locator('[data-id="template_result_1"]')).toContainText('苹果')
  name='红苹果';time='2026-10-19T02:00:00Z';await page.evaluate(()=>window.dispatchEvent(new Event('online')));await expect(input).toHaveValue('红苹果')
  enabled=false;time='2026-10-19T03:00:00Z';await page.evaluate(()=>window.dispatchEvent(new Event('online')));await expect(input).toHaveClass(/custom-choice/)
- await choose(page,'交互对象类型','家具摆件');await expect(input).toHaveValue('红苹果');await input.click();await expect(page.getByRole('listbox').getByRole('option')).toHaveText(['木椅'])
- await input.fill('待开发座椅');await expect(input).toHaveClass(/custom-choice/);await expect(page.locator('[data-id="template_move"] .custom-choice')).toContainText('待开发座椅')
- const saved=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const data=g.getState().exportConfig();g.getState().importConfig(data);return data.graph.nodes.find(n=>n.id==='template_move').data.objectName});expect(saved).toBe('待开发座椅')
+ await choose(page,'对象来源','家具摆件');await expect(input).toHaveValue('红苹果');await input.click();await expect(page.getByRole('listbox').getByRole('option')).toHaveText(['木椅'])
+ await input.fill('待开发座椅');await expect(input).toHaveClass(/custom-choice/);await expect(page.locator('[data-id="template_result_1"] .custom-choice')).toContainText('待开发座椅')
+ const saved=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const data=g.getState().exportConfig();g.getState().importConfig(data);return data.graph.nodes.find(n=>n.id==='template_result_1').data.occupiedResources[0].objectName});expect(saved).toBe('待开发座椅')
  await page.getByRole('button',{name:/公共内容库/}).click();await page.getByRole('button',{name:/对象名录/}).click();await page.getByLabel('对象名录类型').selectOption('furniture');await expect(page.locator('.library-table tbody')).toContainText('木椅');await expect(page.locator('.library-table tbody')).not.toContainText('红苹果')
 })
 test('all object selection areas have name inputs and judge branches inherit names',async({page})=>{
@@ -28,5 +28,5 @@ test('all object selection areas have name inputs and judge branches inherit nam
  await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const rule={id:'r',source:'',objectName:'自定对象',attribute:'',influence:''};g.getState().updateNode('template_result_1',{effectRules:[{...rule,kind:'attribute'},{...rule,id:'b',kind:'buff'}],occupiedResources:[rule]});g.getState().updateNode('template_loop',{completionRules:[rule],resourceRules:[rule],restRules:[rule]})})
  await select(page,'template_result_1');await expect(inputs()).toHaveCount(3)
  await select(page,'template_loop');await expect(inputs()).toHaveCount(3);await expect(page.locator('[data-id="template_loop"] .custom-choice').filter({hasText:'自定对象'})).toHaveCount(3)
- await select(page,'template_move');await page.getByRole('button',{name:'+ 添加占用资源',exact:true}).click();await expect(inputs()).toHaveCount(2);await inputs().first().fill('待释放座椅');await select(page,'template_end');await expect(page.locator('.property-panel').getByLabel('自动释放资源')).toContainText('待释放座椅')
+ await select(page,'template_result_1');await page.getByRole('button',{name:'+ 添加占用资源',exact:true}).click();await expect(inputs()).toHaveCount(4);await inputs().first().fill('待释放座椅');await select(page,'template_end');await expect(page.locator('.property-panel').getByLabel('自动释放资源')).toContainText('待释放座椅')
 })

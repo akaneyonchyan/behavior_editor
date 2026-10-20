@@ -99,7 +99,7 @@ PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `np
 
 ## 结束表演（2026-10-19修正）
 
-结束只有一种节点、一个工具栏入口。每个实例配置一套表演和播放方式（单次／计次／计时），计次／计时可填写文字期望。“完成”“中断”由设计者通过名称、说明、表演与连线表达，不设结束类型字段或固定规则。默认图的两条结束路径使用相同的普通结束节点。
+结束只有一种节点、一个工具栏入口。每个实例配置一套表演和播放方式（单次／计次／计时），计次／计时可填写文字期望。结束节点用于行为内明确设计的收尾，不设结束类型字段。通用意外中断和监听跳出交给行为外规则，默认模板只有一个正常结束节点。
 
 已有图的表演、名称、连线不变；旧 endReason 仅作为兼容数据保留，不展示、不参与规则，新建节点不生成该字段。旧 successAnimation/failAnimation 仍提供“拆分为两个结束节点”入口：按旧表演分配入线，保留原配置，支持撤销。拆分后的两个节点类型完全相同。正式文件仅手动保存后写回。
 
@@ -107,7 +107,7 @@ PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `np
 
 ## 占用资源与行为结束（2026-10-19）
 
-位移／执行节点可声明“占用资源”：对象来源＋属性名，支持公共库选择和自定义下划线输入。含义是该节点执行时产生、由本行为持有至结束的占用；仅移动或普通属性增减不能推断为占用。
+执行节点可声明“占用资源”（旧文件中的位移声明兼容保留）：对象来源＋属性名，支持公共库选择和自定义下划线输入。含义是该节点执行时产生、由本行为持有至结束的占用；仅移动或普通属性增减不能推断为占用。
 
 结束节点的“释放资源（自动）”引用从开始可达且能通向本节点的前序声明，展示对象、属性、来源节点；修改、删除、断线、撤销及公共库改名均自动反映。各分支引用取并集，不意味着每次全部占用；设计语义是只释放本次实际产生、仍由本行为持有的资源。编辑器不模拟运行时，不凭对象类型猜测具体实例或释放顺序；同类型的不同占用由来源节点与声明ID分别追踪。
 
@@ -121,7 +121,7 @@ PNG浏览器测试首次先运行 `npx playwright install chromium`，然后 `np
 
 ## 对象名联动（2026-10-19）
 
-ObjectNameInput.jsx 复用 TextChoice，objectChoices/objectName 负责按类型筛选及稳定引用显示。可选 objectName 为 item:<ID> 或自定义字符串，覆盖准入规则、位移、共享判断属性、分支、执行属性/Buff、循环和占用声明；节点摘要同步显示。位移旧 destination 在交互对象模式无 objectName 时兼容展示，坐标模式仍用 destination。未知字符串保留，不根据名称重写引用。
+ObjectNameInput.jsx 复用 TextChoice，objectChoices/objectName 负责按类型筛选及稳定引用显示。可选 objectName 为 item:<ID> 或自定义字符串，覆盖准入规则、共享判断属性、分支、执行属性/Buff、循环和占用声明；节点摘要同步显示。位移旧 destination 在交互对象模式无 objectName 时兼容展示，坐标模式仍用 destination。未知字符串保留，不根据名称重写引用。
 
 公共库新增可选 items；canonicalLibrary 比较该数组，避免基础三表不变时丢掉名录刷新。FeishuRepository 从对象类型行“对象表ID”读各类型目录、分页拉取并校验整库；保留旧三表无映射兼容。线上只读查询支持目录分表筛选。旧后台不支持名录写入，维护在飞书进行。
 
@@ -172,3 +172,16 @@ downloadBehavior.js 写原始文件文本至已授权目录，检查同名确认
 tests/online-behaviors.cjs、download-behavior.cjs 和 online-files.spec.cjs 以隔离数据模拟 API 与目录权限，覆盖读写分离、Unicode、冲突、失败恢复、只读草稿隔离和令牌不落盘。不使用真实用户 Token 或行为文件来测试写入。scripts/validate-behaviors.mjs 用相同校验器检查整个目录；PR 工作流不使用 pull_request_target，不读取 Secrets。
 
 2026-10-20 更新：publishedBehaviors.js 从 BASE_URL/data/behaviors/index.json 和 blob SHA 命名的静态 JSON 读取公开行为，不传 Token。export-behaviors.mjs 在校验后生成发布目录，使用 Git blob SHA1（含 blob 长度头）保持下载基线与上传 Git API SHA 一致。只提交脚本，不提交生成快照。在线右侧面板固定 360px，与本地相同；状态区在同一 document-bar，PNG 等按钮保留原位。
+
+
+## 跳出行为与旧位移迁移（2026-10-20）
+
+判断分支、执行节点后续、循环各已启用出口，都可选择“连接节点”或“跳出行为”。后者显示节点色的“↗ 跳出行为”标记，可填可选说明，不配置外部流程，也不隐含结束表演、目标判定或资源释放。需要失败表演时，先连执行节点，再跳出。监听随时触发的通用中断无需逐节点配置。
+
+切换为跳出会移除该出口的连线，保留原目标节点及其表演，支持撤销；切回连接节点时处于未连接状态。循环步骤关闭时隐藏对应标记，重新启用恢复。在线只读预览、PNG、保存恢复及复制排序均保留标记。通用跳出的资源清理由行为外规则负责；正常结束仅展示可追溯的占用，无占用时隐藏。
+
+新建不再提供位移节点，默认模板不含位移和中断结束。旧文件不自动改写：选中旧位移，点击“移除旧位移并接续”，仅在正常出口唯一且接续不会生成自身循环时执行，前序出口身份保持不变。原位移数据及涉及连线存入 behavior.legacyMovement，支持撤销；原结束节点不会自动删除。请核对原占用与自定义说明，外部占用不自动搬到执行节点。旧中断连线可逐条切换为跳出，不按节点名猜测。
+
+缓存模板有独立版本；回退到旧缓存模板时采用新版内置模板。现有正式文件和编辑草稿继续恢复，不清空缓存，不批量迁移线上文件。examples/eat-snack.json 保留为旧格式兼容示例；新格式示例见 examples/external-exits.json。
+
+数据：节点 data.externalExits=[{handle,note}]，执行节点 handle 为空字符串，判断使用稳定分支ID，循环使用 complete/insufficient/rest/continue。此列表与同出口 graph.edges 互斥，documentValidation 同时覆盖本地、在线、上传及发布校验。支持关闭的循环出口保留记录；分支删除清理对应记录，排序不改ID。旧 move 类型仍被校验器接受，但创建入口停用。实现入口：externalExits.js、BranchDestination.jsx、behaviorStore.setBranchDestination；回归：tests/external-exits.cjs、external-exits.spec.cjs、move-outputs.spec.cjs。

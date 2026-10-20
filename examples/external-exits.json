@@ -1,0 +1,192 @@
+{
+  "behavior": {
+    "name": "分支跳出示例",
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [],
+      "consumableRules": [],
+      "attributeRules": []
+    },
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "goal_initial",
+        "source": "",
+        "attribute": "",
+        "influence": ""
+      }
+    ],
+    "templateVersion": 2
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "behavior_start",
+        "type": "start",
+        "position": {
+          "x": 0,
+          "y": 180
+        },
+        "data": {}
+      },
+      {
+        "id": "template_judge",
+        "type": "judge",
+        "position": {
+          "x": 360,
+          "y": 180
+        },
+        "data": {
+          "judgeAttributes": [],
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "继续执行",
+              "weightExpectation": "",
+              "weightFactors": []
+            },
+            {
+              "id": "branch_2",
+              "name": "先表演再跳出",
+              "weightExpectation": "",
+              "weightFactors": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "template_result_1",
+        "type": "result",
+        "position": {
+          "x": 720,
+          "y": 0
+        },
+        "data": {
+          "animation": "",
+          "playMode": "",
+          "effectRules": [],
+          "outputs": []
+        }
+      },
+      {
+        "id": "template_result_2",
+        "type": "result",
+        "position": {
+          "x": 720,
+          "y": 380
+        },
+        "data": {
+          "animation": "沮丧地叹气",
+          "playMode": "单次",
+          "effectRules": [],
+          "outputs": [],
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "交回外部通用流程"
+            }
+          ]
+        }
+      },
+      {
+        "id": "template_loop",
+        "type": "loop",
+        "position": {
+          "x": 1080,
+          "y": 180
+        },
+        "data": {
+          "loopVersion": 2,
+          "completionCondition": "",
+          "completionRules": [],
+          "resourceCheck": "",
+          "resourceRules": [],
+          "failureReason": "",
+          "admissionEnabled": true,
+          "restEnabled": true,
+          "restExpectation": "",
+          "restCondition": "",
+          "restRules": [],
+          "externalExits": [
+            {
+              "handle": "insufficient",
+              "note": ""
+            }
+          ]
+        }
+      },
+      {
+        "id": "template_wait",
+        "type": "wait",
+        "position": {
+          "x": 1440,
+          "y": 560
+        },
+        "data": {}
+      },
+      {
+        "id": "template_end",
+        "type": "end",
+        "position": {
+          "x": 1440,
+          "y": 0
+        },
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "playExpectation": ""
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "behavior_start_next",
+        "source": "behavior_start",
+        "target": "template_judge"
+      },
+      {
+        "id": "template_judge_branch_1",
+        "source": "template_judge",
+        "target": "template_result_1",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "template_judge_branch_2",
+        "source": "template_judge",
+        "target": "template_result_2",
+        "sourceHandle": "branch_2"
+      },
+      {
+        "id": "template_result_1_next",
+        "source": "template_result_1",
+        "target": "template_loop"
+      },
+      {
+        "id": "template_loop_complete",
+        "source": "template_loop",
+        "target": "template_end",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "template_loop_rest",
+        "source": "template_loop",
+        "target": "template_wait",
+        "sourceHandle": "rest"
+      },
+      {
+        "id": "template_loop_continue",
+        "source": "template_loop",
+        "target": "template_judge",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "template_wait_next",
+        "source": "template_wait",
+        "target": "template_judge"
+      }
+    ]
+  }
+}

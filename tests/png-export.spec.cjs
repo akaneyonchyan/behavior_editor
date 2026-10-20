@@ -9,8 +9,8 @@ test.beforeEach(async({page})=>{
  await page.addInitScript(()=>{window.showSaveFilePicker=undefined})
  await page.goto('/')
  await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
- await expect(page.locator('.react-flow__node')).toHaveCount(9)
- await expect(page.locator('.react-flow__edge-path')).toHaveCount(12)
+ await expect(page.locator('.react-flow__node')).toHaveCount(7)
+ await expect(page.locator('.react-flow__edge-path')).toHaveCount(9)
  await page.waitForTimeout(500)
 })
 test('full and visible PNG downloads preserve graph, selection, viewport and save state',async({page},info)=>{
@@ -61,7 +61,7 @@ test('snapshot strips editing UI, preserves arrows and custom text, honors disab
   host.remove();return result
  })
  expect(result.removed).toBe(0);expect(result.arrows).toBeGreaterThan(0);expect(result.custom).toBeGreaterThan(0)
- expect(result.edges).toBe(11);expect(result.text).toContain('中文长说明');expect(result.text).not.toContain('第三步')
+ expect(result.edges).toBe(8);expect(result.text).toContain('中文长说明');expect(result.text).not.toContain('第三步')
  expect(result.fits).toBe(true);expect(Math.abs(result.w1-result.w2)).toBeLessThanOrEqual(1);expect(Math.abs(result.h1-result.h2)).toBeLessThanOrEqual(1)
 })
 test('oversized graph is rejected without download; cancellation changes nothing',async({page})=>{

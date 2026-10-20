@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useBehaviorStore } from '../store/behaviorStore'
 import { useDocumentSession, startPersistence, supportsDirectory, authorizeStoredAccess, chooseDirectory, skipSetup, newDocument, openDocument, openFallback, saveDocument, loadExample, recoveryDrafts, recoverDraft } from '../store/documentSession'
-import example from '../../examples/eat-snack.json'
+import example from '../../examples/external-exits.json'
 import PngExport from './PngExport'
 import {useFileView} from '../store/fileView'
 import {downloadBehavior} from '../utils/downloadBehavior'

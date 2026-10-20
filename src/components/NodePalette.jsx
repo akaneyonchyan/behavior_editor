@@ -1,7 +1,7 @@
 import React from 'react'
 import { NODE_CONFIG, NODE_TYPES } from '../constants/behaviorTypes'
 import './NodePalette.css'
-const palette=Object.entries(NODE_CONFIG).filter(([type])=>type!=='start')
+const palette=Object.entries(NODE_CONFIG).filter(([type])=>type!=='start'&&type!=='move')
 
 export default function NodePalette({ onAddNode }) {
   const handleDragStart = (event, nodeType) => {

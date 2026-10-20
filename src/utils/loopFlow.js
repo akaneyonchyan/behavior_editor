@@ -1,6 +1,6 @@
 export const LOOP_OUTPUTS = [
-  {id:'complete',label:'目标达成 → 成功结算'},
-  {id:'insufficient',label:'准入不满足 → 结束收尾'},
+  {id:'complete',label:'目标达成'},
+  {id:'insufficient',label:'准入不满足'},
   {id:'rest',label:'触发稍息 → 待机'},
   {id:'continue',label:'不稍息 → 继续执行'}
 ]

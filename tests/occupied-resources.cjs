@@ -2,6 +2,8 @@ const assert=require('node:assert/strict'),{buildSync}=require('esbuild'),Module
 const file=path.join(process.cwd(),'occupied-test.cjs'),m=new Module(file,module);m.filename=file;m.paths=module.paths
 m._compile(buildSync({stdin:{contents:"export * from './src/utils/occupiedResources.js';export {blankTemplate} from './src/utils/blankTemplate.js';export {useBehaviorStore as store} from './src/store/behaviorStore.js'",resolveDir:process.cwd()},bundle:true,platform:'node',format:'cjs',write:false}).outputFiles[0].text,file)
 const {upstreamOccupancies:derive,blankTemplate,store}=m.exports,c=blankTemplate(),nodes=c.graph.nodes,edges=c.graph.edges
+nodes.splice(1,0,{id:'template_move',type:'move',position:{x:180,y:180},data:{}})
+edges.find(e=>e.source==='behavior_start').target='template_move';edges.push({id:'legacy_move_next',source:'template_move',target:'template_judge'})
 const row=id=>({id,source:'object:point',attribute:'occupied'})
 nodes.find(n=>n.type==='move').data.occupiedResources=[row('move')]
 nodes.find(n=>n.id==='template_result_1').data.occupiedResources=[row('branch1')]

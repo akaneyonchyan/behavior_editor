@@ -3,8 +3,8 @@ const file=path.join(process.cwd(),'endings-test.cjs'),m=new Module(file,module)
 m._compile(buildSync({stdin:{contents:"export * from './src/utils/endings.js';export {blankTemplate} from './src/utils/blankTemplate.js';export {useBehaviorStore as store} from './src/store/behaviorStore.js'",resolveDir:process.cwd()},bundle:true,platform:'node',format:'cjs',write:false}).outputFiles[0].text,file)
 const {splitLegacyEnd,blankTemplate,store}=m.exports
 const template=blankTemplate(),ends=template.graph.nodes.filter(n=>n.type==='end')
-assert.equal(ends.length,2);assert.ok(ends.every(n=>!Object.hasOwn(n.data,'endReason')));assert.equal(m.exports.endLabel({endReason:'中断'}),'结束')
-assert.notEqual(template.graph.edges.find(e=>e.sourceHandle==='complete').target,template.graph.edges.find(e=>e.sourceHandle==='insufficient').target)
+assert.equal(ends.length,1);assert.ok(ends.every(n=>!Object.hasOwn(n.data,'endReason')));assert.equal(m.exports.endLabel({endReason:'中断'}),'结束')
+assert.ok(!template.graph.edges.some(e=>e.sourceHandle==='insufficient'))
 const nodes=[{id:'loop',type:'loop',position:{x:0,y:0},data:{}},{id:'other',type:'result',position:{x:0,y:0},data:{}},{id:'end',type:'end',position:{x:400,y:100},data:{successAnimation:'欢呼',failAnimation:'叹气',playMode:'计时',playExpectation:'短暂',releaseResources:['点位'],targetCondition:'自定义目标',custom:'保留'}}]
 const edges=[{id:'a',source:'loop',sourceHandle:'complete',target:'end'},{id:'b',source:'loop',sourceHandle:'insufficient',target:'end'},{id:'c',source:'other',target:'end'}],before=JSON.stringify({nodes,edges})
 assert.throws(()=>splitLegacyEnd(nodes,edges,'end',{},'new'),/每条入线/)

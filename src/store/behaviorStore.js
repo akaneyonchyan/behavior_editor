@@ -1,3 +1,4 @@
+import {externalExit, exitEnabled, clearExit, portKey, bypassLegacyMove} from '../utils/externalExits'
 import { create } from 'zustand'
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow'
 import { NODE_CONFIG } from '../constants/behaviorTypes'
@@ -19,15 +20,30 @@ export const useBehaviorStore = create((set, get) => {
     updateBehaviorInfo: updates => commit({ behaviorInfo: normalizeMetadata({ ...get().behaviorInfo, ...updates }) }),
     selectNode: node => set(s=>({ selectedNode: node, ...(!node?{nodes:s.nodes.map(n=>({...n,selected:false}))}: {}) })),
     addNode: node => {
-      if(node.type==='start')return
-      const s=get(),targets=[...new Set(s.edges.filter(e=>e.sourceHandle==='unreachable'&&s.nodes.some(n=>n.id===e.source&&n.type==='move')&&s.nodes.some(n=>n.id===e.target&&n.type==='end')).map(e=>e.target))]
-      const edges=node.type==='move'&&targets.length===1?[...s.edges,{id:crypto.randomUUID(),source:node.id,target:targets[0],sourceHandle:'unreachable',type:'default'}]:s.edges
-      commit({ nodes: [...s.nodes.map(n => ({ ...n, selected: false })), { ...node, selected: true }],edges, selectedNode: node })
+      if(node.type==='start'||node.type==='move')return
+      const s=get()
+      commit({ nodes: [...s.nodes.map(n => ({ ...n, selected: false })), { ...node, selected: true }], selectedNode: node })
     },
     updateNode: (id, updates) => {
-      const nodes = get().nodes.map(n => n.id === id ? { ...n, data: { ...n.data, ...updates } } : n)
+      const nodes = get().nodes.map(n => n.id === id ? { ...n, data: { ...n.data, ...updates, ...(updates.branches?{externalExits:(n.data.externalExits||[]).filter(r=>updates.branches.some(b=>b.id===r.handle))}:{}) } } : n)
       const edges = get().edges.filter(e => e.source !== id || !updates.branches || !e.sourceHandle || updates.branches.some(b => b.id === e.sourceHandle))
       commit({ nodes, edges, selectedNode: nodes.find(n => n.id === get().selectedNode?.id) || null })
+    },
+    setBranchDestination: (id,handle,mode,target,note) => {
+      const s=get(),node=s.nodes.find(n=>n.id===id)
+      if(!exitEnabled(node,handle)||!['external','node'].includes(mode))return
+      if(mode==='node'&&target&&(!s.nodes.some(n=>n.id===target&&n.type!=='start')||(node.type==='loop'&&target===id)))return
+      const data=clearExit(node.data,handle)
+      if(mode==='external')data.externalExits.push({handle:portKey(handle),note:note??externalExit(node.data,handle)?.note??''})
+      const nodes=s.nodes.map(n=>n.id===id?{...n,data}:n)
+      const replacing=mode==='external'||target!==undefined
+      const edges=replacing?s.edges.filter(e=>!(e.source===id&&portKey(e.sourceHandle)===portKey(handle))):s.edges
+      if(mode==='node'&&target)edges.push({id:crypto.randomUUID(),source:id,target,...(handle?{sourceHandle:handle}:{}),type:'default'})
+      commit({nodes,edges,selectedNode:nodes.find(n=>n.id===s.selectedNode?.id)||null})
+    },
+    removeLegacyMove: id => {
+      const s=get(),{nodes,edges,archive}=bypassLegacyMove(s.nodes,s.edges,id)
+      commit({nodes,edges,behaviorInfo:{...s.behaviorInfo,legacyMovement:[...(s.behaviorInfo.legacyMovement||[]),clone(archive)]},selectedNode:null,documentRevision:s.documentRevision+1})
     },
     changeNodes: changes => set(s => {
       const nodes = applyNodeChanges(changes.filter(c=>!(c.type==='remove'&&s.nodes.some(n=>n.id===c.id&&n.type==='start'))), s.nodes)
@@ -41,6 +57,8 @@ export const useBehaviorStore = create((set, get) => {
         if(params.sourceHandle||!get().nodes.some(n=>n.id===params.target))return
         commit({edges:addEdge({...params,id:crypto.randomUUID(),type:'default'},get().edges.filter(e=>e.source!==source.id))});return
       }
+      if(externalExit(source.data,params.sourceHandle))return
+      if(['judge','result'].includes(source.type))return get().setBranchDestination(source.id,params.sourceHandle||'','node',params.target)
       if(source?.type==='loop')return get().setLoopTarget(params.source,params.sourceHandle,params.target)
       if(source.type==='move'){
         if(params.sourceHandle&&params.sourceHandle!=='unreachable')return
@@ -58,6 +76,7 @@ export const useBehaviorStore = create((set, get) => {
     setLoopTarget: (id,handle,target) => {
       const s=get(),node=s.nodes.find(n=>n.id===id)
       if(node?.type!=='loop'||!isLoopOutputEnabled(node.data,handle)||target===id||(target&&!s.nodes.some(n=>n.id===target&&n.type!=='start')))return
+      if(externalExit(node.data,handle))return
       const existing=s.edges.find(e=>e.source===id&&e.sourceHandle===handle)
       if((existing?.target||'')===target)return
       const edges=s.edges.filter(e=>!(e.source===id&&e.sourceHandle===handle))
@@ -66,7 +85,7 @@ export const useBehaviorStore = create((set, get) => {
     },
     assignLoopEdge: (edgeId,handle) => {
       const s=get(),edge=s.edges.find(e=>e.id===edgeId)
-      if(!edge||edge.sourceHandle||!isLoopOutputEnabled(s.nodes.find(n=>n.id===edge.source)?.data||{},handle)||s.nodes.find(n=>n.id===edge.source)?.type!=='loop'||s.edges.some(e=>e.source===edge.source&&e.sourceHandle===handle))return
+      if(!edge||externalExit(s.nodes.find(n=>n.id===edge.source)?.data||{},handle)||edge.sourceHandle||!isLoopOutputEnabled(s.nodes.find(n=>n.id===edge.source)?.data||{},handle)||s.nodes.find(n=>n.id===edge.source)?.type!=='loop'||s.edges.some(e=>e.source===edge.source&&e.sourceHandle===handle))return
       commit({edges:s.edges.map(e=>e.id===edgeId?{...e,sourceHandle:handle}:e)})
     },
     splitEnd: (id,assignments) => {const s=get(),patch=splitLegacyEnd(s.nodes,s.edges,id,assignments);commit({...patch,selectedNode:patch.nodes.find(n=>n.id===id),documentRevision:s.documentRevision+1})},

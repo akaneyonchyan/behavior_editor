@@ -8,7 +8,7 @@ const good=file('行为.JSON','\ufeff'+JSON.stringify(a.blankTemplate())),bad=fi
 const dir={name:'行为目录',async queryPermission({mode}){return mode==='read'?'granted':'denied'},async *values(){yield cache;yield nonjson;yield bad;yield good}}
 async function main(){
  const stop=a.startPersistence();await a.waitForInitialization();a.skipSetup();window.showDirectoryPicker=async()=>dir;await a.chooseDirectory()
- const listed=await a.listBehaviorFiles(dir,good);assert.equal(listed.files.length,2);assert.ok(listed.files.find(f=>f.name===bad.name).error);assert.equal(listed.files.find(f=>f.current).nodes,9)
+ const listed=await a.listBehaviorFiles(dir,good);assert.equal(listed.files.length,2);assert.ok(listed.files.find(f=>f.name===bad.name).error);assert.equal(listed.files.find(f=>f.current).nodes,7)
  assert.equal((await a.listBehaviorFiles(null)).permission,'missing');assert.equal((await a.listBehaviorFiles({...dir,queryPermission:async()=> 'prompt'})).permission,'prompt')
  assert.equal(await a.openDirectoryFile(good,dir),true);assert.equal(a.getCurrentFileHandle(),good);assert.equal(a.useDocumentSession.getState().dirty,false)
  a.graph.getState().updateBehaviorInfo({name:'未保存'});const before=JSON.stringify(a.graph.getState().exportConfig());window.confirm=()=>false
