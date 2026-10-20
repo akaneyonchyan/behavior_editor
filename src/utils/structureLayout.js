@@ -1,3 +1,4 @@
+import {structureRanks} from './structureRanks'
 import {activeEdges,resolveScopes} from './loopStructure'
 import {containerTarget} from './normalizeBehavior'
 // Visual-only wrappers and boundary segments; domain graph stays unchanged.
@@ -53,14 +54,8 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
    const from=rep(e.source,scope),to=rep(e.target,scope)
    if(from!==to&&set.has(from)&&set.has(to)&&!links.some(x=>x[0]===from&&x[1]===to))links.push([from,to])
   }
-  // Stable topological ranks; cyclic leftovers stay visible without inventing semantics.
-  const degree=new Map(items.map(id=>[id,links.filter(x=>x[1]===id).length])),rank=new Map(items.map(id=>[id,0]))
-  const pending=items.filter(id=>degree.get(id)===0),visited=new Set()
-  while(pending.length){
-   const id=pending.shift();visited.add(id)
-   for(const [,to] of links.filter(x=>x[0]===id)){rank.set(to,Math.max(rank.get(to),rank.get(id)+1));degree.set(to,degree.get(to)-1);if(degree.get(to)===0)pending.push(to)}
-  }
-  if(visited.size!==items.length&&items.length)warnings.push({id:scope||null,message:'存在交叉回路，已保留原连线；该区域的横向顺序需核对。'})
+  const preferred=scope?rep(scopes.find(s=>s.loopId===scope)?.entry,scope):nodes.find(n=>n.type==='start')?.id
+  const rank=structureRanks(items,links,preferred)
   // Honor branch order without cloning merge targets.
   const order=new Map(items.map((id,i)=>[id,i]))
   for(const n of nodes.filter(n=>n.type==='judge'))(n.data.branches||[]).forEach((b,i)=>{
