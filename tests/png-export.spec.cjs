@@ -16,10 +16,16 @@ test.beforeEach(async({page})=>{
 test('full and visible PNG downloads preserve graph, selection, viewport and save state',async({page},info)=>{
  await page.locator('.react-flow__node').nth(2).click()
  const before=await snapshot(page)
+ const barBefore=await page.locator('.document-bar').boundingBox()
+ const buttonsBefore=await page.locator('.document-actions .toolbar-btn').evaluateAll(nodes=>nodes.map(n=>{const b=n.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height}}))
  await page.getByRole('button',{name:'导出 PNG',exact:true}).click()
  const pending=page.waitForEvent('download')
  await page.getByRole('button',{name:'下载 PNG',exact:true}).click()
  const download=await pending
+ await expect(page.locator('.document-message')).toContainText('已生成 PNG')
+ await expect(page.locator('.document-actions [role=status]')).toHaveCount(0)
+ expect(await page.locator('.document-bar').boundingBox()).toEqual(barBefore)
+ expect(await page.locator('.document-actions .toolbar-btn').evaluateAll(nodes=>nodes.map(n=>{const b=n.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height}}))).toEqual(buttonsBefore)
  expect(download.suggestedFilename()).toMatch(/行为图-\d{8}-\d{6}\.png$/)
  const file=info.outputPath('full.png');await download.saveAs(file)
  const bytes=await fs.readFile(file)
@@ -110,5 +116,5 @@ test('PNG save picker starts in the chosen directory and cancellation preserves 
  await page.getByRole('button',{name:'下载 PNG',exact:true}).click();await expect(page.getByRole('button',{name:'下载 PNG',exact:true})).toBeEnabled();expect(await page.evaluate(()=>window.pngTest.closed)).toBe(0);expect(await snapshot(page)).toBe(before)
  await page.evaluate(()=>{window.pngTest.cancel=false});await page.getByRole('button',{name:'下载 PNG',exact:true}).click();await expect(page.getByRole('dialog',{name:'导出行为图 PNG'})).toHaveCount(0)
  const result=await page.evaluate(()=>window.pngTest);expect(result.sameDirectory).toBe(true);expect(result.active).toBe(true);expect(result.closed).toBe(1);expect(result.bytes).toEqual([137,80,78,71,13,10,26,10]);expect(await snapshot(page)).toBe(before)
- await expect(page.locator('.png-export-notice')).toContainText('PNG 已保存：测试导出.png')
+ await expect(page.locator('.document-message')).toContainText('PNG 已保存：测试导出.png')
 })
