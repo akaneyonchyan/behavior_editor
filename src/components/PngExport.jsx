@@ -6,10 +6,10 @@ import {useCanvasView} from '../store/canvasView'
 
 export default function PngExport(){
   const directoryName=useDocumentSession(s=>s.directoryName),canChoose=typeof window.showSaveFilePicker==='function'
-  const [open,setOpen]=useState(false),[scope,setScope]=useState('all'),[scale,setScale]=useState(2),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
+  const [open,setOpen]=useState(false),[scope,setScope]=useState('all'),[scale,setScale]=useState(2),[busy,setBusy]=useState(false),[error,setError]=useState('')
   async function run(){
     if(busy)return
-    setBusy(true);setError('');setNotice('')
+    setBusy(true);setError('')
     let snapshot
     try{
       let source=document.querySelector('.canvas > .react-flow')
@@ -23,13 +23,12 @@ export default function PngExport(){
         source=snapshot.source
       }
       const frame=await exportCanvasPng(source,options,{download:destination.download})
-      setOpen(false);setNotice((destination.saved?'PNG 已保存：'+destination.name:'已生成 PNG 并发起浏览器下载')+'（'+frame.pixelWidth+'×'+frame.pixelHeight+'）')
+      setOpen(false);useDocumentSession.setState({notice:(destination.saved?'PNG 已保存：'+destination.name:'已生成 PNG 并发起浏览器下载')+'（'+frame.pixelWidth+'×'+frame.pixelHeight+'）'})
     }catch(e){setError('导出失败：'+e.message)}
     finally{snapshot?.dispose();setBusy(false)}
   }
   return <>
-    <button className="toolbar-btn" onClick={()=>{setOpen(true);setError('');setNotice('')}}>导出 PNG</button>
-    {notice&&<span role="status" className="png-export-notice">{notice}</span>}
+    <button className="toolbar-btn" onClick={()=>{setOpen(true);setError('')}}>导出 PNG</button>
     {open&&<div className="dialog-overlay"><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="png-export-title">
       <div className="dialog-header"><h3 id="png-export-title">导出行为图 PNG</h3><button className="dialog-close" disabled={busy} aria-label="关闭导出" onClick={()=>setOpen(false)}>×</button></div>
       <div className="dialog-content png-export-options">

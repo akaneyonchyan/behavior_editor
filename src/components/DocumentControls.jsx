@@ -46,7 +46,7 @@ export default function DocumentControls() {
 {readOnly&&<div className="save-status"><strong>在线只读：{file?.name||'请选择文件'}</strong><span>点击“另存为”保存到本地后编辑。</span></div>}
     </div>
     {(s.error || s.notice) && <div className={'document-message ' + (s.error ? 'error' : '')} role={s.error ? 'alert' : 'status'}>
-      {s.error || s.notice}<button onClick={() => useDocumentSession.setState({ error: '', notice: '' })} aria-label="关闭保存提示">×</button>
+      <span>{s.error}{s.error&&s.notice?' · ':''}{s.notice}</span><button onClick={() => useDocumentSession.setState({ error: '', notice: '' })} aria-label="关闭保存提示">×</button>
     </div>}
 
     {s.ready && s.firstRun && <div className="dialog-overlay"><div className="dialog" role="dialog" aria-modal="true" aria-labelledby="setup-title">
