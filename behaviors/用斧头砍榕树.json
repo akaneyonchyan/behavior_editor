@@ -1,0 +1,1127 @@
+{
+  "behavior": {
+    "name": "用斧头砍榕树｜木材与意外宝藏",
+    "templateVersion": 4,
+    "matchTargets": [],
+    "description": "执行者为行为伙伴，采集对象为乔木中的榕树实例。沿用木材达到N或挥砍轮次达到M结束循环，非跳出轮次判定个性稍息。建议顺序：挥斧与基础消耗→确定损坏→互斥抽取脱手/卡住/正常→正常轮木材结算→额外宝藏→产量归零检查。异常轮暂定不产木材；宝藏不替代木材，最后一轮也可发现。采集效率受精力、体型、个性、情绪共同影响，枚举不直接相乘，具体效率映射待配置。寻路、位移、通用监听在图外；炫耀Buff可能插入监听行为，以通用调度为准。",
+    "targetRules": [
+      {
+        "id": "wood_goal",
+        "source": "object:material",
+        "objectName": "item:material/reczz28P81JmdGLh",
+        "attribute": "数量",
+        "influence": "10"
+      }
+    ],
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "tree",
+          "objectType": "environmentItem",
+          "objectName": "item:environmentItem/reczz28PAurCbpZn"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": [
+        {
+          "id": "equipped",
+          "source": "object:partner",
+          "objectName": "item:partner/reczz28PAvx7wYyE",
+          "attribute": "equipped_slot_tool",
+          "influence": "斧头"
+        },
+        {
+          "id": "usable",
+          "source": "object:equippedItem",
+          "objectName": "item:equippedItem/reczz28P8wQhomvk",
+          "attribute": "durability",
+          "influence": "大于0"
+        },
+        {
+          "id": "stock",
+          "source": "object:environmentItem",
+          "objectName": "榕树",
+          "attribute": "reczz28PBhFkUjct",
+          "influence": "大于0"
+        }
+      ]
+    }
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "loop",
+          "entry": "chop",
+          "members": [
+            "chop",
+            "state",
+            "broken",
+            "grip",
+            "fly",
+            "yield",
+            "wood",
+            "depleted",
+            "rest_check",
+            "rest",
+            "stuck",
+            "treasure_check",
+            "treasure"
+          ]
+        }
+      ],
+      "positions": {
+        "__scope_loop": {
+          "x": 380,
+          "y": 0
+        },
+        "chop": {
+          "x": 120,
+          "y": 246
+        },
+        "state": {
+          "x": 500,
+          "y": 246
+        },
+        "broken": {
+          "x": 880,
+          "y": 246
+        },
+        "grip": {
+          "x": 880,
+          "y": 741
+        },
+        "fly": {
+          "x": 1260,
+          "y": 246
+        },
+        "yield": {
+          "x": 2396.3005714285714,
+          "y": 260.18114285714285
+        },
+        "wood": {
+          "x": 1260,
+          "y": 1471
+        },
+        "depleted": {
+          "x": 2780,
+          "y": 246
+        },
+        "rest_check": {
+          "x": 2780,
+          "y": 612
+        },
+        "rest": {
+          "x": 3160,
+          "y": 246
+        },
+        "stuck": {
+          "x": 1260,
+          "y": 793
+        },
+        "treasure_check": {
+          "x": 1640,
+          "y": 246
+        },
+        "treasure": {
+          "x": 2020,
+          "y": 246
+        },
+        "start": {
+          "x": 0,
+          "y": 0
+        },
+        "end": {
+          "x": 4036,
+          "y": 0
+        }
+      }
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始"
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "loop",
+        "type": "loop",
+        "data": {
+          "name": "榕树砍空或达到轮次上限",
+          "loopVersion": 3,
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "M（本次配置）",
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "goal",
+              "condition": "本次实际获得木材≥N",
+              "rules": [
+                {
+                  "id": "wood_count",
+                  "source": "object:environmentItem",
+                  "objectName": "榕树",
+                  "attribute": "reczz28PBhFkUjct",
+                  "influence": "不为0"
+                }
+              ]
+            },
+            {
+              "id": "limit",
+              "kind": "count",
+              "maxIterations": "M（本次配置）",
+              "condition": "",
+              "rules": []
+            }
+          ],
+          "completionCondition": "本次木材足够，或砍伐轮次达到上限",
+          "completionRules": []
+        },
+        "position": {
+          "x": 350,
+          "y": 0
+        }
+      },
+      {
+        "id": "chop",
+        "type": "result",
+        "data": {
+          "name": "挥斧砍树",
+          "animation": "双脚站稳，双手握柄抬起斧头，朝树干砍下一斧；斧刃接触树干后衔接本轮结果。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "energy_cost",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy",
+              "influence": "减少；重量越大消耗越快",
+              "kind": "attribute"
+            },
+            {
+              "id": "satiety_cost",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "satiety",
+              "influence": "按本轮劳动消耗减少，具体量待配置",
+              "kind": "attribute"
+            },
+            {
+              "id": "durability_cost",
+              "source": "object:equippedItem",
+              "objectName": "item:equippedItem/reczz28P8wQhomvk",
+              "attribute": "durability",
+              "influence": "使用消耗，最低为0",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "description": ""
+        },
+        "position": {
+          "x": 0,
+          "y": 300
+        }
+      },
+      {
+        "id": "state",
+        "type": "judge",
+        "data": {
+          "name": "检查本轮斧头是否损坏",
+          "judgeAttributes": [
+            {
+              "id": "dur",
+              "source": "object:equippedItem",
+              "objectName": "item:equippedItem/reczz28P8wQhomvk",
+              "attribute": "durability",
+              "influence": ""
+            }
+          ],
+          "branches": [
+            {
+              "id": "broken",
+              "name": "斧头耐久归零",
+              "condition": "耐久≤0",
+              "weightExpectation": "满足条件必选",
+              "weightFactors": []
+            },
+            {
+              "id": "usable",
+              "name": "斧头仍可用",
+              "condition": "耐久>0",
+              "weightExpectation": "其余情况",
+              "weightFactors": []
+            }
+          ],
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 360,
+          "y": 300
+        }
+      },
+      {
+        "id": "broken",
+        "type": "result",
+        "data": {
+          "name": "斧头损坏",
+          "animation": "斧头在砍击后断裂，伙伴停住动作，低头看看断口，失望地垂下手臂。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "broken_buff",
+              "source": "object:equippedItem",
+              "objectName": "item:equippedItem/reczz28P8wQhomvk",
+              "attribute": "损坏",
+              "influence": "添加",
+              "kind": "buff"
+            }
+          ],
+          "outputs": [],
+          "description": "",
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "斧头损坏，立即跳出，保留此前收获。"
+            }
+          ]
+        },
+        "position": {
+          "x": 720,
+          "y": 0
+        }
+      },
+      {
+        "id": "grip",
+        "type": "judge",
+        "data": {
+          "name": "脱手、卡住或正常采集",
+          "judgeAttributes": [
+            {
+              "id": "energy",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy",
+              "influence": ""
+            },
+            {
+              "id": "size",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "body_size",
+              "influence": ""
+            },
+            {
+              "id": "pragmatic",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_pragmatic",
+              "influence": ""
+            },
+            {
+              "id": "weight",
+              "source": "object:equippedItem",
+              "objectName": "item:equippedItem/reczz28P8wQhomvk",
+              "attribute": "重量",
+              "influence": ""
+            },
+            {
+              "id": "durability",
+              "source": "object:equippedItem",
+              "objectName": "item:equippedItem/reczz28P8wQhomvk",
+              "attribute": "durability",
+              "influence": ""
+            }
+          ],
+          "branches": [
+            {
+              "id": "fly",
+              "name": "斧头脱手",
+              "condition": "",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "influence": "数值低 · 概率越高",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "id": "size",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "body_size",
+                  "influence": "小 · 概率越高",
+                  "version": 2,
+                  "attributeId": "size",
+                  "influenceType": "小",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "id": "pragmatic",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_pragmatic",
+                  "influence": "有 · 概率越低",
+                  "version": 2,
+                  "attributeId": "pragmatic",
+                  "influenceType": "有",
+                  "influenceRule": "概率越低"
+                },
+                {
+                  "id": "weight",
+                  "source": "object:equippedItem",
+                  "objectName": "item:equippedItem/reczz28P8wQhomvk",
+                  "attribute": "重量",
+                  "influence": "数值高 · 概率越高",
+                  "version": 2,
+                  "attributeId": "weight",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "id": "durability",
+                  "source": "object:equippedItem",
+                  "objectName": "item:equippedItem/reczz28P8wQhomvk",
+                  "attribute": "durability",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "durability",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            },
+            {
+              "id": "stuck",
+              "name": "斧头卡住",
+              "condition": "",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "size",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "body_size",
+                  "influence": "小 · 概率越高",
+                  "version": 2,
+                  "attributeId": "size",
+                  "influenceType": "小",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "id": "pragmatic",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_pragmatic",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "pragmatic",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "weight",
+                  "source": "object:equippedItem",
+                  "objectName": "item:equippedItem/reczz28P8wQhomvk",
+                  "attribute": "重量",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "weight",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "durability",
+                  "source": "object:equippedItem",
+                  "objectName": "item:equippedItem/reczz28P8wQhomvk",
+                  "attribute": "durability",
+                  "influence": "数值低 · 概率越高",
+                  "version": 2,
+                  "attributeId": "durability",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
+                }
+              ]
+            },
+            {
+              "id": "hold",
+              "name": "正常砍取",
+              "condition": "",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "size",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "body_size",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "size",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "pragmatic",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_pragmatic",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "pragmatic",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "weight",
+                  "source": "object:equippedItem",
+                  "objectName": "item:equippedItem/reczz28P8wQhomvk",
+                  "attribute": "重量",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "weight",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "durability",
+                  "source": "object:equippedItem",
+                  "objectName": "item:equippedItem/reczz28P8wQhomvk",
+                  "attribute": "durability",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "durability",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            }
+          ],
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 720,
+          "y": 450
+        }
+      },
+      {
+        "id": "fly",
+        "type": "result",
+        "data": {
+          "name": "斧头飞出手",
+          "animation": "砍击反弹时手掌一滑，斧头飞离双手；伙伴摊着手愣一下，视线追向斧头落点。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "startled",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:emotion_startled",
+              "influence": "添加",
+              "kind": "buff"
+            },
+            {
+              "id": "clear_slot",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "equipped_slot_tool",
+              "influence": "清空斧头",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "description": "",
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "立即跳出，由后续行为处理取回或放弃。"
+            }
+          ]
+        },
+        "position": {
+          "x": 1080,
+          "y": 100
+        }
+      },
+      {
+        "id": "yield",
+        "type": "judge",
+        "data": {
+          "name": "判断乔木产量",
+          "judgeAttributes": [
+            {
+              "id": "tree_yield",
+              "source": "object:environmentItem",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn",
+              "attribute": "reczz28PBhFkUjct"
+            }
+          ],
+          "description": "",
+          "branches": [
+            {
+              "id": "last",
+              "name": "榕树被砍秃",
+              "condition": "剩余产量=0",
+              "weightExpectation": "满足条件必选",
+              "weightFactors": []
+            },
+            {
+              "id": "more",
+              "name": "仍有产量",
+              "condition": "剩余产量>0",
+              "weightExpectation": "其余情况",
+              "weightFactors": []
+            }
+          ]
+        },
+        "position": {
+          "x": 2160,
+          "y": 800
+        }
+      },
+      {
+        "id": "wood",
+        "type": "result",
+        "data": {
+          "name": "获得本轮木材",
+          "animation": "斧头从砍口退出，木块掉落；伙伴收拢本轮木材，重新握好斧柄。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "gain",
+              "source": "object:material",
+              "objectName": "item:material/reczz28P81JmdGLh",
+              "attribute": "数量",
+              "influence": "增加本轮实际获得量，同时累计本次获得量",
+              "kind": "attribute"
+            },
+            {
+              "id": "yield_cost",
+              "source": "object:environmentItem",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn",
+              "attribute": "reczz28PBhFkUjct",
+              "influence": "扣除同一实际获得量，最低为0",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "description": "木材量由榕树产出配置和伙伴采集效率决定，并限制在剩余产量以内；木材增加与产量扣减使用同一实际数量，只结算一次。效率受精力、体型、个性、情绪影响，不把枚举直接相乘。"
+        },
+        "position": {
+          "x": 1080,
+          "y": 800
+        }
+      },
+      {
+        "id": "depleted",
+        "type": "result",
+        "data": {
+          "name": "榕树被砍秃",
+          "animation": "榕树切换为采尽后的外观，伙伴看看树干，收住斧头。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [],
+          "outputs": [],
+          "description": "",
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "产量为0，立即跳出，保留全部收获。"
+            }
+          ]
+        },
+        "position": {
+          "x": 2520,
+          "y": 650
+        }
+      },
+      {
+        "id": "rest_check",
+        "type": "judge",
+        "data": {
+          "name": "每轮个性稍息判断",
+          "judgeAttributes": [
+            {
+              "id": "energy",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "energy"
+            },
+            {
+              "id": "rigorous",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_rigorous"
+            },
+            {
+              "id": "casual",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_casual"
+            }
+          ],
+          "branches": [
+            {
+              "id": "rest",
+              "name": "稍息",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高",
+                  "influence": "数值低 · 概率越高"
+                },
+                {
+                  "id": "rigorous",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_rigorous",
+                  "version": 2,
+                  "attributeId": "rigorous",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "casual",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_casual",
+                  "version": 2,
+                  "attributeId": "casual",
+                  "influenceType": "具体值",
+                  "influenceRule": "概率越高",
+                  "influence": "具体值 · 概率越高"
+                }
+              ]
+            },
+            {
+              "id": "next",
+              "name": "不稍息",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "id": "energy",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "energy",
+                  "version": 2,
+                  "attributeId": "energy",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "rigorous",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_rigorous",
+                  "version": 2,
+                  "attributeId": "rigorous",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                },
+                {
+                  "id": "casual",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_casual",
+                  "version": 2,
+                  "attributeId": "casual",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "influence": "不影响"
+                }
+              ]
+            }
+          ],
+          "description": ""
+        },
+        "position": {
+          "x": 2520,
+          "y": 1000
+        }
+      },
+      {
+        "id": "rest",
+        "type": "wait",
+        "data": {
+          "name": "个性稍息",
+          "description": ""
+        },
+        "position": {
+          "x": 2880,
+          "y": 1200
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "data": {
+          "name": "结束本次砍树",
+          "animation": "伙伴收住斧头，调整握姿，站稳结束本次砍伐。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "木材达标或达到轮次上限均结束，达到上限不等于目标完成，后续目标策略在图外处理。"
+        },
+        "position": {
+          "x": 3900,
+          "y": 0
+        }
+      },
+      {
+        "id": "stuck",
+        "type": "result",
+        "data": {
+          "name": "斧头卡在榕树里",
+          "animation": "斧刃嵌进树干，伙伴下意识一拽没拽动，松手后吓得缩起肩膀，盯着树里的斧头。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "startled",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:emotion_startled",
+              "influence": "添加",
+              "kind": "buff"
+            },
+            {
+              "id": "needs_unstick",
+              "source": "object:environmentItem",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn",
+              "attribute": "需解卡",
+              "influence": "添加",
+              "kind": "buff"
+            },
+            {
+              "id": "clear_slot",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "equipped_slot_tool",
+              "influence": "移出本次斧头，仅清空该斧头占用槽",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "description": "斧头实例挂接榕树，保留二者关联，清槽不销毁斧头。本轮不产木材；需解卡Buff为自定义需求，不替换为装备物卡住Buff或停用的被卡住Buff。立即跳出，由解卡监听接管。",
+          "externalExits": [
+            {
+              "handle": "",
+              "note": "斧头实例挂接榕树，保留二者关联，清槽不销毁斧头。本轮不产木材；需解卡Buff为自定义需求，不替换为装备物卡住Buff或停用的被卡住Buff。立即跳出，由解卡监听接管。"
+            }
+          ]
+        },
+        "position": {
+          "x": 1080,
+          "y": 450
+        }
+      },
+      {
+        "id": "treasure_check",
+        "type": "judge",
+        "data": {
+          "name": "是否发现树中宝藏",
+          "judgeAttributes": [
+            {
+              "id": "age",
+              "source": "object:environmentItem",
+              "objectName": "item:environmentItem/reczz28PAurCbpZn",
+              "attribute": "树龄",
+              "influence": ""
+            },
+            {
+              "id": "rigorous",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "personality_rigorous",
+              "influence": ""
+            },
+            {
+              "id": "dexterous",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "trait_ability_dexterous",
+              "influence": ""
+            }
+          ],
+          "description": "",
+          "branches": [
+            {
+              "id": "found",
+              "name": "发现宝藏",
+              "condition": "存在尚未取走的可发现宝藏",
+              "weightExpectation": "低",
+              "weightFactors": [
+                {
+                  "id": "age",
+                  "source": "object:environmentItem",
+                  "objectName": "item:environmentItem/reczz28PAurCbpZn",
+                  "attribute": "树龄",
+                  "influence": "老 · 概率越高",
+                  "version": 2,
+                  "attributeId": "age",
+                  "influenceType": "老",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "id": "rigorous",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_rigorous",
+                  "influence": "有 · 概率越高",
+                  "version": 2,
+                  "attributeId": "rigorous",
+                  "influenceType": "有",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "id": "dexterous",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "trait_ability_dexterous",
+                  "influence": "有 · 概率越高",
+                  "version": 2,
+                  "attributeId": "dexterous",
+                  "influenceType": "有",
+                  "influenceRule": "概率越高"
+                }
+              ]
+            },
+            {
+              "id": "none",
+              "name": "没有发现",
+              "condition": "无可发现宝藏时必选，其余情况参与抽取",
+              "weightExpectation": "高",
+              "weightFactors": [
+                {
+                  "id": "age",
+                  "source": "object:environmentItem",
+                  "objectName": "item:environmentItem/reczz28PAurCbpZn",
+                  "attribute": "树龄",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "age",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "rigorous",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "personality_rigorous",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "rigorous",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "id": "dexterous",
+                  "source": "object:partner",
+                  "objectName": "item:partner/reczz28PAvx7wYyE",
+                  "attribute": "trait_ability_dexterous",
+                  "influence": "不影响",
+                  "version": 2,
+                  "attributeId": "dexterous",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1440,
+          "y": 800
+        }
+      },
+      {
+        "id": "treasure",
+        "type": "result",
+        "data": {
+          "name": "取出意外宝藏",
+          "animation": "看到树洞里露出亮闪闪的东西，伙伴停手凑近，小心取出宝藏，捧在手心左右端详，眼睛发亮。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "effectRules": [
+            {
+              "id": "showoff",
+              "source": "object:partner",
+              "objectName": "item:partner/reczz28PAvx7wYyE",
+              "attribute": "buff:buff_showoff",
+              "influence": "添加",
+              "kind": "buff"
+            }
+          ],
+          "outputs": [
+            "宝箱*1"
+          ],
+          "description": ""
+        },
+        "position": {
+          "x": 1800,
+          "y": 650
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "f297ba5e-aa45-4d4a-8702-3fa369fad400",
+        "source": "start",
+        "target": "loop"
+      },
+      {
+        "id": "baf12459-ff32-447f-92c0-d6c513918cdf",
+        "source": "loop",
+        "target": "chop",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "1743f93f-0df1-4c04-b0ab-34c2a97d2134",
+        "source": "loop",
+        "target": "end",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "2b665137-ea2e-4c45-89aa-f8fc05c6c56f",
+        "source": "chop",
+        "target": "state"
+      },
+      {
+        "id": "44486a9c-cd95-4bc5-9123-de22b48d351d",
+        "source": "state",
+        "target": "broken",
+        "sourceHandle": "broken"
+      },
+      {
+        "id": "df4ed1f3-b89e-422f-a20c-f954274f4cb8",
+        "source": "state",
+        "target": "grip",
+        "sourceHandle": "usable"
+      },
+      {
+        "id": "7c8320d0-9275-4e2f-9566-8d4c1b76210b",
+        "source": "grip",
+        "target": "fly",
+        "sourceHandle": "fly"
+      },
+      {
+        "id": "8fe672e3-5745-4450-a351-4ffceedadc9c",
+        "source": "grip",
+        "target": "wood",
+        "sourceHandle": "hold"
+      },
+      {
+        "id": "083a3be5-1afb-4fef-bbef-fde82d40cadd",
+        "source": "yield",
+        "target": "depleted",
+        "sourceHandle": "last"
+      },
+      {
+        "id": "1190fd05-b493-46c5-bece-a729c269017f",
+        "source": "yield",
+        "target": "rest_check",
+        "sourceHandle": "more"
+      },
+      {
+        "id": "505ccb62-37e3-4367-a54d-e5e6e10590a5",
+        "source": "wood",
+        "target": "treasure_check"
+      },
+      {
+        "id": "48149840-ed21-4e57-b09e-d676a6ba1409",
+        "source": "rest_check",
+        "target": "rest",
+        "sourceHandle": "rest"
+      },
+      {
+        "id": "7b9e82f5-c73f-458a-8c48-483e445968eb",
+        "source": "rest_check",
+        "target": "loop",
+        "sourceHandle": "next"
+      },
+      {
+        "id": "b12b4332-ddf2-456d-bc90-2623b9d8e56c",
+        "source": "rest",
+        "target": "loop"
+      },
+      {
+        "id": "3366bc49-dd36-48ed-b347-5683a8c0e26e",
+        "source": "grip",
+        "target": "stuck",
+        "sourceHandle": "stuck"
+      },
+      {
+        "id": "38b8b817-851d-4566-8e6f-ca77085aa226",
+        "source": "treasure_check",
+        "target": "treasure",
+        "sourceHandle": "found"
+      },
+      {
+        "id": "ed6f5dcf-69b9-4b65-a15f-a9f40d13a519",
+        "source": "treasure_check",
+        "target": "yield",
+        "sourceHandle": "none"
+      },
+      {
+        "id": "70dad7de-d944-4c30-833b-3f17084282d4",
+        "source": "treasure",
+        "target": "yield"
+      }
+    ]
+  }
+}
