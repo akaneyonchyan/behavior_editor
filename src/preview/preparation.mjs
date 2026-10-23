@@ -1,4 +1,4 @@
-import {Simulation,bindingsFor,inspect} from './runtime.mjs'
+import {Simulation,bindingsFor,inspect,definition} from './runtime.mjs'
 import {integrationBindings,toolFor} from './integration.mjs'
 import {removeBuff} from './state.mjs'
 
@@ -37,13 +37,16 @@ export function preparationPath(file,files,lib,world,actor,params,stack=[]){
       const tree=predicted.find(e=>e.stuckTool),unstick=files.find(f=>f.config.previewIntegration==='unstick')
       if(tree&&unstick){prepare(unstick);t=toolFor(predicted,actor,r.tool)}
      }
-     if(!t||t.attrs.durability<=0)throw Error('缺少可用工具：'+r.tool+'（不自动生成或修复）')
+     if(!t||t.attrs.durability<=0){
+      const item=predicted.find(e=>e.type==='equippedItem'&&e.name===r.tool),holder=predicted.find(e=>e.id===item?.location&&e.type==='partner')
+      throw Error('缺少可用工具：'+r.tool+'（'+(holder?'由'+holder.name+'持有':item?.location?.startsWith('stuck:')?'卡在对象上':item?.attrs.durability<=0?'已损坏':'场景无可用实例')+'）')
+     }
      if(t.location===actor)continue
      if(r.tool==='斧头'){
       const take=files.find(f=>f.config.previewIntegration==='take');if(!take)throw Error('缺少在线前置行为：从工具架拿取斧头');prepare(take)
      }else{service('equip',r.tool);predicted.find(e=>e.id===actor).attrs.equipped_slot_tool=t.id;t.location=actor}
     }
-   }else throw Error('前置条件尚未满足：'+(r.attribute||r.previewOp)+' / '+r.influence)
+   }else throw Error('前置条件尚未满足：'+(definition(lib,r.attribute)?.name||r.attribute||r.previewOp)+' / '+r.influence)
   }
   // Bait is optional: use its real online preparation graph if available, never make it mandatory.
   if(file.config.previewIntegration==='fish'&&!predicted.find(e=>e.id===actor).buffs.design_fishing_bait){
@@ -51,7 +54,7 @@ export function preparationPath(file,files,lib,world,actor,params,stack=[]){
   }
   const final=new Simulation(file.config,lib,predicted,bound(file.config,lib,predicted,actor),actor,params)
   for(const r of file.config.behavior.preconditions?.attributeRules||[])if(!final.condition(r))throw Error('前置计划无法满足 '+r.attribute)
-  for(const r of file.config.behavior.preconditions?.interactObjectRules||[]){const o=final.entity(r);if(o.reachable===false||o.occupied&&o.occupied!==actor)throw Error(o.name+' 当前不可达或被占用')}
+  for(const r of file.config.behavior.preconditions?.interactObjectRules||[]){const o=final.entity(r);if(o.reachable===false||o.type!=='environmen'&&o.occupied&&o.occupied!==actor)throw Error(o.name+' 当前不可达或被占用')}
   steps.push(file)
   // Only declared, deterministic preparation effects are forecast; stochastic action results are never forecast.
   const owner=predicted.find(e=>e.id===actor),p=file.config.previewIntegration

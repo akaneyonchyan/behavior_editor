@@ -29,7 +29,9 @@ if(fs.existsSync('public/data/behaviors/index.json')){
  const lib=JSON.parse(fs.readFileSync('public/data/library.json','utf8')).library,index=JSON.parse(fs.readFileSync('public/data/behaviors/index.json','utf8'))
  const files=index.files.map(f=>({...f,config:m.exports.parseBehavior(fs.readFileSync('public/data/behaviors/'+f.sha+'.json','utf8'))}))
  const o=new OnlineColony(files,lib,makeScenarioWorld(lib,undefined,files),enabled,{seconds:.1},{dayMode:true})
- o.tick(60)
+ // Reservation filtering can select bait preparation first; its effective craft
+ // time excludes reactions, so a 60-minute wall-clock window is not sufficient.
+ o.tick(120)
  for(const s of Object.values(o.members)){assert.ok(s.completed.length>0,s.actor+' must complete real graphs');assert.ok(!s.files.some(f=>f.name.includes('炫耀')))}
  o.setEnabled('pip',false);const pos=structuredClone(o.world.find(e=>e.id==='pip'));o.tick(2)
  assert.equal(o.world.find(e=>e.id==='pip').x,pos.x);assert.equal(o.world.find(e=>e.id==='pip').z,pos.z)

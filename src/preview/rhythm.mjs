@@ -55,7 +55,7 @@ export function rhythmEffect(s,r){
  if(s.rhythm.id==='eat'&&r.attribute==='satiety'&&['增','增加'].includes(r.influence)){
   const a=s.world.find(o=>o.id===s.actor),food=s.world.find(o=>o.id===a.foodRef)
   if(!food||food.bites<=0||food.attrs.freshness<=0)throw Error('食物已耗尽或变质，停止本口结算')
-  food.bites--;s.log('消耗一口食物；恢复量已按实际进食时间结算')
+  food.bites--;if(food.bites===0)a.attrs.equipped_slot_food='0';s.log('消耗一口食物；恢复量已按实际进食时间结算')
  }
  return true
 }

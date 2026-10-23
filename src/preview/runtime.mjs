@@ -36,6 +36,7 @@ export function makeWorld(lib,p=DEFAULTS,config=null){
   if(type==='partner'||!lib.objects.some(o=>o.enabled&&o.id===type)||!name||name.startsWith('item:')||world.some(o=>o.type===type&&o.name===name))continue
   const id='placeholder-'+world.length;world.push({id,name,type,placeholder:true,x:22+(world.length*7)%55,z:22+(world.length*11)%50,zone:'行为测试区',attrs:attrs(type),buffs:{},inventory:{},color:'#cbbba7'})
  }
+ if(config&&allRules(config).some(({r})=>(r.source||r.objectType)==='object:environmen'||r.objectType==='environmen')&&!world.some(o=>o.type==='environmen'))world.push({id:'preview-environment',name:'当前环境',type:'environmen',placeholder:true,x:80,z:50,attrs:attrs('environmen'),buffs:{},inventory:{}})
  return layoutIsland(world)
 }
 export function bindingsFor(config,lib,world,actor){
@@ -150,7 +151,7 @@ export class Simulation{
    if(this.config.previewIntegration==='showoff'&&n.type==='loop'){const others=this.world.filter(e=>e.type==='partner'&&e.id!==this.actor&&e.visible!==false);if(!others.length){this.status='exited';this.log('没有可见互动伙伴，保留炫耀Buff并交回目标策略');return}const target=others[(this.loops[n.id]||0)%others.length];for(const {r}of allRules(this.config))if(/任意|其他伙伴/.test(r.objectName||''))this.bindings[refKey(r)]=target.id}
    if(n.type==='start'){
     const rs=this.config.behavior.preconditions?.attributeRules||[];if(!rs.every(r=>this.condition(r)))throw Error('准入条件不满足：请调整场景初始属性或 Buff 后重置')
-    const targets=(this.config.behavior.preconditions?.interactObjectRules||[]).map(r=>this.entity(r));if(targets.some(o=>o.occupied&&o.occupied!==this.actor))throw Error('交互对象被其他伙伴占用')
+    const targets=(this.config.behavior.preconditions?.interactObjectRules||[]).map(r=>this.entity(r)).filter(o=>o.type!=='environmen');if(targets.some(o=>o.occupied&&o.occupied!==this.actor))throw Error('交互对象被其他伙伴占用')
     for(const o of targets){o.occupied=this.actor;this.held.add(o.id);this.log('预约 '+o.name)}
     this.next()
    }else if(n.type==='judge'){

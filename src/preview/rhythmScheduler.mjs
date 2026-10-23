@@ -49,7 +49,12 @@ export class RhythmScheduler extends GoalScheduler{
    return {...g,value:g.kind==='home'?1:this.value(g),weight:eligible&&!cooldown?this.score(g):0,base:g.kind==='buff'?800:this.baseScore(g),eligible,cooldown,candidates}
   })
   const chosen=this.requests.shift()||this.goalScores.reduce((a,g)=>g.weight>0&&(!a||g.weight>a.weight)?g:a,null)
-  if(!chosen){this.status='waiting';this.nextCheck=this.elapsed+1;this.waitReason='暂无可行在线行为，等待属性或占用变化';return}
+  if(!chosen){
+   this.candidates=this.goalScores.flatMap(g=>g.candidates||[])
+   const reasons=[...new Set(this.candidates.flatMap(c=>c.reasons))]
+   const cooling=this.goalScores.filter(g=>g.cooldown>0&&g.eligible).map(g=>g.name+'冷却剩余 '+Math.ceil(g.cooldown)+' 分钟')
+   this.status='waiting';this.nextCheck=this.elapsed+1;this.waitReason=[...cooling,...reasons].join('；')||'暂无可行在线行为，等待属性或占用变化';return
+  }
   this.goal=chosen;this.attempts=0;this.waitReason='';this.log('按数值表最高分选择：'+chosen.name+' · '+Number(chosen.weight||this.score(chosen)).toFixed(2));this.plan()
  }
  plan(){
