@@ -57,3 +57,7 @@
 rhythm.mjs负责数值映射与连续结算；rhythmScheduler.mjs负责评分与准备调度；onlineColony.mjs负责多人共享世界；runtime.mjs解释真实图；RhythmPanel.jsx显示来源。balance.mjs和colony.mjs仅保留为内部计算测试基准，不被预览界面使用。
 
 执行 npm test、npm run build。浏览器设置 PW_CHANNEL=msedge 后执行 npx playwright test 'preview-.*spec.cjs'。preview-rhythm.mjs验证真实图耗时、需求速率、权重、准备、避免重复结算及六伙伴全天执行。内部原表10080分钟指纹只证明数值基准，不代表真实图轨迹逐分钟相同。
+
+## 发布公共库口径
+
+代码推送发布复用原网站已经发布的公共库快照，保留原 syncedAt，并再次完整校验。定时任务继续从飞书读取并校验新快照。两条路径都必须通过库校验、模拟器测试和构建；读取失败或格式无效时停止，不发布空库。此安排避免飞书网络超时阻塞纯代码更新。

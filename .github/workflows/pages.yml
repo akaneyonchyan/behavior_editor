@@ -30,6 +30,7 @@ jobs:
         if: github.event_name == 'push'
         run: npx playwright install --with-deps chromium
       - name: Read and validate Feishu rows
+        if: github.event_name == 'schedule'
         run: node scripts/export-public-library.mjs
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
@@ -38,6 +39,9 @@ jobs:
           FEISHU_OBJECT_TABLE: ${{ secrets.FEISHU_OBJECT_TABLE }}
           FEISHU_ATTRIBUTE_TABLE: ${{ secrets.FEISHU_ATTRIBUTE_TABLE }}
           FEISHU_BUFF_TABLE: ${{ secrets.FEISHU_BUFF_TABLE }}
+      - name: Reuse validated published library for code releases
+        if: github.event_name == 'push'
+        run: node scripts/reuse-public-library.mjs
       - name: Validate public library before publishing
         run: node scripts/validate-public-library.mjs
       - name: Export public behavior files
