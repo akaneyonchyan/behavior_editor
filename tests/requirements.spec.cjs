@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test'),fs=require('node:fs/promises')
 test('requirement tabs, export, live refresh and location do not edit behavior',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[{id:'partner',name:'伙伴角色',description:'',enabled:true}],attributes:[],buffs:[],items:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  const before=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const r={id:'a',source:'object:partner',attribute:'发光度',influence:'增'};g.getState().updateNode('template_result_1',{effectRules:[r,{...r,id:'b',kind:'buff',attribute:'星光Buff'}],animation:'挥手发光',outputs:['月亮碎片']});g.getState().updateNode('template_result_2',{effectRules:[r]});return JSON.stringify(g.getState().exportConfig())})
  await page.getByRole('button',{name:'需求清单',exact:true}).click();const dialog=page.getByRole('dialog',{name:'需求清单',exact:true})
  await expect(dialog.getByRole('tab',{name:'属性（1）'})).toBeVisible();await expect(dialog.locator('tbody tr')).toHaveCount(1);await expect(dialog.locator('.requirement-location')).toHaveCount(2)
@@ -16,12 +16,12 @@ test('requirement tabs, export, live refresh and location do not edit behavior',
  const after=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return JSON.stringify(g.getState().exportConfig())});expect(after).toBe(before)
 })
 test('unavailable library never reports all fields as unsupported',async({page})=>{
- await page.route('**/data/library.json*',r=>r.fulfill({status:503,body:'unavailable'}));await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await page.getByRole('button',{name:'需求清单',exact:true}).click()
+ await page.route('**/data/library.json*',r=>r.fulfill({status:503,body:'unavailable'}));await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await page.getByRole('button',{name:'需求清单',exact:true}).click()
  const dialog=page.getByRole('dialog',{name:'需求清单',exact:true});await expect(dialog).toContainText('公共库尚未就绪');await expect(dialog.getByRole('button',{name:'导出完整清单'})).toBeDisabled()
 })
 test('wide requirement list keeps table scrolling and fits narrow screens',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[],items:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().updateNode('template_result_1',{effectRules:Array.from({length:40},(_,i)=>({id:String(i),source:'测试对象',attribute:'需要核对的属性'+i,influence:'增'}))})})
  await page.getByRole('button',{name:'需求清单',exact:true}).click()
  const dialog=page.getByRole('dialog',{name:'需求清单',exact:true})

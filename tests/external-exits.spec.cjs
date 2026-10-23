@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test')
 const select=(page,id)=>page.evaluate(async id=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().selectNode(g.getState().nodes.find(n=>n.id===id))},id)
 test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await page.evaluate(async()=>{const {blankTemplate}=await import('/tests/fixtures/legacyTemplate.js');const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().importConfig(blankTemplate())});await expect(page.locator('.react-flow__node')).toHaveCount(9)
 })
 test('external branch labels, no ports, undo, loop toggles, PNG snapshot and reload',async({page})=>{

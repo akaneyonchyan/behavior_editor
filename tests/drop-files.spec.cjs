@@ -6,7 +6,7 @@ async function drop(page,files){
  await page.locator('.canvas > .react-flow').dispatchEvent('drop',{dataTransfer:dt});await dt.dispose()
 }
 async function config(page){return page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');return JSON.stringify(g.getState().exportConfig())})}
-test.beforeEach(async({page})=>{await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}));await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await expect(page.locator('.react-flow__node')).toHaveCount(7);await page.waitForTimeout(400)})
+test.beforeEach(async({page})=>{await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}));await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await expect(page.locator('.react-flow__node')).toHaveCount(7);await page.waitForTimeout(400)})
 test('drop JSON loads named graph, fits viewport and preserves palette node dragging',async({page})=>{
  const data=JSON.parse(await config(page));data.behavior.name='拖入行为';delete data.graph.layout;data.graph.nodes=data.graph.nodes.slice(0,2);data.graph.edges=data.graph.edges.filter(e=>data.graph.nodes.some(n=>n.id===e.source)&&data.graph.nodes.some(n=>n.id===e.target))
  await drop(page,[{name:'test.json',text:JSON.stringify(data)}])

@@ -4,7 +4,7 @@ const choose=async(page,label,value)=>{await page.getByRole('combobox',{name:lab
 test('object names filter by type, preserve invalid input and follow published rename/disable',async({page})=>{
  let name='苹果',enabled=true,time='2026-10-19T01:00:00Z'
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:time,library:{version:1,objects:[{id:'food',name:'食物',description:'',enabled:true},{id:'furniture',name:'家具摆件',description:'',enabled:true}],attributes:[],buffs:[],items:[{id:'food/apple',objectType:'food',name,enabled,description:''},{id:'food/hidden',objectType:'food',name:'隐藏食物',enabled:false,description:''},{id:'furniture/chair',objectType:'furniture',name:'木椅',enabled:true,description:''}]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await select(page,'template_result_1')
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await select(page,'template_result_1')
  await page.getByRole('button',{name:'+ 添加占用资源',exact:true}).click();await choose(page,'对象大类','食物')
  const input=page.getByRole('combobox',{name:'对象子类',exact:true});await input.click();await expect(page.getByRole('listbox').getByRole('option')).toHaveText(['苹果']);await page.getByRole('option',{name:'苹果',exact:true}).click()
  await expect(input).not.toHaveClass(/custom-choice/);await expect(page.locator('[data-id="template_result_1"]')).toContainText('苹果')
@@ -17,7 +17,7 @@ test('object names filter by type, preserve invalid input and follow published r
 })
 test('all object selection areas have name inputs and judge branches inherit names',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[],items:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  const inputs=()=>page.locator('.property-panel').getByRole('combobox',{name:'对象子类',exact:true})
  await expect(inputs()).toHaveCount(1)
  await page.getByRole('button',{name:'+ 添加交互对象',exact:true}).click();await page.getByRole('button',{name:'+ 添加消耗品',exact:true}).click();await page.getByRole('button',{name:'+ 添加规则',exact:true}).click();await expect(inputs()).toHaveCount(4)

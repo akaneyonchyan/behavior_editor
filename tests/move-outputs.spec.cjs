@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test')
 test('legacy movement is readable, explicitly bypassed, archived and undoable',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const c=g.getState().exportConfig();c.graph.nodes.push({id:'old_move',type:'move',position:{x:180,y:700},data:{description:'旧目的地说明'}});c.graph.edges.find(e=>e.source==='behavior_start').target='old_move';c.graph.edges.push({id:'normal',source:'old_move',target:'template_judge'},{id:'failed',source:'old_move',sourceHandle:'unreachable',target:'template_end'});g.getState().importConfig(c);g.getState().selectNode(g.getState().nodes.find(n=>n.id==='old_move'))})
  await expect(page.locator('.property-panel')).toContainText('旧目的地说明')
  await expect(page.locator('[data-id=old_move] .react-flow__handle.source')).toHaveCount(2)

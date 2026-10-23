@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test')
 test('directory strip lists, searches, refreshes and safely switches local graphs',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  const panel=page.getByRole('region',{name:'本地行为文件'});await expect(panel).toContainText('未选择保存目录')
  await page.evaluate(async()=>{
   const {blankTemplate}=await import('/src/utils/blankTemplate.js'),template=blankTemplate()

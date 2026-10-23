@@ -7,7 +7,7 @@ async function keyboardMove(page,list,index,keys=['ArrowDown'],cancel=false){
 }
 test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await page.evaluate(async()=>{
   const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const s=()=>g.getState(),rule=(id,kind='attribute')=>({id,kind,source:'自定义对象',objectName:'对象'+id,attribute:'属性'+id,influence:'自定义规则'+id})
   s().updateBehaviorInfo({preconditions:{...s().behaviorInfo.preconditions,attributeRules:[rule('a'),rule('b'),rule('c')]}})

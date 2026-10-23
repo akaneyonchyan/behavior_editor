@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test'),fs=require('node:fs/promises')
 test('online requirements scan all files, merge rows, show origins, export failures and keep local drafts isolated',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[{id:'partner',name:'伙伴角色',enabled:true,description:''}],attributes:[],buffs:[],items:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  const config=await page.evaluate(async()=>{const {blankTemplate}=await import('/src/utils/blankTemplate.js');const c=blankTemplate();c.graph.nodes.find(n=>n.type==='result').data.effectRules=[{id:'a',source:'object:partner',attribute:'发光度',influence:'增'}];return c})
  const local=await page.evaluate(async()=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().updateBehaviorInfo({name:'本地未保存内容'});return JSON.stringify({config:g.getState().exportConfig(),past:g.getState().past})})
  const manifest={version:1,publishedAt:'2026-10-20T00:00:00Z',files:[{name:'甲.json',sha:'a'.repeat(40)},{name:'乙.json',sha:'b'.repeat(40)},{name:'坏文件.json',sha:'c'.repeat(40)}]}
@@ -49,7 +49,7 @@ test('online requirements scan all files, merge rows, show origins, export failu
 test('directory failure, missing library and empty directory never appear as complete valid scans',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({status:503,body:'failed'}))
  let fail=true;await page.route('**/data/behaviors/index.json',r=>fail?r.fulfill({status:503,body:'failed'}):r.fulfill({json:{version:1,files:[]}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await page.getByRole('tab',{name:'在线',exact:true}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await page.getByRole('tab',{name:'在线',exact:true}).click()
  await page.getByRole('button',{name:'需求清单',exact:true}).click();const dialog=page.getByRole('dialog',{name:'需求清单',exact:true})
  await expect(dialog.getByRole('alert')).toContainText('重新读取在线文件');await expect(dialog.getByRole('button',{name:'导出完整清单'})).toBeDisabled()
  fail=false;await dialog.getByRole('button',{name:'重新读取在线文件'}).click();await expect(dialog).toContainText('已读取 0 / 0')

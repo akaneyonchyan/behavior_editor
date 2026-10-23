@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test')
 test('cyclic local retries stay horizontal; re-layout replaces cached vertical coordinates',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('pps-canvas-view','structure'))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await page.evaluate(async()=>{
   const {useBehaviorStore:s}=await import('/src/store/behaviorStore.js')
   const c=s.getState().exportConfig();c.graph.nodes.push({id:'retry',type:'wait',position:{x:0,y:0},data:{}})

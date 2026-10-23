@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test')
 test('repeat glyph supports delete, reload, drag reconnect, undo, collapse and PNG',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('pps-canvas-view','structure'))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  const read=()=>page.evaluate(async()=>{const {useBehaviorStore:s}=await import('/src/store/behaviorStore.js');return s.getState().exportConfig()})
  await expect(page.locator('.loop-portal.repeat')).toHaveCount(1);await page.waitForTimeout(400)
  const returning=(await read()).graph.edges.find(e=>e.source==='template_wait')

@@ -3,7 +3,7 @@ const state=page=>page.evaluate(async()=>{const {useBehaviorStore:g}=await impor
 test.beforeEach(async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('pps-canvas-view','structure'))
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
 })
 async function dragCenter(page,locator,point,group=false){
  const box=await locator.boundingBox(),header=await locator.locator(group?'.loop-scope header':'.node-header').boundingBox()

@@ -1,5 +1,5 @@
 const {test,expect}=require('@playwright/test')
-test.beforeEach(async({page})=>{await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}));await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await expect(page.locator('.react-flow__node')).toHaveCount(7)})
+test.beforeEach(async({page})=>{await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}));await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click();await expect(page.locator('.react-flow__node')).toHaveCount(7)})
 test('single generic ending entry and playback configuration',async({page})=>{
  await page.locator('.node-palette').getByText('结束',{exact:true}).click()
  await expect(page.getByRole('combobox',{name:'结束类型',exact:true})).toHaveCount(0)

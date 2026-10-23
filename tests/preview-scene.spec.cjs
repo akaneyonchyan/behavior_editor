@@ -1,6 +1,6 @@
 const {test,expect}=require('@playwright/test')
 test('continuous playback moves the actor and advances real graph',async({page})=>{
- await page.goto('/?view=preview')
+ await page.goto('/')
  await page.getByLabel('预览模式').selectOption('single')
  await expect(page.locator('select[aria-label="在线行为"] option')).not.toHaveCount(1)
  await expect(page.getByLabel('在线行为',{exact:true})).toHaveValue('在床上睡觉.json')

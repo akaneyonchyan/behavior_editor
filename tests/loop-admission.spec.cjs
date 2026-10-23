@@ -1,6 +1,6 @@
 const {test,expect}=require('@playwright/test')
 test('admission and rest are ordinary internal judgments, including disabled-stage preservation',async({page})=>{
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  for(const admission of [false,true])for(const rest of [false,true]){
   await page.evaluate(async({admission,rest})=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');const {blankTemplate}=await import('/tests/fixtures/legacyTemplate.js');const f=blankTemplate(),d=f.graph.nodes.find(n=>n.type==='loop').data;Object.assign(d,{admissionEnabled:admission,restEnabled:rest,resourceCheck:'自定义准入条件',restCondition:'自定义稍息条件'});g.getState().importConfig(f);g.getState().selectNode(g.getState().nodes.find(n=>n.id==='template_loop'))},{admission,rest})
   await expect(page.locator('.property-panel').getByLabel('结束条件 1 类型',{exact:true})).toBeVisible()

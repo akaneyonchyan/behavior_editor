@@ -15,7 +15,7 @@ import './preview/preview.css'
 const BehaviorPreview=lazy(()=>import('./preview/Preview'))
 
 export default function App() {
-  const [workspace,setWorkspace]=useState(new URLSearchParams(location.search).get('view')==='preview'?'preview':'editor')
+  const [workspace,setWorkspace]=useState(()=>new URLSearchParams(location.search).get('view')==='editor'?'editor':'preview')
   useEffect(()=>{if(publishedMode)return startPublishedLibrary();connectTeamLibrary()},[])
   const { addNode } = useBehaviorStore()
   const {tab,file,selected}=useFileView(),readOnly=tab==='online'

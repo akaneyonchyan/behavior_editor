@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test')
 test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
  await page.addInitScript(()=>localStorage.setItem('pps-canvas-view','structure'))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await expect(page.locator('.loop-scope')).toHaveCount(1)
 })
 test('single loop header, sidebar conditions, centered execution port and repeat glyph instead of long return wires',async({page},info)=>{

@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test')
 test('occupancy edits synchronize endings without target configuration',async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  const select=id=>page.evaluate(async id=>{const {useBehaviorStore:g}=await import('/src/store/behaviorStore.js');g.getState().selectNode(g.getState().nodes.find(n=>n.id===id))},id)
  await select('template_result_1');await page.getByRole('button',{name:'+ 添加占用资源',exact:true}).click()
  await page.getByRole('combobox',{name:'对象大类',exact:true}).fill('测试座位')

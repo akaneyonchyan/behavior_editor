@@ -3,7 +3,7 @@ const {test,expect}=require('@playwright/test')
 let config
 test.beforeEach(async({page})=>{
  await page.route('**/data/library.json*',r=>r.fulfill({json:{syncedAt:new Date().toISOString(),library:{version:1,objects:[],attributes:[],buffs:[]}}}))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  config=await page.evaluate(async()=>{const {blankTemplate}=await import('/src/utils/blankTemplate.js');const c=blankTemplate();c.behavior.name='线上独立行为';c.graph.nodes.find(n=>n.type==='result').data.animation='仅线上表演';return c})
  await page.route('**/data/behaviors/index.json',r=>r.fulfill({json:{version:1,files:[{name:'线上行为.json',sha:'a'.repeat(40),size:100}]}}))
  await page.route('**/data/behaviors/'+ 'a'.repeat(40)+'.json',r=>r.fulfill({body:JSON.stringify(config),contentType:'application/json'}))

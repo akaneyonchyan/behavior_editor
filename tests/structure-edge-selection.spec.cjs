@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test')
 test('structure edges select their source connection, delete and undo without moving nodes',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('pps-canvas-view','structure'))
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  const state=()=>page.evaluate(async()=>{const {useBehaviorStore:s}=await import('/src/store/behaviorStore.js');return s.getState().exportConfig()})
  await page.locator('.react-flow__edge').first().waitFor()
  const before=await state(),edge=page.locator('.react-flow__edge').first()

@@ -1,6 +1,6 @@
 const {test,expect}=require('@playwright/test')
 test('split influence controls preserve custom choices and sync summary after reopen',async({page})=>{
- await page.goto('/');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
+ await page.goto('/?view=editor');await page.getByRole('button',{name:'暂用浏览器草稿'}).click()
  await page.locator('[data-id=template_judge]').click()
  const panel=page.locator('.property-panel')
  await panel.getByRole('button',{name:'+ 添加属性',exact:true}).click()
