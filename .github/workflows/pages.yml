@@ -26,9 +26,9 @@ jobs:
       - run: npm ci
       - name: Validate shared behavior files
         run: node scripts/validate-behaviors.mjs
-      - name: Install Chromium for PNG regression tests
+      - name: Verify runner Chrome for browser regression tests
         if: github.event_name == 'push'
-        run: npx playwright install --with-deps chromium
+        run: google-chrome --version
       - name: Read and validate Feishu rows
         if: github.event_name == 'schedule'
         run: node scripts/export-public-library.mjs
@@ -51,6 +51,8 @@ jobs:
       - name: Verify editor and preview in browser
         if: github.event_name == 'push'
         run: npm run test:browser
+        env:
+          PW_CHANNEL: chrome
       - name: Build read-only editor
         run: npm run build
         env:
