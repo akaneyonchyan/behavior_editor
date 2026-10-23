@@ -19,7 +19,7 @@ test('resize split, fit graph, readable zoom and pan without editing',async({pag
  const pan=await camera.getAttribute('transform');await page.mouse.wheel(0,-200);await expect(camera).not.toHaveAttribute('transform',pan)
  await page.getByRole('button',{name:'适应全图',exact:true}).click();await expect.poll(allVisible).toBe(true)
  await page.getByLabel('在线行为').selectOption('在床上睡觉.json');await expect.poll(allVisible).toBe(true)
- await page.getByRole('button',{name:'开始',exact:true}).click();await page.getByRole('button',{name:'暂停',exact:true}).click();await page.getByRole('button',{name:'定位当前节点'}).click();await expect.poll(()=>camera.evaluate(el=>el.transform.baseVal.consolidate().matrix.a)).toBeCloseTo(1)
+ await page.getByRole('spinbutton',{name:'精力',exact:true}).fill('50');await page.getByRole('button',{name:'开始',exact:true}).click();await page.getByRole('button',{name:'暂停',exact:true}).click();await page.getByRole('button',{name:'定位当前节点'}).click();await expect.poll(()=>camera.evaluate(el=>el.transform.baseVal.consolidate().matrix.a)).toBeCloseTo(1)
  await page.screenshot({path:'test-results/preview-viewport-desktop.png'})
  const ratio=await divider.getAttribute('aria-valuenow');await page.reload();await expect(divider).toHaveAttribute('aria-valuenow',ratio)
  await page.getByLabel('预览模式').selectOption('single')

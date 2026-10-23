@@ -9,7 +9,7 @@ export default function Island({world,actor,current,running=false,progress=0,onS
   try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:false})}catch{setFailed('此设备无法启用 WebGL，仍可在侧栏查看与单步执行。');return}
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));renderer.setClearColor('#82becb');renderer.shadowMap.enabled=true;root.appendChild(renderer.domElement)
   const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera(-65,65,55,-55,.1,500);camera.position.set(50,145,150)
-  const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(50,0,45);controls.enableDamping=true;controls.enableRotate=false;controls.screenSpacePanning=true;controls.minZoom=.5;controls.maxZoom=5;controls.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:null};controls.touches={ONE:THREE.TOUCH.PAN,TWO:THREE.TOUCH.DOLLY_PAN}
+  const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(50,0,45);controls.enableDamping=false;controls.enableRotate=false;controls.screenSpacePanning=true;controls.minZoom=.5;controls.maxZoom=5;controls.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:null};controls.touches={ONE:THREE.TOUCH.PAN,TWO:THREE.TOUCH.DOLLY_PAN}
   scene.add(new THREE.HemisphereLight('#fffbe8','#71949d',2.4));const sun=new THREE.DirectionalLight('#fff3cf',3);sun.position.set(40,100,30);sun.castShadow=true;scene.add(sun)
   const material=color=>new THREE.MeshStandardMaterial({color,roughness:1})
   function mesh(geo,color,x,y,z,parent=scene){const m=new THREE.Mesh(geo,material(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
