@@ -1,6 +1,7 @@
 import {GoalScheduler} from './scheduler.mjs'
 import {executeService} from './preparation.mjs'
 import {schedule,applyIdle,RHYTHM_MAP} from './rhythm.mjs'
+import {expireWorldBuffs} from './state.mjs'
 import DATA from './balance-data.json' with {type:'json'}
 
 export class RhythmScheduler extends GoalScheduler{
@@ -85,7 +86,7 @@ export class RhythmScheduler extends GoalScheduler{
   this.pendingSteps=[];this.queue=[];this.goal=null;this.status='waiting';this.nextCheck=this.elapsed+.1
  }
  advance(dt){
-  if(this.service){this.elapsed+=dt;applyIdle(this.world,this.actor,dt);this.service.progress+=dt;if(this.service.progress>=this.service.minutes)this.finish();return}
+  if(this.service){this.elapsed+=dt;if(!this.settings.skipWorldTick)expireWorldBuffs(this.world,this.elapsed*this.settings.worldSecondsPerSecond);applyIdle(this.world,this.actor,dt);this.service.progress+=dt;if(this.service.progress>=this.service.minutes)this.finish();return}
   if(this.status!=='running'||!this.active)applyIdle(this.world,this.actor,dt)
   super.advance(dt)
  }

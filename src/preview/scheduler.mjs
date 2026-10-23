@@ -88,7 +88,7 @@ export class GoalScheduler{
  }
  extraValue(g){
   const a=this.world.find(e=>e.id===this.actor),target=this.world.find(e=>e.id===g.target)
-  if(g.kind==='buff')return (target||a).buffs[g.buff]||0
+  if(g.kind==='buff')return g.id==='unstick'&&target?.stuckTool?1:(target||a).buffs[g.buff]||0
   if(g.kind==='object')return target?.attrs[g.attribute]??100
   if(g.kind==='stock')return a.inventory[g.item]||0
   if(g.kind==='rounds')return this.rounds
@@ -99,7 +99,7 @@ export class GoalScheduler{
   if(!this.settings.dayMode||this.settings.scenarioOnly)return []
   const a=this.world.find(e=>e.id===this.actor),list=[]
   for(const [buff,p]of [['design_dizzy','dizzy'],['buff_showoff','showoff'],['emotion_super_happy','laugh']])if(a.buffs[buff])list.push({id:buff,name:'解除'+(this.lib.buffs.find(b=>b.id===buff)?.name||buff),kind:'buff',buff,files:[p],threshold:0})
-  const tree=this.world.find(e=>e.name==='乔木'&&e.type==='environmentItem');if(tree?.buffs.buff_be_stuck)list.push({id:'unstick',name:'解除树与斧头的卡住关系',kind:'buff',buff:'buff_be_stuck',target:tree.id,files:['unstick'],threshold:0})
+  const tree=this.world.find(e=>e.name==='乔木'&&e.type==='environmentItem');if(tree?.stuckTool||tree?.buffs.buff_be_stuck)list.push({id:'unstick',name:'解除树与斧头的卡住关系',kind:'buff',buff:'buff_be_stuck',target:tree.id,files:['unstick'],threshold:0})
   const target=this.world.find(e=>e.name==='桌子');if(target)for(const [attribute,p]of [['durability','repair'],['cleanliness','clean']])list.push({id:'object-'+attribute,name:p==='repair'?'修理桌子':'打扫桌子',kind:'object',attribute,target:target.id,files:[p],threshold:70})
   const wood=this.lib.items.find(i=>i.name==='木材');if(wood)list.push({id:'wood-stock',name:'储备50份木材',kind:'stock',item:wood.id,files:['wood','banyan'],threshold:50})
   if(this.files.some(f=>f.config.previewIntegration==='fish'))list.push({id:'fishing-rounds',name:'完成6轮钓鱼',kind:'rounds',files:['fish'],threshold:6})

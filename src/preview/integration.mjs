@@ -86,7 +86,7 @@ export function integrateFile(file){
   config.behavior.preconditions.attributeRules.push(actorRule('equipped_slot_tool','为空'))
   for(const r of rows(config))if(['reczz28PBpzFKg4B','卡住'].includes(r.attribute)){r.source='object:environmentItem';r.objectName='';r.attribute='reczz28PBpzFKg4B';if(r.influence==='处于指定状态时')r.influence='具有指定 Buff 时';if(r.influence==='改变')r.influence='消除'}
   for(const n of config.graph.nodes)for(const r of n.data.effectRules||[])if(r.attribute==='reczz28PBpzFKg4B'&&r.influence==='减')op(r,'unstick')
-  note('解卡读取同一棵树的被卡住Buff；成功解除树与斧头的卡住关系并归还装备槽。')
+  note('解卡读取同一棵树与斧头的实际卡住关系；Buff到期不自动解卡，成功解除关系后归还装备槽。')
  }
  if(id==='bait'){
   for(const c of node('craft_loop')?.data.loopConditions||[])if(c.kind==='goal')c.rules=[{...actorRule('',''),previewOp:'craft',amount:12}]

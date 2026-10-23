@@ -46,7 +46,7 @@ export function dayBindings(bindings,config,world,actor){
 export function advanceDayState(world,dt,elapsed,settings,actor,profile,active,log){
  const seconds=dt*settings.worldSecondsPerSecond,now=elapsed*settings.worldSecondsPerSecond,hour=(settings.startHour+now/3600)%24
  for(const e of settings.skipWorldTick?[]:world){
-  for(const b of expireBuffs(e,now))log(e.name+' · Buff到期：'+b.buffId)
+  for(const b of expireBuffs(e,now,world))log(e.name+' · Buff结束：'+b.buffId)
   if(e.type==='environmen'&&'weather'in e.attrs)e.attrs.weather=hour>=8&&hour<20?'小雨':'晴天'
   if(e.type==='food'&&e.expiresAt!=null)e.attrs.freshness=Math.max(0,e.expiresAt-now)
   if('cleanliness'in e.attrs)e.attrs.cleanliness=clamp(e.attrs.cleanliness-settings.cleanlinessDecay*seconds/3600)

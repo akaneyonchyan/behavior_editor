@@ -6,6 +6,7 @@ import {scenario,validateCatalog} from '../src/preview/scenarios.mjs'
 import {preparationPath,bound,executeService} from '../src/preview/preparation.mjs'
 import {inspect,Simulation} from '../src/preview/runtime.mjs'
 import {previewEffect} from '../src/preview/integration.mjs'
+import {expireWorldBuffs} from '../src/preview/state.mjs'
 
 if(!fs.existsSync('public/data/behaviors/index.json')){
  console.log('SKIP published integration fixtures: run npm run dev:preview to fetch snapshots')
@@ -43,6 +44,9 @@ if(!fs.existsSync('public/data/behaviors/index.json')){
  const stuck=scenario(files,lib,'斧头被树卡住.json'),sf=stuck.files.find(f=>f.config.previewIntegration==='wood')
  const sp=preparationPath(sf,stuck.files,stuck.lib,stuck.world,'pip',stuck.params)
  assert.equal(sp.error,undefined);assert.equal(sp.steps[0].config.previewIntegration,'unstick')
+ expireWorldBuffs(stuck.world,601)
+ const expiredPath=preparationPath(sf,stuck.files,stuck.lib,stuck.world,'pip',stuck.params)
+ assert.equal(expiredPath.error,undefined);assert.equal(expiredPath.steps[0].config.previewIntegration,'unstick','expired Buff must not strand a physically stuck tool')
  for(const f of stuck.files)assert.deepEqual(inspect(f.config,stuck.lib,stuck.world,bound(f.config,stuck.lib,stuck.world,'pip')),[],f.name)
  console.log('18 published graphs × 3 seeds; equipment identity, finite yield, recursive unstick chain, missing preparation, occupied objects and source isolation passed')
 }

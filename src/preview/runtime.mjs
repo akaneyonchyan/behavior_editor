@@ -1,6 +1,6 @@
 // Isolated, deterministic design simulator. Never writes editor state or source JSON.
 import {OP_NAMES,previewCondition,previewEffect,previewGate,previewNodeComplete} from './integration.mjs'
-import {effectiveValue,addBuff,removeBuff,completeBuffNode,expireBuffs} from './state.mjs'
+import {effectiveValue,addBuff,removeBuff,completeBuffNode,expireWorldBuffs} from './state.mjs'
 import {layoutIsland} from './mapLayout.mjs'
 import {attachRhythm,rhythmDuration,applyRhythm,rhythmEffect,inferredDelta,NEEDS} from './rhythm.mjs'
 export const CHARACTERS=[['pip','皮普','兔子','种植 · 自然观察','#f4a6ad'],['banban','斑斑','鹿','雕塑 · 自然采集','#cf9a72'],['nana','娜娜','马','唱歌 · 吉他','#a99bd0'],['pietro','裴洛','猫','摄影 · 家居布置','#e7cb8b'],['finn','芬恩','垂耳兔','绘本插画 · 画云','#9bbfc4'],['granny','古奶奶','仓鼠','读书 · 收集贝壳','#c0b598']].map(([id,name,species,hobby,color])=>({id,name,species,hobby,color}))
@@ -111,7 +111,7 @@ export class Simulation{
   throw Error('未支持条件：'+s)
  }
  duration(n){if(this.rhythm)return rhythmDuration(this,n);if(!['result','wait','end'].includes(n.type))return 0.4;const d=n.data,number=String(d.playExpectation||'').match(/^\s*(\d+(?:\.\d+)?)\s*(秒|次|s)?\s*$/)?.[1];return d.playMode==='计时'?Math.max(.2,Number(number)||this.params.seconds):d.playMode==='计次'?Math.max(1,Number(number)||this.params.count)*this.params.seconds:this.params.seconds}
- tick(dt){if(['blocked','done','exited'].includes(this.status))return;this.status='running';this.elapsed+=dt;if(this.params.selfClock){this.params.worldNow=this.elapsed*60;for(const o of this.world)expireBuffs(o,this.params.worldNow)}const moving=this.approach(dt);if(this.rhythm)applyRhythm(this,dt,moving);if(moving)return;this.progress+=dt;if(this.progress>=this.duration(this.node())){this.progress=0;this.step(false)}}
+ tick(dt){if(['blocked','done','exited'].includes(this.status))return;this.status='running';this.elapsed+=dt;if(this.params.selfClock){this.params.worldNow=this.elapsed*60;expireWorldBuffs(this.world,this.params.worldNow)}const moving=this.approach(dt);if(this.rhythm)applyRhythm(this,dt,moving);if(moving)return;this.progress+=dt;if(this.progress>=this.duration(this.node())){this.progress=0;this.step(false)}}
  approach(dt){const actor=this.world.find(o=>o.id===this.actor),n=this.node();if(n?.type!=='start')return false;if(!(this.config.behavior.preconditions?.attributeRules||[]).every(r=>this.condition(r)))return false;const rule=this.config.behavior.preconditions?.interactObjectRules?.[0];if(!rule)return false;const target=this.entity(rule);if(target.id===actor.id)return false;const dx=target.x-3-actor.x,dz=target.z-actor.z,d=Math.hypot(dx,dz);if(d<.2)return false;const ratio=Math.min(1,dt*12/d);actor.x+=dx*ratio;actor.z+=dz*ratio;return true}
  next(handle=''){
   const n=this.node();if(n.data.externalExits?.some(e=>(e.handle||'')===handle)){this.status='exited';this.log('跳出行为，交由外部策略处理；不自动执行结束节点');return}
@@ -146,8 +146,9 @@ export class Simulation{
  step(manual=true){
   if(['blocked','done','exited'].includes(this.status))return
   try{
+   const eligibleBuffs=new Map(this.world.map(e=>[e.id,new Set((e.buffInstances||[]).map(b=>b.id))]));
    if(++this.steps>this.params.maxSteps)throw Error('达到预览步数上限，请检查循环或调整场景条件')
-   this.status='running';const n=this.node();if(!n)throw Error('没有有效节点');if(manual){const time=Math.max(0,this.duration(n)-this.progress);this.elapsed+=time;if(this.params.selfClock){this.params.worldNow=this.elapsed*60;for(const o of this.world)expireBuffs(o,this.params.worldNow)}this.approach(100);if(this.rhythm)applyRhythm(this,time)}this.progress=0;const d=n.data||{};this.visited.push(n.id);this.log('执行 '+(d.name||n.type))
+   this.status='running';const n=this.node();if(!n)throw Error('没有有效节点');if(manual){const time=Math.max(0,this.duration(n)-this.progress);this.elapsed+=time;if(this.params.selfClock){this.params.worldNow=this.elapsed*60;expireWorldBuffs(this.world,this.params.worldNow)}this.approach(100);if(this.rhythm)applyRhythm(this,time)}this.progress=0;const d=n.data||{};this.visited.push(n.id);this.log('执行 '+(d.name||n.type))
    if(this.config.previewIntegration==='showoff'&&n.type==='loop'){const others=this.world.filter(e=>e.type==='partner'&&e.id!==this.actor&&e.visible!==false);if(!others.length){this.status='exited';this.log('没有可见互动伙伴，保留炫耀Buff并交回目标策略');return}const target=others[(this.loops[n.id]||0)%others.length];for(const {r}of allRules(this.config))if(/任意|其他伙伴/.test(r.objectName||''))this.bindings[refKey(r)]=target.id}
    if(n.type==='start'){
     const rs=this.config.behavior.preconditions?.attributeRules||[];if(!rs.every(r=>this.condition(r)))throw Error('准入条件不满足：请调整场景初始属性或 Buff 后重置')
@@ -181,7 +182,7 @@ export class Simulation{
      for(const output of d.outputs||[]){const item=this.lib.items.find(i=>i.name===output||'item:'+i.id===output),actor=this.world.find(o=>o.id===this.actor);actor.inventory[item.id]=(actor.inventory[item.id]||0)+(this.rhythm?.id==='fish'?2:1);this.log('获得 '+item.name+' ×'+(this.rhythm?.id==='fish'?2:1))}
      previewNodeComplete(this,n)
     }catch(e){this.world=before;this.metrics=metricsBefore;this.random=randomBefore;this.held=heldBefore;this.logs=logsBefore;throw e}
-    if(this.params.stateRules)for(const e of this.world)completeBuffNode(e,n.id,this.params.executionId+':'+this.steps);if(n.type==='end'){for(const id of this.held){const o=this.world.find(o=>o.id===id);if(o?.occupied===this.actor)delete o.occupied}this.held.clear();this.status='done';const goals=this.config.behavior.targetRules||[];this.log('行为结束；目标策略：'+(goals.length?(goals.every(r=>this.condition(r))?'目标已满足':'目标未满足'):'未配置目标'))}else this.next()
+    if(this.params.stateRules)for(const e of this.world)completeBuffNode(e,n.id,this.actor+':'+this.params.executionId+':'+this.steps,eligibleBuffs.get(e.id));if(n.type==='end'){for(const id of this.held){const o=this.world.find(o=>o.id===id);if(o?.occupied===this.actor)delete o.occupied}this.held.clear();this.status='done';const goals=this.config.behavior.targetRules||[];this.log('行为结束；目标策略：'+(goals.length?(goals.every(r=>this.condition(r))?'目标已满足':'目标未满足'):'未配置目标'))}else this.next()
    }
   }catch(e){this.status='blocked';this.error=e.message;this.log('暂停：'+e.message)}
  }

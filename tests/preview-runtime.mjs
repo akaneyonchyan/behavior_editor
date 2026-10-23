@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import {Simulation,makeWorld,bindingsFor,inspect,DEFAULTS} from '../src/preview/runtime.mjs'
+import {initializeState,addBuff} from '../src/preview/state.mjs'
 const lib={objects:[{id:'partner',name:'伙伴',enabled:true}],attributes:[{id:'energy',name:'精力',kind:'数值',objectTypes:['partner'],enabled:true}],buffs:[{id:'stuck',name:'卡住',objectTypes:['partner'],enabled:true}],items:[]}
 const rule={source:'object:partner',objectName:'',attribute:'energy',influence:'增'}
 const node=(id,type,data={})=>({id,type,data:{name:id,...data}})
@@ -20,5 +21,12 @@ const nested=structuredClone(graph);nested.graph.nodes[1].data.loopConditions=[{
 const denied=structuredClone(graph);denied.behavior.preconditions.attributeRules=[{...rule,influence:'大于80'}];const ds=setup(denied);ds.step();assert.equal(ds.status,'blocked');assert.equal(ds.world[0].attrs.energy,50)
 const instant=structuredClone(judge);instant.graph.nodes[1].data.branches[0].weightFactors=[{...rule,influenceType:'具有（1）',influenceRule:'允许选中'}];const js=setup(instant);js.step();js.step();assert.match(js.logs[0].text,/B/)
 assert.equal(setup().initial[0].attrs.energy,50)
+for(const manual of [true,false]){
+ const clocked=setup();initializeState(clocked.world);clocked.params.stateRules=true;clocked.params.selfClock=true
+ const actor=clocked.world[0];addBuff(actor,'temporary',0,'test',{seconds:1,add:{energy:10}})
+ assert.equal(actor.buffInstances.length,1)
+ if(manual)clocked.step();else clocked.tick(.1)
+ assert.equal(actor.buffInstances.length,0,'single '+(manual?'step':'tick')+' expires buffs')
+}
 console.log('Nested loop reentry, failed admission and branch exclusion passed')
 const zero=structuredClone(graph);zero.graph.nodes[1].data.loopConditions=[{kind:'count',maxIterations:0}];const zs=setup(zero);while(!['done','blocked'].includes(zs.status))zs.step();assert.equal(zs.visited.includes('action'),false)
