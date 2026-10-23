@@ -9,6 +9,7 @@
 ## 文档入口
 
 - [工具说明](docs/tool/README.md)：产品定位、使用方法、开发与协作。
+- [行为预览场景](docs/tool/behavior-preview.md)：运行 npm run dev:preview，打开本地小岛，查看在线行为的节点执行与模拟状态。
 - [公共内容库说明](docs/content-library/README.md)：字段与使用规则、飞书维护、同步排查、规则来源与待核对事项。
 - [Agent 协作入口](AGENTS.md)：当前产品约束、验证要求和修改边界。
 - [行为编辑器 Skill](docs/tool/skills/behavior-editor/SKILL.md)：工具说明目录内的完整 Skill，可阅读或复制安装；[安装及调用示例](docs/tool/README.md#通过-skill-使用与维护)。

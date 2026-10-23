@@ -7,3 +7,4 @@ playwright-report/
 !.env.example
 server-data/
 public/data/library.json*
+public/data/behaviors/

@@ -10,6 +10,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reactflow": "^11.10.0",
+    "three": "^0.186.1",
     "zustand": "^4.4.0"
   },
   "devDependencies": {
@@ -18,7 +19,9 @@
     "vite": "^5.0.0"
   },
   "scripts": {
-    "test": "node tests/persistence.cjs && node tests/routing-weights.cjs && node tests/content-library.cjs && node tests/team-sync.mjs && node tests/loop-flow.cjs && node tests/published-library.cjs && node tests/metadata.cjs && node tests/node-design.cjs && node tests/start-metadata.cjs && node tests/startup-files.cjs && node tests/png-export.cjs && node tests/drop-files.cjs && node tests/endings.cjs && node tests/occupied-resources.cjs && node tests/library-publish-validation.mjs && node tests/object-catalog.cjs && node tests/catalog-sync.mjs && node tests/requirements.cjs && node tests/png-save.cjs && node tests/behavior-files.cjs && node tests/online-behaviors.cjs && node tests/download-behavior.cjs && node tests/external-exits.cjs && node tests/online-requirements.cjs && node tests/structure.cjs && node tests/loop-container.cjs && node tests/loop-boundaries.cjs && node tests/loop-editing.cjs && node tests/influence-rules.cjs && node tests/loop-returns.cjs && node tests/structure-ranks.cjs",
+    "dev:preview": "node scripts/preview-dev.mjs",
+    "test:simulation": "node tests/preview-rhythm.mjs && node tests/preview-colony.mjs && node tests/preview-balance.mjs && node tests/preview-runtime.mjs && node tests/preview-scheduler.mjs && node tests/preview-state.mjs && node tests/preview-integration.mjs",
+    "test": "node tests/preview-rhythm.mjs && node tests/preview-colony.mjs && node tests/preview-balance.mjs && node tests/preview-integration.mjs && node tests/preview-runtime.mjs && node tests/preview-scheduler.mjs && node tests/preview-state.mjs && node tests/persistence.cjs && node tests/routing-weights.cjs && node tests/content-library.cjs && node tests/team-sync.mjs && node tests/loop-flow.cjs && node tests/published-library.cjs && node tests/metadata.cjs && node tests/node-design.cjs && node tests/start-metadata.cjs && node tests/startup-files.cjs && node tests/png-export.cjs && node tests/drop-files.cjs && node tests/endings.cjs && node tests/occupied-resources.cjs && node tests/library-publish-validation.mjs && node tests/object-catalog.cjs && node tests/catalog-sync.mjs && node tests/requirements.cjs && node tests/png-save.cjs && node tests/behavior-files.cjs && node tests/online-behaviors.cjs && node tests/download-behavior.cjs && node tests/external-exits.cjs && node tests/online-requirements.cjs && node tests/structure.cjs && node tests/loop-container.cjs && node tests/loop-boundaries.cjs && node tests/loop-editing.cjs && node tests/influence-rules.cjs && node tests/loop-returns.cjs && node tests/structure-ranks.cjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -27,4 +30,3 @@
     "test:browser": "playwright test"
   }
 }
-

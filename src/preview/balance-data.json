@@ -1,0 +1,814 @@
+{
+  "source": {
+    "name": "伙伴行为选择模拟V3.2_轻量版.xlsx",
+    "sha256": "9df5a033efaaf462b13ee0a08e829ac4527a1f830f1bfef728b45559e17b4024"
+  },
+  "actions": [
+    {
+      "name": "睡觉",
+      "minutes": 420,
+      "tool": "不要求",
+      "recovery": [
+        99,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        0,
+        6,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A20:C20;A46:V46"
+    },
+    {
+      "name": "正餐",
+      "minutes": 30,
+      "tool": "为空",
+      "recovery": [
+        0,
+        78,
+        0,
+        0
+      ],
+      "cost": [
+        6,
+        0,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A21:C21;A47:V47"
+    },
+    {
+      "name": "社交",
+      "minutes": 30,
+      "tool": "不要求",
+      "recovery": [
+        0,
+        0,
+        30,
+        10
+      ],
+      "cost": [
+        6,
+        12,
+        0,
+        0
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A22:C22;A48:V48"
+    },
+    {
+      "name": "散步",
+      "minutes": 30,
+      "tool": "不要求",
+      "recovery": [
+        0,
+        0,
+        0,
+        15
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        0
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": "休闲",
+      "skill": null,
+      "source": "01 基础配置!A23:C23;A49:V49"
+    },
+    {
+      "name": "大建筑",
+      "minutes": 240,
+      "tool": "建造锤",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        12,
+        21,
+        3,
+        48
+      ],
+      "materials": [
+        8,
+        12,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A24:C24;A50:V50"
+    },
+    {
+      "name": "中建筑",
+      "minutes": 120,
+      "tool": "建造锤",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        12,
+        21,
+        3,
+        48
+      ],
+      "materials": [
+        4,
+        8,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A25:C25;A51:V51"
+    },
+    {
+      "name": "小建筑",
+      "minutes": 60,
+      "tool": "建造锤",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        12,
+        21,
+        3,
+        48
+      ],
+      "materials": [
+        2,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A26:C26;A52:V52"
+    },
+    {
+      "name": "大家具",
+      "minutes": 120,
+      "tool": "制作刀",
+      "recovery": [
+        0,
+        0,
+        0,
+        15
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        0
+      ],
+      "materials": [
+        2,
+        6,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A27:C27;A53:V53"
+    },
+    {
+      "name": "中家具",
+      "minutes": 60,
+      "tool": "制作刀",
+      "recovery": [
+        0,
+        0,
+        0,
+        15
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        0
+      ],
+      "materials": [
+        1,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A28:C28;A54:V54"
+    },
+    {
+      "name": "小家具",
+      "minutes": 30,
+      "tool": "制作刀",
+      "recovery": [
+        0,
+        0,
+        0,
+        15
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        0
+      ],
+      "materials": [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A29:C29;A55:V55"
+    },
+    {
+      "name": "打盹",
+      "minutes": 5,
+      "tool": "不要求",
+      "recovery": [
+        10,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        0,
+        6,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A30:C30;A56:V56"
+    },
+    {
+      "name": "小吃",
+      "minutes": 5,
+      "tool": "为空",
+      "recovery": [
+        0,
+        10,
+        0,
+        0
+      ],
+      "cost": [
+        6,
+        0,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A31:C31;A57:V57"
+    },
+    {
+      "name": "拿取并装备工具",
+      "minutes": 2,
+      "tool": "为空",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "无",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A32:C32;A58:V58"
+    },
+    {
+      "name": "拿取材料",
+      "minutes": 2,
+      "tool": "不要求",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "无",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A33:C33;A59:V59"
+    },
+    {
+      "name": "钓鱼",
+      "minutes": 5,
+      "tool": "鱼竿",
+      "recovery": [
+        0,
+        0,
+        0,
+        2
+      ],
+      "cost": [
+        12,
+        18,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": "肉",
+      "quantity": 2,
+      "debit": "无",
+      "category": "爱好",
+      "skill": "钓鱼",
+      "source": "01 基础配置!A34:C34;A60:V60"
+    },
+    {
+      "name": "伐木",
+      "minutes": 5,
+      "tool": "斧头",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        12,
+        18,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": "木材",
+      "quantity": 2,
+      "debit": "无",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A35:C35;A61:V61"
+    },
+    {
+      "name": "采石",
+      "minutes": 5,
+      "tool": "镐子",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        12,
+        18,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": "石头",
+      "quantity": 2,
+      "debit": "无",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A36:C36;A62:V62"
+    },
+    {
+      "name": "采摘",
+      "minutes": 5,
+      "tool": "不要求",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        12,
+        18,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": "水果",
+      "quantity": 2,
+      "debit": "无",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A37:C37;A63:V63"
+    },
+    {
+      "name": "等待（无候选）",
+      "minutes": 1,
+      "tool": "不要求",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "无",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A38:C38;A64:V64"
+    },
+    {
+      "name": "归还工具",
+      "minutes": 2,
+      "tool": "当前工具",
+      "recovery": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        6
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": "无",
+      "quantity": 0,
+      "debit": "无",
+      "category": null,
+      "skill": null,
+      "source": "01 基础配置!A39:C39;A65:V65"
+    },
+    {
+      "name": "种田",
+      "minutes": 30,
+      "tool": "不要求",
+      "recovery": [
+        0,
+        0,
+        0,
+        10
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        0
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": "爱好",
+      "skill": "种田",
+      "source": "01 基础配置!A40:C40;A66:V66"
+    },
+    {
+      "name": "烹饪",
+      "minutes": 30,
+      "tool": "不要求",
+      "recovery": [
+        0,
+        0,
+        0,
+        10
+      ],
+      "cost": [
+        6,
+        12,
+        3,
+        0
+      ],
+      "materials": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "output": null,
+      "quantity": 0,
+      "debit": "开工",
+      "category": "爱好",
+      "skill": "烹饪",
+      "source": "01 基础配置!A41:C41;A67:V67"
+    }
+  ],
+  "goals": [
+    {
+      "name": "恢复体力",
+      "weight": 90
+    },
+    {
+      "name": "填饱肚子",
+      "weight": 90
+    },
+    {
+      "name": "满足社交",
+      "weight": 100
+    },
+    {
+      "name": "满足娱乐",
+      "weight": 200
+    },
+    {
+      "name": "演化家园",
+      "weight": 10000
+    }
+  ],
+  "hobbyThreshold": 200.0,
+  "schedules": [
+    {
+      "goal": "睡眠日程",
+      "start": 0,
+      "end": 300,
+      "percent": 10000
+    },
+    {
+      "goal": "睡眠日程",
+      "start": 300,
+      "end": 360,
+      "percent": 200
+    },
+    {
+      "goal": "用餐日程",
+      "start": 360,
+      "end": 480,
+      "percent": 2000
+    },
+    {
+      "goal": "用餐日程",
+      "start": 720,
+      "end": 840,
+      "percent": 2000
+    },
+    {
+      "goal": "用餐日程",
+      "start": 1080,
+      "end": 1200,
+      "percent": 2000
+    },
+    {
+      "goal": "睡眠日程",
+      "start": 1380,
+      "end": 1440,
+      "percent": 400
+    }
+  ],
+  "initial": {
+    "needs": [
+      100,
+      100,
+      100,
+      100
+    ],
+    "enabled": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "home": "小建筑",
+    "hobby": "钓鱼",
+    "leisure": "散步",
+    "tools": {
+      "建造锤": 1,
+      "制作刀": 1,
+      "鱼竿": 1,
+      "斧头": 1,
+      "镐子": 1
+    },
+    "materials": [
+      {
+        "name": "石头",
+        "carry": 0,
+        "store": 24,
+        "world": 240
+      },
+      {
+        "name": "木材",
+        "carry": 0,
+        "store": 24,
+        "world": 240
+      },
+      {
+        "name": "谷物",
+        "carry": 0,
+        "store": 0,
+        "world": 0
+      },
+      {
+        "name": "菜",
+        "carry": 0,
+        "store": 0,
+        "world": 0
+      },
+      {
+        "name": "肉",
+        "carry": 0,
+        "store": 0,
+        "world": 240
+      },
+      {
+        "name": "水果",
+        "carry": 0,
+        "store": 0,
+        "world": 240
+      }
+    ]
+  }
+}

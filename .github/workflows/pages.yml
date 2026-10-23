@@ -24,15 +24,11 @@ jobs:
         with:
           enablement: true
       - run: npm ci
-      - run: npm test
       - name: Validate shared behavior files
         run: node scripts/validate-behaviors.mjs
       - name: Install Chromium for PNG regression tests
         if: github.event_name == 'push'
         run: npx playwright install --with-deps chromium
-      - name: Verify canvas file drop and PNG export in browser
-        if: github.event_name == 'push'
-        run: npm run test:browser
       - name: Read and validate Feishu rows
         run: node scripts/export-public-library.mjs
         env:
@@ -46,6 +42,11 @@ jobs:
         run: node scripts/validate-public-library.mjs
       - name: Export public behavior files
         run: node scripts/export-behaviors.mjs
+      - name: Test editor and behavior simulation with published snapshots
+        run: npm test
+      - name: Verify editor and preview in browser
+        if: github.event_name == 'push'
+        run: npm run test:browser
       - name: Build read-only editor
         run: npm run build
         env:
