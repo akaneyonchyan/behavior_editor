@@ -1,3 +1,14 @@
+# 已迁移到公司 GitLab
+
+本仓库停止维护，GitHub Pages 与 Actions 已停用。
+
+- 正式网站：https://behavior-editor.online/（使用飞书登录）
+- 维护仓库：https://git.xindong.com/petpals/shared/design_behavior_editor
+
+后续代码和行为图更新请提交公司 GitLab。历史源码与文档保留如下；旧站部署及同步说明已不再生效。
+
+---
+
 # 行为编辑器
 
 基于 React Flow 的行为图编辑器，支持节点摘要、三步循环判定、曲线流光、撤销复制、本地 JSON 文件和定时备份。
