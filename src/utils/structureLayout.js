@@ -3,7 +3,7 @@ import {activeEdges,resolveScopes} from './loopStructure'
 import {containerTarget} from './normalizeBehavior'
 // Visual-only wrappers and boundary segments; domain graph stays unchanged.
 export function scopeNodeId(nodes,id){let prefix='__scope_';while(nodes.some(n=>n.id.startsWith(prefix)))prefix+='_';return prefix+id}
-export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
+export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[],sourceHandles={}){
  const {scopes,warnings}=resolveScopes(nodes,edges,layout),byId=new Map(nodes.map(n=>[n.id,n])),collapsedSet=new Set(collapsed)
  const prefix=scopeNodeId(nodes,'')
  const groupId=id=>prefix+id
@@ -80,6 +80,19 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
 
  }
  place(null)
+ // Resolve each exit in its container's coordinate system, from the actual
+ // source handle. Nested exits inherit the visible child boundary's height.
+ const boundaryY=(scope,edge)=>{
+  const exits=boundaries.get(scope),index=exits.findIndex(exit=>exit.edgeId===edge.id)
+  if(collapsedSet.has(scope))return 72+index*28
+  const source=rep(edge.source,scope),position=positionFor(source,scope)
+  if(source.startsWith(prefix)){
+   const child=source.slice(prefix.length)
+   return position.y+(child===edge.source?(sourceHandles[source]?.[edge.sourceHandle||'']??28):boundaryY(child,edge))
+  }
+  return position.y+(sourceHandles[source]?.[edge.sourceHandle||'']??(boxes.get(source)?.height||260)/2)
+ }
+ for(const [scope,exits] of boundaries)for(const exit of exits)exit.y=boundaryY(scope,active.find(edge=>edge.id===exit.edgeId))
  function emit(scope){
   const children=scopes.filter(s=>(parents.get(s.loopId)||null)===scope)
   for(const child of children){
@@ -93,9 +106,10 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[]){
      output.push({id:entryId(child.loopId),type:'loopPortal',parentNode:id,position:{x:32,y},data:{kind:'entry'},draggable:false,selectable:false,deletable:false})
     }
     const first=child.entry?rep(child.entry,child.loopId):null,firstPos=first?positionFor(first,child.loopId):{y:(sizes['header:'+child.loopId]?.height||150)+32}
-    const repeatY=Math.max(firstPos.y+((boxes.get(first)?.height||140)/2)-16,(sizes['header:'+child.loopId]?.height||150)+32+boundaries.get(child.loopId).length*48)
+    let repeatY=Math.max(firstPos.y+((boxes.get(first)?.height||140)/2)-16,(sizes['header:'+child.loopId]?.height||150)+32)
+    for(const exit of [...boundaries.get(child.loopId)].sort((a,b)=>a.y-b.y))if(Math.abs(repeatY+16-exit.y)<40)repeatY=exit.y+40-16
     output.push({id:repeatId(child.loopId),type:'loopPortal',parentNode:id,position:{x:size.width-64,y:repeatY},data:{kind:'repeat',loopId:child.loopId,label:'继续循环'},draggable:false,selectable:false,deletable:false})
-    boundaries.get(child.loopId).forEach((exit,i)=>output.push({id:exitId(child.loopId,exit.edgeId),type:'loopPortal',parentNode:id,position:{x:size.width-64,y:(sizes['header:'+child.loopId]?.height||150)+32+i*48},data:{kind:'exit',label:exit.label},draggable:false,selectable:false,deletable:false}))
+    boundaries.get(child.loopId).forEach(exit=>output.push({id:exitId(child.loopId,exit.edgeId),type:'loopPortal',parentNode:id,position:{x:size.width-64,y:exit.y-12},data:{kind:'exit',label:exit.label},draggable:false,selectable:false,deletable:false}))
    }
   }
   for(const n of nodes.filter(n=>n.id!==scope&&(owners.get(n.id)||null)===scope)){

@@ -38,6 +38,21 @@ for(const collapsed of [[],['inner'],['template_loop'],['inner','template_loop']
  assert.equal(v.edges.filter(e=>e.target==='outside').length,2)
  assert.ok(v.edges.some(e=>e.target==='outside'&&e.source==='__scope_template_loop'&&e.sourceHandle==='exit:inner_exit'))
 }
+// Exit centers use source handles, not edge order; nested containers preserve
+// the same absolute height, including when an inner container is collapsed.
+const alignedLayout={...f.graph.layout,positions:{body:{x:120,y:700}}}
+const measured={body:{leave:230,return:120}},dimensions={body:{width:280,height:300}}
+for(const collapsed of [[],['inner']]){
+ const visual=structureLayout(f.graph.nodes,f.graph.edges,alignedLayout,dimensions,collapsed,measured)
+ const innerNode=visual.nodes.find(n=>n.id==='__scope_inner'),outerNode=visual.nodes.find(n=>n.id==='__scope_template_loop')
+ const inside=innerNode.data.boundaryExits.find(e=>e.edgeId==='inner_exit'),outside=outerNode.data.boundaryExits.find(e=>e.edgeId==='inner_exit')
+ assert.equal(inside.y,collapsed.length?72:930)
+ assert.equal(outside.y,innerNode.position.y+inside.y)
+ const portal=visual.nodes.find(n=>n.id==='__scope_template_loop__exit_inner_exit')
+ assert.equal(portal.position.y+12,outside.y)
+}
+const moved=structureLayout(f.graph.nodes,f.graph.edges,{...alignedLayout,positions:{body:{x:120,y:900}}},dimensions,[],measured)
+assert.equal(moved.nodes.find(n=>n.id==='__scope_inner').data.boundaryExits.find(e=>e.edgeId==='inner_exit').y,1130)
 // Both local and online ingestion use the pure normalizer; source JSON is unchanged.
 const text=JSON.stringify(original),online=parseBehavior(text);assert.equal(online.graph.nodes.find(n=>n.type==='loop').data.loopVersion,3);assert.equal(JSON.stringify(original),text)
 const malformed=structuredClone(original);malformed.graph.edges.filter(e=>e.source==='template_loop').forEach(e=>delete e.sourceHandle)

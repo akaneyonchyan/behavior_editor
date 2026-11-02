@@ -39,7 +39,7 @@
 .loop-scope {position:relative;}
 .loop-scope>.react-flow__handle {background:#f472b6;}
 .scope-output>.react-flow__handle {right:-5px;top:50%;}
-.scope-boundary {width:95px;font-size:10px;}
+.scope-boundary {width:95px;height:0;font-size:10px;}
 .loop-portal {width:32px;height:32px;border:1px solid #f472b6;border-radius:50%;background:#241d29;color:#f472b6;display:flex;align-items:center;justify-content:center;font-size:13px;}
 .loop-portal .react-flow__handle {background:#f472b6;}
 .loop-portal.exit {width:24px;height:24px;font-size:14px;}

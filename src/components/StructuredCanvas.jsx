@@ -1,7 +1,7 @@
 import {loopReturnConnection} from '../utils/loopReturns'
 import {absolutePosition,dropContainer} from '../utils/structureEditing'
 import React,{useMemo,useState,useEffect,useRef} from 'react'
-import ReactFlow,{Background,Controls,MiniMap,Handle,Position,MarkerType,useReactFlow,useUpdateNodeInternals} from 'reactflow'
+import ReactFlow,{Background,Controls,MiniMap,Handle,Position,MarkerType,useReactFlow,useUpdateNodeInternals,useStore,internalsSymbol} from 'reactflow'
 import 'reactflow/dist/style.css'
 import {structureLayout,scopeNodeId} from '../utils/structureLayout'
 import {NODE_CONFIG} from '../constants/behaviorTypes'
@@ -29,7 +29,7 @@ function ScopeNode({id,data}){
   </header>
   <Handle type="target" position={Position.Left} id="in" style={{top:28}} title="循环入口"/>
   <div className="scope-output" style={{top:24}}>{externalExit(node.data,'complete')?<span title={externalExit(node.data,'complete').note}>循环结束 ↗ 跳出行为</span>:<><span>循环出口</span><Handle type="source" position={Position.Right} id="complete"/></>}</div>
-  {data.boundaryExits.map((exit,i)=><div key={exit.handle} className="scope-output scope-boundary" style={{top:collapsed?64+i*28:(data.headerHeight||150)+40+i*48}}><span title={exit.label}>分支出口 {i+1}</span><Handle type="source" position={Position.Right} id={exit.handle}/></div>)}
+  {data.boundaryExits.map((exit,i)=><div key={exit.handle} className="scope-output scope-boundary" style={{top:exit.y-1}}><span title={exit.label}>分支出口 {i+1}</span><Handle type="source" position={Position.Right} id={exit.handle}/></div>)}
 
  </div>
 }
@@ -40,6 +40,11 @@ function LoopPortal({data}){
 }
 const nodeTypes={loopPortal:LoopPortal,...Object.fromEntries(Object.keys(NODE_CONFIG).map(t=>[t,BehaviorNode])),start:StartNode,loopScope:ScopeNode}
 const edgeTypes={default:FlowingEdge}
+function SourceHandleMeasurements({onMeasure}){
+ const measurements=useStore(state=>JSON.stringify(Object.fromEntries([...state.nodeInternals.values()].filter(n=>n.type!=='loopPortal').map(n=>[n.id,Object.fromEntries((n[internalsSymbol]?.handleBounds?.source||[]).filter(h=>n.type!=='loopScope'||h.id==='complete').map(h=>[h.id||'',Math.round((h.y+h.height/2)*100)/100]))]))))
+ useEffect(()=>onMeasure(JSON.parse(measurements)),[measurements,onMeasure])
+ return null
+}
 function FitStructure({geometry,revision}){
  const {fitView}=useReactFlow()
  useEffect(()=>{const timer=setTimeout(()=>fitView({padding:.12,maxZoom:1}),80);return()=>clearTimeout(timer)},[geometry,revision,fitView])
@@ -47,6 +52,7 @@ function FitStructure({geometry,revision}){
 }
 export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositions,onAdd,onUpdate,onMove,onAddStructure,onSelectEdge,onConnect,revision=0}){
  const [sizes,setSizes]=useState({}),[collapsed,setCollapsed]=useState([]),[dragged,setDragged]=useState({}),[previewPositions,setPreviewPositions]=useState(null)
+ const [sourceHandles,setSourceHandles]=useState({})
  const dragStart=useRef(null),flow=useRef(null),selectRef=useRef(onSelect);selectRef.current=onSelect
  useEffect(()=>{setDragged({})},[graph.layout])
  useEffect(()=>{
@@ -55,7 +61,7 @@ export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositi
   return()=>window.removeEventListener('pps-focus-node',focus)
  },[graph.nodes,onSelect,readOnly])
  const layout=useMemo(()=>({...graph.layout,...(readOnly&&previewPositions?{positions:previewPositions}:{})}),[graph.layout,readOnly,previewPositions])
- const computed=useMemo(()=>structureLayout(graph.nodes,graph.edges,layout,sizes,collapsed),[graph.nodes,graph.edges,layout,sizes,collapsed])
+ const computed=useMemo(()=>structureLayout(graph.nodes,graph.edges,{...layout,positions:{...layout.positions,...dragged}},sizes,collapsed,sourceHandles),[graph.nodes,graph.edges,layout,sizes,collapsed,sourceHandles,dragged])
  const toggle=id=>setCollapsed(list=>list.includes(id)?list.filter(x=>x!==id):[...list,id])
  const measure=React.useCallback((id,height)=>setSizes(old=>old['header:'+id]?.height===height?old:{...old,['header:'+id]:{height}}),[])
  const nodes=computed.nodes.map(n=>({...n,position:dragged[n.id]||n.position,draggable:n.type!=='loopPortal'&&!readOnly,...(n.type==='loopScope'?{data:{...n.data,headerHeight:sizes['header:'+n.data.node.id]?.height,toggle,select:onSelect,readOnly,update:onUpdate,measure}}:{})}))
@@ -103,6 +109,7 @@ export default function StructuredCanvas({graph,readOnly=false,onSelect,onPositi
    defaultEdgeOptions={{markerEnd:{type:MarkerType.ArrowClosed,color:'#94A3B8'}}}>
    <Background color="#29313d" gap={20}/><Controls showInteractive={false}/><MiniMap nodeColor={n=>n.type==='loopScope'?'#372536':n.type==='loopPortal'?NODE_CONFIG.loop.color:NODE_CONFIG[n.type]?.color||'#94A3B8'}/>
    <FitStructure geometry={geometry} revision={revision}/>
+   <SourceHandleMeasurements onMeasure={setSourceHandles}/>
   </ReactFlow>
   </GraphDisplayContext.Provider>
  </div>

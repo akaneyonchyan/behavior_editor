@@ -225,7 +225,7 @@ normalizeBehavior 是纯函数，在 store.importConfig、onlineBehaviors.parseB
 
 当前 loopVersion=3，loopConditions 为有序列表，每项有稳定 id、kind=goal|count，目标项使用 condition/rules，次数项使用 maxIterations 文字。列表按顺序 OR 短路；空列表表示尚未配置，不猜测退出时机。旧 loopMode/completionRules/maxIterations 仅作为读取回退，读取只保留原来已启用的一种模式，不擅自激活历史闲置配置。循环自身仅 continue/complete 两个端口。底层返回连线保留占用追溯与保存兼容，结构图将这些线接到所属容器右侧的继续循环标记。containerTarget 将跨入成员的连接指向最外层跨越容器；确认范围、画布连线和侧栏设置共用该约束。
 
-structureLayout 生成纯视觉 loopScope 与 loopPortal，域节点仍不新增类型。内部 continue 由左侧起点图形发出；成员跨出范围时按原连线标识逐层拆成内部出口与容器边界段。分支出口互不合并，折叠仍保留对应出口。只保存 graph.layout 的成员和位置，不把视觉辅助节点／边写入文件。头部测量决定内部排布和出口位置。
+structureLayout 生成纯视觉 loopScope 与 loopPortal，域节点仍不新增类型。内部 continue 由左侧起点图形发出；成员跨出范围时按原连线标识逐层拆成内部出口与容器边界段。展开时，内部出口标记与边界出口对齐源头的实际出线点；判断节点按对应分支端口高度对齐，拖动、内容高度变化及嵌套出口同步更新。分支出口互不合并，折叠时按序紧凑排列，外层出口跟随可见的内层出口。只保存 graph.layout 的成员和位置，不把视觉辅助节点／边写入文件。头部测量决定内部排布，端口测量只用于显示，不写入行为文件。
 
 回归：loop-boundaries.cjs 覆盖纯转换、重复读取、规则保留、直接中途入口、嵌套／折叠边界和在线隔离；loop-container.spec.cjs、structure.spec.cjs 覆盖实际端口、起点位置、条件编辑、PNG和恢复。legacyTemplate 是固定历史测试数据，不是第二套用户规则。
 
