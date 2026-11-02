@@ -18,4 +18,32 @@ const saved={...graph.layout,positions:{template_result_1:{x:140,y:900}}},manual
 assert.deepEqual(manual.nodes.find(n=>n.id==='template_result_1').position,{x:140,y:900})
 assert.deepEqual([...structureRanks(items,links,'entry')],[...r])
 console.log('PASS: retry cycles keep horizontal forward ranks, branches align, real edges and manual positions preserved')
+// Targets created in reverse order must follow source port heights, including
+// through nested loops. Edge insertion order is not a visual ordering rule.
+const node=(id,type)=>({id,type,position:{x:0,y:0},data:{name:id,loopVersion:3}})
+const downstream={nodes:[node('s','start'),node('source','loop'),node('bottom','result'),node('middle','result'),node('top','result'),node('c','loop'),node('b','loop'),node('a','loop'),node('done','loop')],edges:[{id:'s-source',source:'s',target:'source'},{id:'entry',source:'source',sourceHandle:'continue',target:'top'},{id:'low',source:'bottom',target:'c'},{id:'mid',source:'middle',target:'b'},{id:'high',source:'top',target:'a'},{id:'done-edge',source:'source',sourceHandle:'complete',target:'done'}],layout:{version:1,scopes:[{loopId:'source',entry:'top',members:['top','middle','bottom']},...['a','b','c','done'].map(loopId=>({loopId,entry:'',members:[]}))],positions:{top:{x:120,y:200},middle:{x:120,y:500},bottom:{x:120,y:800}}}}
+const ordered=(graph,collapsed=[],handles={})=>structureLayout(graph.nodes,graph.edges,graph.layout,{},collapsed,handles)
+const targetOrder=visual=>visual.nodes.filter(n=>['a','b','c','done'].includes(n.data?.scope?.loopId)).sort((a,b)=>a.position.y-b.position.y).map(n=>n.data.scope.loopId)
+const unchanged=structuredClone(downstream)
+assert.deepEqual(targetOrder(ordered(downstream)),['done','a','b','c'])
+assert.deepEqual(targetOrder(ordered({...downstream,edges:[...downstream.edges].reverse()})),['done','a','b','c'])
+assert.deepEqual(downstream,unchanged)
+// Collapsed outgoing ports have their own compact visible order.
+assert.deepEqual(targetOrder(ordered(downstream,['source'])),['done','c','b','a'])
+const nested=structuredClone(downstream)
+nested.nodes.push(node('inner','loop'));nested.layout.scopes[0].members.push('inner')
+nested.layout.scopes[0].entry='inner';nested.edges.find(e=>e.id==='entry').target='inner'
+nested.edges.push({id:'nested-entry',source:'inner',sourceHandle:'continue',target:'top'})
+nested.layout.scopes.push({loopId:'inner',entry:'top',members:['top','middle','bottom']})
+assert.deepEqual(targetOrder(ordered(nested)),['done','a','b','c'])
+assert.deepEqual(targetOrder(ordered(nested,['inner'])),['done','c','b','a'])
+// Measured judge ports can differ from branch array order; use rendered height.
+const judge=structuredClone(downstream)
+judge.nodes=judge.nodes.filter(n=>!['top','middle','bottom'].includes(n.id));judge.nodes.push({...node('j','judge'),data:{branches:[{id:'low'},{id:'mid'},{id:'high'}]}})
+judge.layout.scopes[0]={loopId:'source',entry:'j',members:['j']};judge.layout.positions={}
+judge.edges=judge.edges.map(e=>['low','mid','high'].includes(e.id)?{...e,source:'j',sourceHandle:e.id}:e.id==='entry'?{...e,target:'j'}:e)
+assert.deepEqual(targetOrder(ordered(judge,[],{j:{low:300,mid:200,high:100}})),['done','a','b','c'])
+const pinned=structuredClone(downstream);pinned.layout.positions.__scope_c={x:1300,y:20}
+assert.deepEqual(ordered(pinned).nodes.find(n=>n.id==='__scope_c').position,{x:1300,y:20})
+console.log('PASS: downstream containers follow visible source exits, nested and collapsed sources, measured branch handles, stable edge order and pinned positions')
 

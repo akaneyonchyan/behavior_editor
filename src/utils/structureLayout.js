@@ -56,17 +56,23 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[],sour
   }
   const preferred=scope?rep(scopes.find(s=>s.loopId===scope)?.entry,scope):nodes.find(n=>n.type==='start')?.id
   const rank=structureRanks(items,links,preferred)
-  // Honor branch order without cloning merge targets.
+  // Stable tie-breaker only: downstream order follows visible source ports,
+  // including ports projected through nested container boundaries.
   const order=new Map(items.map((id,i)=>[id,i]))
-  for(const n of nodes.filter(n=>n.type==='judge'))(n.data.branches||[]).forEach((b,i)=>{
-   const edge=active.find(e=>e.source===n.id&&e.sourceHandle===b.id)
-   if(edge&&set.has(rep(edge.target,scope)))order.set(rep(edge.target,scope),(order.get(rep(n.id,scope))||0)+i/100)
-  })
   let x=scope?120:0,maxHeight=0
   const ranks=[...new Set(rank.values())].sort((a,b)=>a-b)
   for(const r of ranks){
    let y=scope?(sizes['header:'+scope]?.height||150)+32:0,width=0
-   const column=items.filter(id=>rank.get(id)===r).sort((a,b)=>order.get(a)-order.get(b))
+   const anchors=new Map()
+   for(const id of items.filter(id=>rank.get(id)===r)){
+    const incoming=active.filter(e=>rep(e.target,scope)===id&&set.has(rep(e.source,scope))&&rank.get(rep(e.source,scope))<r).map(e=>sourceY(scope,e)).sort((a,b)=>a-b)
+    // Merge targets use the median incoming height and remain a single node.
+    if(incoming.length)anchors.set(id,(incoming[Math.floor((incoming.length-1)/2)]+incoming[Math.floor(incoming.length/2)])/2)
+   }
+   const column=items.filter(id=>rank.get(id)===r).sort((a,b)=>{
+    const ay=anchors.get(a)??Infinity,by=anchors.get(b)??Infinity
+    return ay===by?order.get(a)-order.get(b):ay-by
+   })
    for(const id of column){
     const n=byId.get(id),size=boxes.get(id)||sizes[id]||{width:280,height:n?.type==='loop'?720:n?.type==='start'?300:260}
     positions.set(id,{x,y});boxes.set(id,size);y+=size.height+70;width=Math.max(width,size.width)
@@ -82,15 +88,20 @@ export function structureLayout(nodes,edges,layout={},sizes={},collapsed=[],sour
  place(null)
  // Resolve each exit in its container's coordinate system, from the actual
  // source handle. Nested exits inherit the visible child boundary's height.
- const boundaryY=(scope,edge)=>{
+ function boundaryY(scope,edge){
   const exits=boundaries.get(scope),index=exits.findIndex(exit=>exit.edgeId===edge.id)
   if(collapsedSet.has(scope))return 72+index*28
+  return sourceY(scope,edge)
+ }
+ function sourceY(scope,edge){
   const source=rep(edge.source,scope),position=positionFor(source,scope)
   if(source.startsWith(prefix)){
    const child=source.slice(prefix.length)
    return position.y+(child===edge.source?(sourceHandles[source]?.[edge.sourceHandle||'']??28):boundaryY(child,edge))
   }
-  return position.y+(sourceHandles[source]?.[edge.sourceHandle||'']??(boxes.get(source)?.height||260)/2)
+  const branches=byId.get(source)?.data.branches||[],branch=branches.findIndex(b=>b.id===edge.sourceHandle),height=boxes.get(source)?.height||260
+  const fallback=branch<0?height/2:height*(branch+1)/(branches.length+1)
+  return position.y+(sourceHandles[source]?.[edge.sourceHandle||'']??fallback)
  }
  for(const [scope,exits] of boundaries)for(const exit of exits)exit.y=boundaryY(scope,active.find(edge=>edge.id===exit.edgeId))
  function emit(scope){
