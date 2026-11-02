@@ -1,4 +1,10 @@
 node_modules/
+__pycache__/
+server/generated/
+release/
+public/data/behaviors/
+deploy/secrets/
+deploy/data/
 dist/
 test-results/
 playwright-report/
@@ -6,5 +12,6 @@ playwright-report/
 .env.*
 !.env.example
 server-data/
+collaboration-data/
 public/data/library.json*
 public/data/behaviors/

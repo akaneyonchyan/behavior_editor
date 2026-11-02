@@ -1,0 +1,57 @@
+image: node:22-bookworm-slim
+
+# Active deployment is the local scheduled coordinator. Enable only after a Runner is ready.
+workflow:
+  rules:
+    - if: '$ENABLE_GITLAB_RUNNER == "true"'
+    - when: never
+
+stages:
+  - verify
+  - package
+
+verify-preview:
+  stage: verify
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+  script:
+    - npm ci --no-audit --no-fund
+    - node scripts/reuse-public-library.mjs
+    - node scripts/export-behaviors.mjs
+    - npm test
+    - node tests/gitlab-behaviors.mjs
+    - node tests/snapshot-behaviors.mjs
+    - node tests/feishu-auth.mjs
+    - node scripts/validate-behaviors.mjs
+    - npx playwright install --with-deps chromium
+    - npx playwright test --config playwright.gitlab.config.cjs
+    - SNAPSHOT_BROWSER_TEST=1 npx playwright test --config playwright.gitlab.config.cjs
+    - npx playwright test --config playwright.auth.config.cjs
+    - VITE_ONLINE_PROVIDER=gitlab VITE_LIBRARY_MODE=published npm run build
+    - node scripts/build-server-validator.mjs
+  artifacts:
+    expire_in: 7 days
+    paths:
+      - dist/
+      - server/
+      - shared/
+  # No deployment job until Runner, destination and authentication are approved.
+
+package-cloud-snapshot:
+  stage: package
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+  script:
+    - npm ci --no-audit --no-fund
+    - node scripts/export-public-library.mjs
+    - node scripts/validate-public-library.mjs
+    - node scripts/package-cloud-release.mjs public/data/library.json
+  artifacts:
+    expire_in: 7 days
+    paths:
+      - release/*.tar.gz
+      - release/*.sha256

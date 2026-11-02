@@ -1,0 +1,11 @@
+[Unit]
+Description=Synchronize behavior editor Feishu library every five minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=5min
+AccuracySec=15s
+Unit=pps-editor-library-sync.service
+
+[Install]
+WantedBy=timers.target

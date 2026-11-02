@@ -1,15 +1,12 @@
-# 已迁移到公司 GitLab
-
-本仓库停止维护，GitHub Pages 与 Actions 已停用。
-
-- 正式网站：https://behavior-editor.online/（使用飞书登录）
-- 维护仓库：https://git.xindong.com/petpals/shared/design_behavior_editor
-
-后续代码和行为图更新请提交公司 GitLab。历史源码与文档保留如下；旧站部署及同步说明已不再生效。
-
----
-
 # 行为编辑器
+
+2026-10-26 当前入口：https://petpals-behavior-editor.workers.xd-sites.com（公司网络、心动 SSO、站点列表隐藏）。用户已确认可登录。公共库与代码自动发布见 [XD Sites 自动化](deploy/xd-sites-automation.md)。下方上海服务器和旧站说明保留作历史参考。
+
+当前维护仓库为公司 GitLab，正式入口：https://behavior-editor.online/（飞书登录）。自动发布采用本机定时构建与云服务器部署，见 [自动部署说明](deploy/automatic-release.md)。下方 GitHub Pages 说明仅作为历史参考，旧站按迁移安排停用。
+
+当前云部署流程为 [从 GitLab master 打包并传到服务器](deploy/offline-release.md)，不要求云服务器访问公司内网。
+
+生产服务已接入飞书登录，旧 GitHub Pages 和 Actions 已停用。公共内容库由云服务器独立同步；当前部署与验收入口见 [部署说明](deploy/README.md)。
 
 基于 React Flow 的行为图编辑器，支持节点摘要、三步循环判定、曲线流光、撤销复制、本地 JSON 文件和定时备份。
 
@@ -19,6 +16,8 @@
 
 ## 文档入口
 
+- [小白上手手册](docs/tool/beginner-guide.md)：仓库地址、克隆方式、使用编辑器、用 Cindy 修改编辑器。
+- [同事开发入门：GitLab + Cindy](docs/tool/team-onboarding.md)：权限申请、本地启动、分支协作、测试与发布。
 - [工具说明](docs/tool/README.md)：产品定位、使用方法、开发与协作。
 - [行为预览场景](docs/tool/behavior-preview.md)：运行 npm run dev:preview，打开本地小岛，查看在线行为的节点执行与模拟状态。
 - [公共内容库说明](docs/content-library/README.md)：字段与使用规则、飞书维护、同步排查、规则来源与待核对事项。

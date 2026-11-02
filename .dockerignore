@@ -1,0 +1,12 @@
+.git
+node_modules
+dist
+.env
+.env.*
+server-data
+server/generated
+public/data
+test-results
+playwright-report
+deploy/secrets
+deploy/data

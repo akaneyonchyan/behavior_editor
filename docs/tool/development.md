@@ -1,5 +1,21 @@
 # 开发与协作
 
+2026-10-28：多人在线编辑代码与回归入口见 [多人协作](collaboration.md)，服务上线条件见 [协作部署](../../deploy/collaboration.md)。本地文档与协作房间使用隔离的行为 store。
+
+当前首次启动与团队协作以 [同事开发入门](team-onboarding.md) 为准，发布以 [XD Sites 自动化](../../deploy/xd-sites-automation.md) 为准。下文 GitHub 克隆、直连 GitLab 后端及自建鉴权的启动方式保留作历史参考，不用于当前静态站点的首次开发。
+
+2026-10-26 新增独立飞书鉴权服务 server/cloud-auth.mjs，见 [鉴权部署](../../deploy/feishu-auth.md)。以下 private-preview 限制继续适用于旧预览服务。
+
+GitLab 迁移分支新增受限测试部署和在线文件适配，见 [部署说明](../../deploy/README.md)。
+默认运行方式仍兼容下述 GitHub Pages 流程；GitLab 构建设置
+`VITE_ONLINE_PROVIDER=gitlab`、`VITE_LIBRARY_MODE=published`。
+服务入口为 `server/cloud-preview.mjs`，GitLab 适配为 `server/gitlab-behaviors.mjs`，
+浏览器分流为 `src/utils/onlineProvider.js`。凭据仅由服务端读取。
+新增测试：`node tests/gitlab-behaviors.mjs`、
+`npx playwright test --config playwright.gitlab.config.cjs`。
+本地启动新服务前执行 `node scripts/build-server-validator.mjs`。
+此测试服务未实现身份鉴权，不可公开部署。
+
 更新日期：2026-10-19。运行事实以源码、package.json、工作流为准。
 
 ## 本地启动

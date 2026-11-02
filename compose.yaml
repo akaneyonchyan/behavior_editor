@@ -1,0 +1,28 @@
+services:
+  editor:
+    build: .
+    image: ${EDITOR_IMAGE:-behavior-editor:preview}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5110:5110"
+    environment:
+      PREVIEW_ONLY: "true"
+      CONTAINER_PREVIEW: "true"
+      PREVIEW_ORIGIN: "${PREVIEW_ORIGIN:-http://localhost:5110}"
+      GITLAB_TOKEN_FILE: /run/secrets/gitlab_token
+      GITLAB_BRANCH: "${GITLAB_BRANCH:-master}"
+      ENABLE_UPLOADS: "${ENABLE_UPLOADS:-false}"
+      LIBRARY_SNAPSHOT_PATH: /data/library.json
+    secrets:
+      - gitlab_token
+    volumes:
+      - ./deploy/data:/data:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+secrets:
+  gitlab_token:
+    file: ./deploy/secrets/gitlab_token

@@ -1,0 +1,23 @@
+services:
+  editor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${EDITOR_IMAGE:-behavior-editor:authenticated}
+    command: [node, server/cloud-auth.mjs]
+    restart: unless-stopped
+    ports: ["127.0.0.1:5111:5110"]
+    env_file: /home/ubuntu/pps-editor/private/auth.env
+    environment:
+      AUTH_DB_PATH: /app/auth-data/auth.sqlite
+      AUTH_MEMBERS_FILE: /run/editor-secrets/members.json
+      FEISHU_LOGIN_APP_SECRET_FILE: /run/editor-secrets/feishu-app-secret
+      LIBRARY_SNAPSHOT_PATH: /app/library-data/library.json
+    volumes:
+      - /home/ubuntu/pps-editor/private:/run/editor-secrets:ro
+      - /home/ubuntu/pps-editor/auth-data:/app/auth-data
+      - /home/ubuntu/pps-editor/shared:/app/library-data:ro
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]

@@ -1,0 +1,23 @@
+services:
+  collaboration:
+    image: node:22-bookworm-slim
+    user: "1000:1000"
+    working_dir: /app
+    command: ["node", "service.mjs"]
+    init: true
+    restart: "no"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    ports:
+      - "127.0.0.1:5112:5112"
+    environment:
+      COLLAB_HOST: 0.0.0.0
+      COLLAB_PORT: "5112"
+      COLLAB_DATA_DIR: /data
+      COLLAB_SERVICE_TOKEN_FILE: /run/secrets/service-token
+    volumes:
+      - ./service.mjs:/app/service.mjs:ro
+      - ./data:/data
+      - ./private/service-token:/run/secrets/service-token:ro

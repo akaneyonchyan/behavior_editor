@@ -1,0 +1,12 @@
+[Unit]
+Description=Read and validate Feishu library for behavior editor
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/lib/pps-editor/run-library-sync.py
+TimeoutStartSec=5min
+UMask=0077
+NoNewPrivileges=true

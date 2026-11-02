@@ -6,7 +6,11 @@
 
 ## 当前产品约束
 
-- 线上为 GitHub Pages 静态编辑器，行为图本地保存；公共库由飞书维护、Actions 发布、网页只读。旧 Node 后台仅保留兼容。
+- 2026-10-26 当前生产入口改为 petpals-behavior-editor.workers.xd-sites.com，平台心动 SSO、公司网络、列表隐藏。优先遵循 deploy/xd-sites-automation.md；下面上海部署说明属保留历史。GitLab master 是唯一代码来源，公共库继续来自云端只读飞书同步；Cindy 检测代码/库变化后按插件流程发布。不得导出 Cindy 令牌或绕过发布门禁。
+
+- 生产入口为 behavior-editor.online，飞书鉴权与 HTTPS 已上线；旧 cloud-preview 不可公开。自动发布采用本机定时任务，见 deploy/automatic-release.md。GitLab master 是唯一发布来源。
+
+- 线上为云服务器鉴权编辑器，行为图本地保存，线上快照只读；旧 GitHub 发布链路停用。公共库由服务器独立定时同步飞书，见 deploy/library-sync.md；代码发布不得覆盖较新的同步快照。旧 Node 后台仅保留兼容。
 - 工具表达规则和定性期望，不实现正式工程数值平衡或工程表导出。行为预览使用隔离的模拟数值和运行副本，不能把预览结果当作游戏运行结果，详见 docs/tool/behavior-preview.md。
 - 下拉允许非候选文字，并以下划线标识；不能静默清除自定义输入。
 - 开始节点唯一、蓝色、不可删除复制；节点面板与画布摘要保持一致。
