@@ -1,3 +1,4 @@
+import {finishRecord,closeWaiting,syncSimulation} from './experience.mjs'
 import {GoalScheduler} from './scheduler.mjs'
 import {RhythmScheduler} from './rhythmScheduler.mjs'
 import {CHARACTERS} from './runtime.mjs'
@@ -41,8 +42,8 @@ export class OnlineColony{
  setEnabled(id,on){
   if(!this.members[id]||this.enabled[id]===on)return
   const s=this.members[id];this.enabled[id]=on
-  if(!on){this.release(id);for(const o of this.world){if(o.occupied===id)delete o.occupied;if(o.location===id&&o.type==='equippedItem')o.location=this.world.find(o=>o.name==='工具柜')?.id||'storage'}const a=this.world.find(o=>o.id===id);if(a)a.attrs.equipped_slot_tool='0';s.active=null;s.service=null;s.goal=null;s.pendingSteps=[];s.queue=[];s.status='disabled';s.log('关闭伙伴：中断行为并释放场景占用，工具归还')}
-  else {s.elapsed=this.elapsed;s.nextCheck=this.elapsed;s.status='waiting';s.log('启用伙伴，重新选择目标')}
+  if(!on){if(s.status==='running'){if(s.active)syncSimulation(s.active);finishRecord(s,'interrupted','关闭伙伴，外部调度归还工具并释放占用');}closeWaiting(s);this.release(id);for(const o of this.world){if(o.occupied===id)delete o.occupied;if(o.location===id&&o.type==='equippedItem')o.location=this.world.find(o=>o.name==='工具柜')?.id||'storage'}const a=this.world.find(o=>o.id===id);if(a)a.attrs.equipped_slot_tool='0';s.active=null;s.service=null;s.goal=null;s.pendingSteps=[];s.queue=[];s.status='disabled';s.log('关闭伙伴：中断行为并释放场景占用，工具归还')}
+  else {s.elapsed=this.elapsed;s.nextCheck=this.elapsed;s.waitReason='';s.status='waiting';s.log('启用伙伴，重新选择目标')}
   this.publish()
  }
  publish(){for(const [id,s]of Object.entries(this.members)){const a=this.world.find(o=>o.id===id);if(a){a.inactive=!this.enabled[id];a.activity=this.enabled[id]?(s.service?.step.name||s.active?.node()?.data.name||'等待目标'):null;a.activityProgress=s.active?.node()?s.active.progress/s.active.duration(s.active.node()):0}}}

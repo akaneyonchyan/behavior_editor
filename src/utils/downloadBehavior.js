@@ -1,5 +1,6 @@
 import {getSaveDirectory,getCurrentFileHandle,useDocumentSession,openDirectoryFile} from '../store/documentSession'
 import {parseBehavior,validateFileName} from './onlineBehaviors'
+import {revisionKey} from './onlineProvider'
 export async function downloadBehavior(file){
  validateFileName(file.name);parseBehavior(file.text)
  const dir=getSaveDirectory()
@@ -19,7 +20,7 @@ export async function downloadBehavior(file){
  const stream=await handle.createWritable()
  try{await stream.write(file.text);await stream.close()}catch(e){await stream.abort().catch(()=>{});throw e}
  // Provenance contains only the public blob revision, never credentials or graph contents.
- try{localStorage.setItem('pps-online-base:'+file.name,file.sha)}catch{}
+ try{localStorage.setItem(revisionKey(file.name),file.sha)}catch{}
  const opened=await openDirectoryFile(handle,dir)
  return {opened,name:file.name}
 }

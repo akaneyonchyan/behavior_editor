@@ -1,3 +1,4 @@
+import {experience,event,changes,effect,syncSimulation} from './experience.mjs'
 // Isolated, deterministic design simulator. Never writes editor state or source JSON.
 import {OP_NAMES,previewCondition,previewEffect,previewGate,previewNodeComplete} from './integration.mjs'
 import {effectiveValue,addBuff,removeBuff,completeBuffNode,expireWorldBuffs} from './state.mjs'
@@ -88,11 +89,13 @@ export function inspect(config,lib,world,bindings){
 export class Simulation{
  constructor(config,lib,world,bindings,actor,params={}){
   this.config=structuredClone(config);this.lib=structuredClone(lib);this.world=structuredClone(world);this.bindings={...bindings};this.actor=actor;this.params={...DEFAULTS,...params};this.random=this.params.seed>>>0;this.current=config.graph.nodes.find(n=>n.type==='start')?.id;this.status='ready';this.elapsed=0;this.progress=0;this.steps=0;this.logs=[];this.loops={};this.held=new Set();this.visited=[];this.edges=[];this.initial=structuredClone(this.world);this.metrics={};this.previewTool=this.world.find(e=>e.id===this.bindings[JSON.stringify(['object:equippedItem',''])])?.id||this.world.find(e=>e.id===actor)?.attrs.equipped_slot_tool
+  this.experience=experience({actor,name:config.behavior.name||'未命名行为'});this.recordOffset=0
   const issues=inspect(config,lib,world,bindings);if(issues.length){this.status='blocked';this.error=issues.map(i=>i.where+'：'+i.text).join('\n')}
   if(this.params.rhythm&&this.config.previewIntegration)attachRhythm(this)
  }
  node(){return this.config.graph.nodes.find(n=>n.id===this.current)}
- log(text){this.logs.unshift({time:this.elapsed,node:this.current,text});this.logs=this.logs.slice(0,200)}
+ describeRule(r){let value;try{value=this.value(r)}catch{value='未记录'}return (definition(this.lib,r.attribute)?.name||r.tool||r.previewOp||'条件')+' = '+value+'；'+(r.influence||'预览条件')}
+ log(text,kind='debug'){event(this.experience,(this.recordOffset||0)+this.elapsed,text,kind,{node:this.current});this.logs.unshift({time:this.elapsed,node:this.current,text});this.logs=this.logs.slice(0,200)}
  entity(r){const e=this.world.find(o=>o.id===this.bindings[refKey(r)]);if(!e)throw Error('对象未绑定');return e}
  value(r,initial=false){const entity=this.entity(r),e=initial?this.initial.find(o=>o.id===entity.id):entity,def=definition(this.lib,r.attribute);if(!def)throw Error('属性定义缺失');if(r.attribute.startsWith('buff:')||def.isBuff)return e.buffs[def.id]||0;if(!(def.id in e.attrs))throw Error('属性值缺失：'+r.attribute);return this.params.stateRules?effectiveValue(e,def.id):e.attrs[def.id]}
  condition(r){if(r.previewOp)return previewCondition(this,r);const v=this.value(r),old=this.value(r,true),s=conditionAlias[r.influence]||r.influence,compare=comparison(s)
@@ -126,12 +129,13 @@ export class Simulation{
   }
   this.edges.push(e.id);this.current=e.target
  }
+ factorValue(f){return f.previewFactor==='weight'?50:f.previewFactor==='age'?1:f.previewFactor==='size'?({'小型':20,'中型':50,'大型':80}[this.value(f)]??50):this.value(f)}
  branchWeight(b){
   if(b.previewGate&&!previewGate(this,b.previewGate))return 0
   let w=WEIGHTS[b.weightExpectation]
   for(const f of b.weightFactors||[]){
    if(f.influenceRule==='不影响')continue
-   const v=f.previewFactor==='weight'?50:f.previewFactor==='age'?1:f.previewFactor==='size'?({'小型':20,'中型':50,'大型':80}[this.value(f)]??50):this.value(f)
+   const v=this.factorValue(f)
    const max=f.attribute==='freshness'?(this.entity(f).freshnessMax||100):100
    const strength=f.previewFactor==='age'?1:f.influenceType==='小'?(Number(v)<40?1:0):f.influenceType==='未达目标'?(Number(v)<(this.rhythmTargets?.[f.attribute]??this.params.threshold)?1:0):f.influenceType==='达到目标'?(Number(v)>=(this.rhythmTargets?.[f.attribute]??this.params.threshold)?1:0):f.influenceType==='数值高'?Number(v)/max:f.influenceType==='数值低'?1-Number(v)/max:f.influenceType==='具体值'?(definition(this.lib,f.attribute)?.kind==='数值'?(Number(v)===(f.previewSpecific??this.params.specific)?1:0):(Number(v)>0?1:0)):f.influenceType==='具有（1）'?(Number(v)>0?1:0):(Number(v)===0?1:0)
    if(!Number.isFinite(strength))throw Error('无法比较属性值')
@@ -148,25 +152,26 @@ export class Simulation{
   try{
    const eligibleBuffs=new Map(this.world.map(e=>[e.id,new Set((e.buffInstances||[]).map(b=>b.id))]));
    if(++this.steps>this.params.maxSteps)throw Error('达到预览步数上限，请检查循环或调整场景条件')
-   this.status='running';const n=this.node();if(!n)throw Error('没有有效节点');if(manual){const time=Math.max(0,this.duration(n)-this.progress);this.elapsed+=time;if(this.params.selfClock){this.params.worldNow=this.elapsed*60;expireWorldBuffs(this.world,this.params.worldNow)}this.approach(100);if(this.rhythm)applyRhythm(this,time)}this.progress=0;const d=n.data||{};this.visited.push(n.id);this.log('执行 '+(d.name||n.type))
+   this.status='running';const n=this.node();if(!n)throw Error('没有有效节点');if(manual){const time=Math.max(0,this.duration(n)-this.progress);this.elapsed+=time;if(this.params.selfClock){this.params.worldNow=this.elapsed*60;expireWorldBuffs(this.world,this.params.worldNow)}this.approach(100);if(this.rhythm)applyRhythm(this,time)}this.progress=0;const d=n.data||{};this.visited.push(n.id);this.log('执行 '+(d.name||n.type),'action')
    if(this.config.previewIntegration==='showoff'&&n.type==='loop'){const others=this.world.filter(e=>e.type==='partner'&&e.id!==this.actor&&e.visible!==false);if(!others.length){this.status='exited';this.log('没有可见互动伙伴，保留炫耀Buff并交回目标策略');return}const target=others[(this.loops[n.id]||0)%others.length];for(const {r}of allRules(this.config))if(/任意|其他伙伴/.test(r.objectName||''))this.bindings[refKey(r)]=target.id}
    if(n.type==='start'){
-    const rs=this.config.behavior.preconditions?.attributeRules||[];if(!rs.every(r=>this.condition(r)))throw Error('准入条件不满足：请调整场景初始属性或 Buff 后重置')
+    const rs=this.config.behavior.preconditions?.attributeRules||[];if(!rs.every(r=>this.condition(r)))throw Error('准入条件不满足：'+rs.filter(r=>!this.condition(r)).map(r=>this.describeRule(r)).join('；'))
     const targets=(this.config.behavior.preconditions?.interactObjectRules||[]).map(r=>this.entity(r)).filter(o=>o.type!=='environmen');if(targets.some(o=>o.occupied&&o.occupied!==this.actor))throw Error('交互对象被其他伙伴占用')
     for(const o of targets){o.occupied=this.actor;this.held.add(o.id);this.log('预约 '+o.name)}
     this.next()
    }else if(n.type==='judge'){
     const weighted=(d.branches||[]).map(b=>({b,w:this.branchWeight(b)}))
     const forced=weighted.find(x=>x.b.previewPriority&&x.w>0);if(forced)for(const x of weighted)if(x!==forced)x.w=0
-    const total=weighted.reduce((a,x)=>a+x.w,0);if(!total)throw Error('没有可选择的分支');this.random=(Math.imul(1664525,this.random)+1013904223)>>>0;let x=this.random/4294967296*total;const selected=weighted.find(a=>(x-=a.w)<0)||weighted.at(-1);this.log(weighted.map(a=>a.b.name+' '+Math.round(a.w/total*100)+'%').join(' / ')+' → '+selected.b.name);this.next(selected.b.id)
+    const total=weighted.reduce((a,x)=>a+x.w,0);if(!total)throw Error('没有可选择的分支');this.random=(Math.imul(1664525,this.random)+1013904223)>>>0;let x=this.random/4294967296*total;const selected=weighted.find(a=>(x-=a.w)<0)||weighted.at(-1);this.log(weighted.map(a=>a.b.name+' '+Math.round(a.w/total*100)+'%').join(' / ')+' → '+selected.b.name);event(this.experience,(this.recordOffset||0)+this.elapsed,(forced?'优先规则选中':weighted.filter(a=>a.w>0).length===1?'唯一可选分支':'随机选中')+'「'+selected.b.name+'」（'+Math.round(selected.w/total*100)+'%）','branch',{node:n.id,candidates:weighted.map(a=>({name:a.b.name,probability:a.w/total,evidence:(a.b.weightFactors||[]).map(f=>{let v;try{v=this.factorValue(f)}catch{v='未记录'}return (definition(this.lib,f.attribute)?.name||f.attribute)+' = '+v+'；'+f.influenceType+' → '+f.influenceRule}),gate:a.b.previewGate||null})),selected:selected.b.id});this.next(selected.b.id)
    }else if(n.type==='loop'){
     const count=this.loops[n.id]||0;const conditions=d.loopConditions||[]
     const hit=conditions.find(c=>c.kind==='count'?(this.config.previewProfile==='eat'&&this.world.find(o=>o.id===this.world.find(a=>a.id===this.actor)?.foodRef)?.bites===0)||count>=(c.maxIterations==null||c.maxIterations===''||c.maxIterations==='默认次数'?this.params.count:Number(c.maxIterations)):(c.rules?.length?c.rules:this.config.behavior.targetRules||[]).length>0&&(c.rules?.length?c.rules:this.config.behavior.targetRules||[]).every(r=>this.condition(r)))
     this.log('已完成 '+count+' 轮；'+(hit?'结束：'+hit.kind:'进入下一轮'))
+    event(this.experience,(this.recordOffset||0)+this.elapsed,'已完成 '+count+' 轮 → '+(hit?'满足'+(hit.kind==='count'?(this.config.previewProfile==='eat'&&this.world.find(o=>o.id===this.world.find(a=>a.id===this.actor)?.foodRef)?.bites===0?'食物已耗尽':'次数条件（'+(hit.maxIterations==null||hit.maxIterations===''||hit.maxIterations==='默认次数'?this.params.count:hit.maxIterations)+'）'):'目标条件（'+(hit.rules?.length?hit.rules:this.config.behavior.targetRules||[]).map(r=>this.describeRule(r)).join('；')+'）')+'，离开循环':'未满足结束条件，继续循环'),'condition',{node:n.id,condition:hit||null});
     if(hit)this.next('complete');else {const scope=this.config.graph.layout.scopes.find(s=>s.loopId===n.id);this.current=scope.entry;if(this.node()?.type==='loop')this.loops[this.current]=0}
    }else{
     // Stage all effects on a clone; a malformed rule cannot partially settle a node.
-    const before=structuredClone(this.world),metricsBefore=structuredClone(this.metrics),randomBefore=this.random,heldBefore=new Set(this.held),logsBefore=[...this.logs];try{
+    const before=structuredClone(this.world),metricsBefore=structuredClone(this.metrics),randomBefore=this.random,heldBefore=new Set(this.held),logsBefore=[...this.logs],eventsBefore=structuredClone(this.experience.events),omittedBefore=this.experience.omitted;try{
      for(const r of d.occupiedResources||[]){const o=this.entity(r);if(o.occupied&&o.occupied!==this.actor)throw Error('对象被占用：'+o.name);o.occupied=this.actor;this.held.add(o.id)}
      for(const r of d.effectRules||[]){
      if(rhythmEffect(this,r))continue
@@ -181,9 +186,9 @@ export class Simulation{
      const o=this.entity(r),v=this.value(r),def=definition(this.lib,r.attribute),minus=['减','减少','移除 Buff','消除','概率消除'].includes(r.influence);if(r.influence==='有概率提升'){this.random=(Math.imul(1664525,this.random)+1013904223)>>>0;if(this.random/4294967296>=.1){this.log('模拟生病概率10%：未触发');continue}}if(r.attribute.startsWith('buff:')||def.isBuff){if(this.params.stateRules){if(minus)removeBuff(o,def.id);else addBuff(o,def.id,this.params.worldNow||0,this.actor)}else o.buffs[def.id]=minus?Math.max(0,Number(v)-1):Number(v)+1;}else if(def.kind==='数值')o.attrs[def.id]=Math.max(0,Math.min(100,r.influence==='归零'?0:r.influence==='恢复'?this.params.initial:Number(o.attrs[def.id])+(minus?-1:1)*inferredDelta(this,r)));else o.attrs[def.id]=minus||r.influence==='归零'?'0':'1';this.log(o.name+' · '+def.name+'：'+v+' → '+this.value(r))}
      for(const output of d.outputs||[]){const item=this.lib.items.find(i=>i.name===output||'item:'+i.id===output),actor=this.world.find(o=>o.id===this.actor);actor.inventory[item.id]=(actor.inventory[item.id]||0)+(this.rhythm?.id==='fish'?2:1);this.log('获得 '+item.name+' ×'+(this.rhythm?.id==='fish'?2:1))}
      previewNodeComplete(this,n)
-    }catch(e){this.world=before;this.metrics=metricsBefore;this.random=randomBefore;this.held=heldBefore;this.logs=logsBefore;throw e}
-    if(this.params.stateRules)for(const e of this.world)completeBuffNode(e,n.id,this.actor+':'+this.params.executionId+':'+this.steps,eligibleBuffs.get(e.id));if(n.type==='end'){for(const id of this.held){const o=this.world.find(o=>o.id===id);if(o?.occupied===this.actor)delete o.occupied}this.held.clear();this.status='done';const goals=this.config.behavior.targetRules||[];this.log('行为结束；目标策略：'+(goals.length?(goals.every(r=>this.condition(r))?'目标已满足':'目标未满足'):'未配置目标'))}else this.next()
+    }catch(e){this.world=before;this.metrics=metricsBefore;this.random=randomBefore;this.held=heldBefore;this.logs=logsBefore;this.experience.events=eventsBefore;this.experience.omitted=omittedBefore;throw e}
+    if(this.params.stateRules)for(const e of this.world)completeBuffNode(e,n.id,this.actor+':'+this.params.executionId+':'+this.steps,eligibleBuffs.get(e.id));effect(this.experience,changes(before,this.world,this.lib));if(n.type==='end'){for(const id of this.held){const o=this.world.find(o=>o.id===id);if(o?.occupied===this.actor)delete o.occupied}this.held.clear();this.status='done';const goals=this.config.behavior.targetRules||[];this.experience.goalResult=goals.length?(goals.every(r=>this.condition(r))?'行为目标已满足':'行为目标未满足'):'未配置行为目标';this.log('行为结束；目标策略：'+this.experience.goalResult)}else this.next()
    }
-  }catch(e){this.status='blocked';this.error=e.message;this.log('暂停：'+e.message)}
+  }catch(e){this.status='blocked';this.error=e.message;this.log('暂停：'+e.message,'status')}finally{syncSimulation(this)}
  }
 }

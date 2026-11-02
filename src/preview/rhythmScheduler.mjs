@@ -1,3 +1,4 @@
+import {beginRecord,finishRecord,changes,effect} from './experience.mjs'
 import {GoalScheduler} from './scheduler.mjs'
 import {executeService} from './preparation.mjs'
 import {schedule,applyIdle,RHYTHM_MAP} from './rhythm.mjs'
@@ -66,16 +67,16 @@ export class RhythmScheduler extends GoalScheduler{
  }
  startNext(){
   const next=this.pendingSteps[0]
-  if(next?.service){this.pendingSteps.shift();this.service={step:next,progress:0,minutes:2};this.active=null;this.currentFile=null;this.status='running';this.log(next.name+' · 按拿还工具配置执行2分钟');return}
+  if(next?.service){this.pendingSteps.shift();beginRecord(this,next);this.service={step:next,progress:0,minutes:2};this.active=null;this.currentFile=null;this.status='running';this.log(next.name+' · 按拿还工具配置执行2分钟');return}
   super.startNext()
  }
  finish(){
   const goal=this.goal
   if(this.service){
-   const service=this.service;try{executeService(service.step,this.world,this.actor);this.completed.push({file:service.step.name,status:'done',goal:goal?.id,time:this.elapsed});this.log(service.step.name+'完成，重新比较目标')}catch(e){this.log('准备未完成：'+e.message);if(goal)this.cooldowns[goal.id]=this.elapsed+10}
+   const service=this.service,before=structuredClone(this.world);try{executeService(service.step,this.world,this.actor);effect(this.currentExperience,changes(before,this.world,this.lib));this.currentExperience.net=changes(this.serviceInitial||before,this.world,this.lib);this.currentExperience.goalResult='准备步骤已完成';finishRecord(this,'done','准备完成，重新比较可行目标');this.completed.push({file:service.step.name,status:'done',goal:goal?.id,time:this.elapsed});this.log(service.step.name+'完成，重新比较目标')}catch(e){finishRecord(this,'blocked',e.message);this.log('准备未完成：'+e.message);if(goal)this.cooldowns[goal.id]=this.elapsed+10}
    this.service=null
   }else{
-   const s=this.active;if(!s||this.handled)return;this.handled=true;this.world=structuredClone(s.world)
+   const s=this.active;if(!s||this.handled)return;finishRecord(this,s.status,s.error||'结束后重新比较可行目标');this.handled=true;this.world=structuredClone(s.world)
    for(const id of s.held){const o=this.world.find(o=>o.id===id);if(o?.occupied===this.actor)delete o.occupied}s.held.clear()
    this.completed.push({file:this.currentFile.name,status:s.status,goal:goal?.id,time:this.elapsed});this.rounds+=s.metrics.rounds||0
    if(s.status==='done')this.statistics[this.currentFile.name]=(this.statistics[this.currentFile.name]||0)+1
@@ -83,7 +84,7 @@ export class RhythmScheduler extends GoalScheduler{
    if(s.status!=='done'&&goal)this.cooldowns[goal.id]=this.elapsed+10
    this.log('在线图'+(s.status==='done'?'完成':'返回')+'；保留实际属性、装备和产物，重新竞争目标')
   }
-  this.pendingSteps=[];this.queue=[];this.goal=null;this.status='waiting';this.nextCheck=this.elapsed+.1
+  this.pendingSteps=[];this.queue=[];this.goal=null;this.waitReason='';this.status='waiting';this.nextCheck=this.elapsed+.1
  }
  advance(dt){
   if(this.service){this.elapsed+=dt;if(!this.settings.skipWorldTick)expireWorldBuffs(this.world,this.elapsed*this.settings.worldSecondsPerSecond);applyIdle(this.world,this.actor,dt);this.service.progress+=dt;if(this.service.progress>=this.service.minutes)this.finish();return}

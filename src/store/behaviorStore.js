@@ -13,7 +13,7 @@ import {splitLegacyEnd} from '../utils/endings'
 import {emptyBehavior,normalizeMetadata,ensureStart} from '../utils/behaviorMetadata'
 const clone = value => JSON.parse(JSON.stringify(value))
 const snapshot = s => clone({ nodes: s.nodes, edges: s.edges, behaviorInfo: s.behaviorInfo, layout:s.layout })
-export const useBehaviorStore = create((set, get) => {
+export const createBehaviorStore = () => create((set, get) => {
   const commit = patch => { get().checkpoint(); set(patch) }
   const restore = (s, patch) => ({ ...patch, selectedNode: patch.nodes.find(n => n.id === s.selectedNode?.id) || null })
   return {
@@ -173,3 +173,5 @@ export const useBehaviorStore = create((set, get) => {
   }
 })
 
+
+export const useBehaviorStore = createBehaviorStore()

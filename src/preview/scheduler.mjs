@@ -1,3 +1,4 @@
+import {beginRecord,finishRecord,syncWaiting,changes,effect} from './experience.mjs'
 import {CATALOG,integrateFile,integrationLibrary,prepareIntegrationWorld} from './integration.mjs'
 import {bound,preparationPath,executeService} from './preparation.mjs'
 import {DAY_DEFAULTS,dayConfig,initializeDay,prepareMeal,dayBindings,advanceDayState,clockLabel} from './day.mjs'
@@ -33,7 +34,7 @@ export function makeScenarioWorld(lib,params,files){
 export class GoalScheduler{
  constructor(files,lib,world,actor,params={},settings={}){
   this.settings={...DAY_DEFAULTS,...SCHEDULER_DEFAULTS,...settings};this.files=files.map(schedulerConfig).map(f=>this.settings.dayMode?dayConfig(f):f);this.lib=integrationLibrary(lib);this.files=this.files.map(integrateFile);this.world=structuredClone(world);this.actor=actor;this.params={...DEFAULTS,...params};this.random=this.params.seed>>>0
-  this.elapsed=0;this.status='ready';this.logs=[];this.active=null;this.currentFile=null;this.goal=null;this.queue=[];this.attempts=0;this.cooldowns={};this.nextCheck=0;this.completed=[];this.candidates=[];this.goalScores=[];this.handled=false
+  this.experiences=[];this.elapsed=0;this.status='ready';this.logs=[];this.active=null;this.currentFile=null;this.goal=null;this.queue=[];this.attempts=0;this.cooldowns={};this.nextCheck=0;this.completed=[];this.candidates=[];this.goalScores=[];this.handled=false
   if(this.settings.dayMode)initializeDay(this.world,this.settings);prepareIntegrationWorld(this.world);this.executionCount=0;this.statistics={};this.pendingSteps=[];this.requests=[];this.rounds=0;
   this.goals=GOAL_PRESETS.filter(g=>{const d=definition(lib,g.attribute);return d?.kind==='数值'&&d.objectTypes?.includes('partner')}).map(g=>({...g,id:g.attribute,threshold:this.params.threshold}))
  }
@@ -53,7 +54,7 @@ export class GoalScheduler{
   const weights=GOAL_PRESETS.filter(other=>this.supports(f,other));const weight=(weights.reduce((n,other)=>n+this.score(other),0)||60)/Math.max(1,path.steps?.length||1)
   return {file:f,reasons,steps:path.steps||[],weight:reasons.length?0:weight}
  }
- cooldown(reason){this.log(this.goal.name+'：'+reason+'；冷却 '+this.settings.failCooldownSec+' 秒');this.cooldowns[this.goal.id]=this.elapsed+this.settings.failCooldownSec;this.goal=null;this.queue=[];this.pendingSteps=[];this.status='waiting';this.nextCheck=this.elapsed+this.settings.recheckSec}
+ cooldown(reason){this.waitReason=this.goal.name+'：'+reason+'；等待失败冷却';this.log(this.goal.name+'：'+reason+'；冷却 '+this.settings.failCooldownSec+' 秒');this.cooldowns[this.goal.id]=this.elapsed+this.settings.failCooldownSec;this.goal=null;this.queue=[];this.pendingSteps=[];this.status='waiting';this.nextCheck=this.elapsed+this.settings.recheckSec}
  plan(){
   this.candidates=this.files.filter(f=>this.supports(f,this.goal)).map(f=>this.evaluate(f,this.goal))
   const pool=this.candidates.filter(c=>!c.reasons.length)
@@ -72,7 +73,7 @@ export class GoalScheduler{
   this.waitReason='';this.goal=chosen;this.attempts=0;this.log('属性选目标：'+chosen.name+'（当前 '+(chosen.value??this.value(chosen))+' → '+chosen.threshold+'，目标分 '+(chosen.weight??this.score(chosen)).toFixed(1)+'）');this.plan()
  }
  finish(){
-  const s=this.active;if(!s||this.handled)return;this.handled=true;this.world=structuredClone(s.world)
+  const s=this.active;if(!s||this.handled)return;finishRecord(this,s.status,s.error||'');this.handled=true;this.world=structuredClone(s.world)
   // Terminal graph result returns to the external policy. Only its own reservations are released.
   for(const id of s.held){const o=this.world.find(o=>o.id===id);if(o?.occupied===this.actor)delete o.occupied}if(s.held.size)this.log('外部调度回收本次行为预约');s.held.clear()
   this.completed.push({file:this.currentFile.name,status:s.status,goal:this.goal.id,time:this.elapsed});this.completed=this.completed.slice(-1000);this.statistics[this.currentFile.name]=(this.statistics[this.currentFile.name]||0)+1
@@ -82,9 +83,9 @@ export class GoalScheduler{
   }
   if(s.status==='done'&&this.pendingSteps.length){this.active=null;this.startNext();return}
   this.pendingSteps=[];this.queue=[]
-  if(this.satisfied(this.goal)){this.log('实际结果验证：'+this.goal.name+'已达成（'+this.value(this.goal)+'）；清空队列，重新选择目标');this.goal=null;this.status='waiting';this.nextCheck=this.elapsed+.5}
+  if(this.satisfied(this.goal)){this.log('实际结果验证：'+this.goal.name+'已达成（'+this.value(this.goal)+'）；清空队列，重新选择目标');this.goal=null;this.waitReason='';this.status='waiting';this.nextCheck=this.elapsed+.5}
   else if(this.attempts>=this.settings.maxAttempts)this.cooldown('实际执行后仍未达成，尝试次数已用完')
-  else {this.log('实际结果验证：目标未达成'+(s.error?'；'+s.error:'')+'，保留当前状态，围绕原目标重规划');this.status='waiting';this.nextCheck=this.elapsed+this.settings.recheckSec}
+  else {this.waitReason=s.error?'等待重试：'+s.error:'';this.log('实际结果验证：目标未达成'+(s.error?'；'+s.error:'')+'，保留当前状态，围绕原目标重规划');this.status='waiting';this.nextCheck=this.elapsed+this.settings.recheckSec}
  }
  extraValue(g){
   const a=this.world.find(e=>e.id===this.actor),target=this.world.find(e=>e.id===g.target)
@@ -117,20 +118,21 @@ export class GoalScheduler{
   try{
    while(this.pendingSteps.length){
     const step=this.pendingSteps.shift();this.queue=[step.name,...this.pendingSteps.map(f=>f.name)]
-    if(step.service){executeService(step,this.world,this.actor);this.log(step.name+'（公共库实例转移，缺少对应在线准备稿）');continue}
+    if(step.service){beginRecord(this,step);const before=structuredClone(this.world);executeService(step,this.world,this.actor);effect(this.currentExperience,changes(before,this.world,this.lib));finishRecord(this,'done','准备步骤完成');this.log(step.name+'（公共库实例转移，缺少对应在线准备稿）');continue}
     if(this.settings.dayMode){const meal=prepareMeal(this.world,this.actor,step.config,this.elapsed*this.settings.worldSecondsPerSecond);if(meal.error)throw Error(meal.error);this.world=meal.world;if(meal.food)this.log('场景供餐：从有限库存装备 '+meal.food.name)}
     const s=new Simulation(step.config,this.lib,this.world,dayBindings(bound(step.config,this.lib,this.world,this.actor),step.config,this.world,this.actor),this.actor,{...this.params,seed:this.randomValue()*4294967296,stateRules:this.settings.dayMode,worldNow:this.elapsed*this.settings.worldSecondsPerSecond,executionId:++this.executionCount})
+    beginRecord(this,step,s)
     if(s.status==='blocked')throw Error(s.error)
     for(const r of step.config.behavior.preconditions?.attributeRules||[])if(!s.condition(r))throw Error('执行前条件已变化：'+r.attribute)
     this.currentFile=step;this.active=s;this.handled=false;this.status='running';for(const note of step.notes||[])this.log(note);return
    }
-  }catch(e){this.active=null;this.pendingSteps=[];this.queue=[];if(this.attempts>=this.settings.maxAttempts)this.cooldown(e.message);else{this.log('准备链重规划：'+e.message);this.status='waiting';this.nextCheck=this.elapsed+this.settings.recheckSec}}
+  }catch(e){if(this.currentExperience?.end==null)finishRecord(this,'blocked',e.message);this.active=null;this.pendingSteps=[];this.queue=[];if(this.attempts>=this.settings.maxAttempts)this.cooldown(e.message);else{this.waitReason='等待重试：'+e.message;this.log('准备链重规划：'+e.message);this.status='waiting';this.nextCheck=this.elapsed+this.settings.recheckSec}}
  }
  clock(){return clockLabel(this.elapsed,this.settings)}
  tick(dt){
-  if(!this.settings.dayMode){this.advance(dt);return}
+  if(!this.settings.dayMode){this.advance(dt);syncWaiting(this);return}
   let remaining=Math.min(Math.max(0,dt),this.settings.daySeconds-this.elapsed)
-  while(remaining>1e-8){const slice=Math.min(.1,remaining);this.advance(slice);remaining-=slice}
+  while(remaining>1e-8){const slice=Math.min(.1,remaining);this.advance(slice);syncWaiting(this);remaining-=slice}
   if(this.elapsed>=this.settings.daySeconds-1e-7&&this.status!=='day-complete'){this.elapsed=this.settings.daySeconds;this.status='day-complete';this.log('24小时预览完成；保留当前节点与场景状态，不伪造行为完成。')}
  }
  advance(dt){

@@ -1,8 +1,10 @@
 import {NODE_CONFIG} from '../constants/behaviorTypes'
 import {validateConfig} from '../store/documentValidation'
 import {normalizeBehavior} from './normalizeBehavior'
-export const REPO='akaneyonchyan/behavior_editor', FOLDER='behaviors', BRANCH='main'
-export const REPO_URL='https://github.com/'+REPO
+import {gitlabMode,behaviorApi,revisionKey} from './onlineProvider'
+import {PROJECT,FOLDER as GITLAB_FOLDER} from '../../shared/behavior-source.mjs'
+export const REPO=gitlabMode?PROJECT:'akaneyonchyan/behavior_editor', FOLDER=gitlabMode?GITLAB_FOLDER:'behaviors', BRANCH=gitlabMode?'master':'main'
+export const REPO_URL=gitlabMode?'https://git.xindong.com/'+REPO:'https://github.com/'+REPO
 const API='https://api.github.com/repos/'+REPO
 export const MAX_BYTES=2*1024*1024
 export function validateFileName(name){
@@ -22,6 +24,7 @@ async function api(path,token='',body,method=body?'POST':'GET'){
 }
 function checkedTree(tree){if(tree.truncated)throw new Error('仓库目录过大，GitHub 未返回完整目录，请拆分目录后重试');return tree.tree}
 export async function listOnlineFiles(token=''){
+ if(gitlabMode)return behaviorApi('')
  const ref=await api('/git/ref/heads/'+BRANCH,token),head=ref.object.sha
  const commit=await api('/git/commits/'+head,token),tree=commit.tree.sha
  const root=checkedTree(await api('/git/trees/'+tree,token)),folder=root.find(x=>x.path===FOLDER)
@@ -30,6 +33,7 @@ export async function listOnlineFiles(token=''){
  return {head,tree,files:entries.filter(x=>x.type==='blob'&&x.mode==='100644'&&/\.json$/i.test(x.path)).map(x=>({name:x.path,sha:x.sha,size:x.size})).sort((a,b)=>a.name.localeCompare(b.name,'zh-CN',{numeric:true}))}
 }
 export async function readOnlineFile(file,token=''){
+ if(gitlabMode){const result=await behaviorApi('/file?'+new URLSearchParams({name:file.name,ref:file.ref,sha:file.sha}));return {...file,text:result.text,config:parseBehavior(result.text)}}
  validateFileName(file.name)
  if(file.size>MAX_BYTES)throw new Error('文件超过 2 MB，无法在编辑器中预览')
  const blob=await api('/git/blobs/'+encodeURIComponent(file.sha),token)
@@ -44,10 +48,11 @@ export async function prepareUpload(files,token=''){
  if(total>10*1024*1024)throw new Error('每次上传总大小不能超过 10 MB')
  const base=await listOnlineFiles(token)
  for(const item of items){const collision=base.files.find(f=>f.name.toLowerCase()===item.name.toLowerCase()&&f.name!==item.name);if(collision)throw new Error('线上已有仅大小写不同的文件：'+collision.name+'，请统一文件名');item.previousSha=base.files.find(f=>f.name===item.name)?.sha||null}
- for(const item of items){let known=null;try{known=localStorage.getItem('pps-online-base:'+item.name)}catch{}if(known&&known!==item.previousSha)throw new Error(item.name+' 自上次下载后线上已有更新，请先下载最新版本并整合本地修改，或在 GitHub 手动创建分支处理冲突')}
-return {base,items}
+ for(const item of items){let known=null;try{known=localStorage.getItem(revisionKey(item.name))}catch{}if(known&&known!==item.previousSha)throw new Error(item.name+' 自上次下载后线上已有更新，请先下载最新版本并整合本地修改，或在仓库手动创建分支处理冲突')}
+return {base,items,...(gitlabMode?{requestId:crypto.randomUUID()}:{} )}
 }
 export async function submitUpload(plan,token,onProgress=()=>{}){
+ if(gitlabMode)return behaviorApi('/uploads',{items:plan.items,requestId:plan.requestId})
  if(!token.trim())throw new Error('请填写自己的 GitHub Token 后再上传')
  // Compare every affected file, then branch from the exact reviewed snapshot.
  const current=await listOnlineFiles(token)
