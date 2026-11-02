@@ -1,10 +1,10 @@
 import { mkdir, writeFile, rename } from 'node:fs/promises'
 import { FeishuRepository } from '../server/feishu.mjs'
 
-// This script runs in GitHub Actions only. No credentials enter the browser build.
+// Runs on a trusted build host (GitLab CI or GitHub Actions). Never in the browser.
 const required = ['FEISHU_APP_ID','FEISHU_APP_SECRET','FEISHU_BASE_TOKEN','FEISHU_OBJECT_TABLE','FEISHU_ATTRIBUTE_TABLE','FEISHU_BUFF_TABLE']
 if (required.some(key => !process.env[key])) {
-  throw new Error('请在 GitHub Actions Secrets 中配置全部飞书同步参数；本次不覆盖已发布版本');
+  throw new Error('请在构建环境配置全部飞书同步参数（GitLab CI/CD Variables 或 GitHub Secrets）；本次不覆盖已发布版本');
 }
 const repo = new FeishuRepository(process.env)
 repo.tables = { objects: process.env.FEISHU_OBJECT_TABLE, attributes: process.env.FEISHU_ATTRIBUTE_TABLE, buffs: process.env.FEISHU_BUFF_TABLE }

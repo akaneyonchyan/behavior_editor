@@ -1,6 +1,7 @@
 import './validate-behaviors.mjs'
 import {readdir,readFile,mkdir,writeFile} from 'node:fs/promises'
 import {createHash} from 'node:crypto'
+import {execFileSync} from 'node:child_process'
 const target='public/data/behaviors';await mkdir(target,{recursive:true})
 const files=[]
 for(const name of await readdir('behaviors')){
@@ -10,5 +11,6 @@ for(const name of await readdir('behaviors')){
  await writeFile(target+'/'+sha+'.json',bytes)
  files.push({name,sha,size:bytes.length})
 }
-await writeFile(target+'/index.json',JSON.stringify({version:1,publishedAt:new Date().toISOString(),files}))
+const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()
+await writeFile(target+'/index.json',JSON.stringify({version:1,head,publishedAt:new Date().toISOString(),files}))
 console.log('Published '+files.length+' behavior files')

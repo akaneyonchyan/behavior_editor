@@ -1,0 +1,2 @@
+const {defineConfig}=require('@playwright/test')
+module.exports=defineConfig({testDir:'./tests',testMatch:'feishu-auth.spec.cjs',workers:1,use:{baseURL:'http://127.0.0.1:5198',channel:process.env.PW_CHANNEL||undefined},webServer:{command:'npm run dev -- --host 127.0.0.1 --port 5198 --strictPort',url:'http://127.0.0.1:5198',reuseExistingServer:false,env:{VITE_AUTH_MODE:'feishu',VITE_LIBRARY_MODE:'published',VITE_ONLINE_PROVIDER:'gitlab-snapshot'}}})
