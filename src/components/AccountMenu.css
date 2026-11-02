@@ -1,0 +1,3 @@
+.account-menu { display:flex; align-items:center; gap:12px; margin-left:auto; padding-left:16px; border-left:1px solid var(--border); flex-shrink:0; white-space:nowrap; }
+.account-name { max-width:120px; overflow:hidden; text-overflow:ellipsis; color:var(--text-secondary); font-size:13px; }
+@media (max-width:700px) { .account-menu { gap:8px; padding-left:10px; } .account-name { max-width:80px; } }

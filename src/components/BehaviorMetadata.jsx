@@ -1,5 +1,5 @@
 import React from 'react'
-import {useBehaviorStore} from '../store/behaviorStore'
+import {useEditorStore as useBehaviorStore} from '../store/editorStore'
 import {useContentLibrary} from '../store/contentLibrary'
 import LibraryRules from './LibraryRules'
 import {PropertyInputs} from './DesignInputs'

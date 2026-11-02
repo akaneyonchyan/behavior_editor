@@ -2,7 +2,7 @@ import {containerTarget} from '../utils/normalizeBehavior'
 import {NODE_CONFIG} from '../constants/behaviorTypes'
 import React from 'react'
 import {Handle, Position} from 'reactflow'
-import {useBehaviorStore} from '../store/behaviorStore'
+import {useEditorStore as useBehaviorStore} from '../store/editorStore'
 import {externalExit, exitEnabled} from '../utils/externalExits'
 
 export function BranchPort({data, handle, className='node-handle', disabled=false}) {

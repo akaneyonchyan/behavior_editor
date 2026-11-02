@@ -1,0 +1,26 @@
+.gitlab-access {flex:none;min-width:0;margin:12px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-1);color:var(--text-primary);font:inherit;font-size:12px;line-height:1.65;overflow-wrap:anywhere}
+.gitlab-access p {margin:0}
+.gitlab-access-heading {display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.gitlab-access-heading strong {font-size:13px;font-weight:600}
+.gitlab-access.is-collapsed {padding:10px 14px}
+.gitlab-access.is-collapsed .gitlab-access-heading {margin-bottom:0}
+.gitlab-access button,.gitlab-access input {font:inherit;box-sizing:border-box}
+.gitlab-access button {padding:7px 9px;min-height:32px;border:1px solid var(--border);border-radius:5px;background:var(--surface-2);color:var(--text-primary);cursor:pointer;line-height:1.4}
+.gitlab-access button:hover:not(:disabled) {border-color:var(--accent)}
+.gitlab-access button:disabled {opacity:.45;cursor:default}
+.gitlab-access .gitlab-access-toggle {flex:none;padding:4px 8px;min-height:28px;background:transparent}
+.gitlab-access-fields {display:grid;gap:12px;margin-top:14px}
+.gitlab-access-fields[hidden] {display:none}
+.gitlab-access-token {display:grid;gap:6px}
+.gitlab-access-token input {width:100%;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:5px;background:var(--surface-2);color:var(--text-primary)}
+.gitlab-access-remember {display:flex;align-items:flex-start;gap:8px;cursor:pointer}
+.gitlab-access-remember input {flex:none;width:14px;height:14px;margin:3px 0 0;accent-color:var(--accent)}
+.gitlab-access-hint {display:block;color:var(--text-secondary)}
+.gitlab-access-help {display:grid;gap:5px;color:var(--text-secondary)}
+.gitlab-access-help a {color:var(--text-primary);text-decoration:underline;text-underline-offset:3px}
+.gitlab-access-help a:hover {color:var(--accent)}
+.gitlab-access-actions {display:flex;gap:8px;flex-wrap:wrap}
+.gitlab-access-actions button[type=submit] {width:100%;font-weight:600}
+.gitlab-access-actions button[type=button] {flex:1 1 80px}
+.gitlab-access :is(button,input,a):focus-visible {outline:2px solid var(--accent);outline-offset:2px}
+.gitlab-access [role=alert] {margin-top:8px;color:var(--text-primary)}

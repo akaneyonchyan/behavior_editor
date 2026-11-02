@@ -5,7 +5,9 @@ import Toolbar from './components/Toolbar'
 import NodePalette from './components/NodePalette'
 import Canvas from './components/Canvas'
 import OnlinePreview from './components/OnlinePreview'
+import CollaborativeEditor from './components/CollaborativeEditor'
 import {useFileView} from './store/fileView'
+import {liveGitlabMode} from './utils/onlineProvider'
 import BehaviorFiles from './components/BehaviorFiles'
 import PropertyPanel from './components/PropertyPanel'
 import { useBehaviorStore } from './store/behaviorStore'
@@ -18,10 +20,10 @@ export default function App() {
   const [workspace,setWorkspace]=useState(()=>new URLSearchParams(location.search).get('view')==='editor'?'editor':'preview')
   useEffect(()=>{if(publishedMode)return startPublishedLibrary();connectTeamLibrary()},[])
   const { addNode } = useBehaviorStore()
-  const {tab,file,selected}=useFileView(),readOnly=tab==='online'
+  const {tab,file,selected,onlineAccess,requestOnlineEdit,collaborating,onlineControls,setCollaborating}=useFileView(),readOnly=tab==='online',shared=readOnly&&collaborating&&!!file
 
   const handleAddNode = (type) => {
-    if(readOnly)return
+    if(readOnly){if(shared&&onlineControls?.canEdit)onlineControls.addNode(type);return}
     const newNode = {
       id: `${type}_${Date.now()}`,
       type,
@@ -43,11 +45,11 @@ export default function App() {
       <Toolbar navigation={<WorkspaceNavigation workspace={workspace} onChange={setWorkspace}/>} />
       <div className="app-main">
         <aside className="behavior-sidebar" aria-label="节点与本地文件">
-          <div className="palette-container" inert={readOnly?'':undefined} aria-disabled={readOnly}><NodePalette onAddNode={handleAddNode} /></div>
+          <div className="palette-container" inert={readOnly&&!onlineControls?.canEdit?'':undefined} aria-disabled={readOnly&&!onlineControls?.canEdit}><NodePalette onAddNode={handleAddNode} /></div>
           <BehaviorFiles/>
         </aside>
-        {readOnly?(file?<OnlinePreview key={file.sha+file.name} file={file}/>:<div className="online-empty">从左侧选择在线行为文件，在这里只读查看。<br/>下载到本地保存目录后即可编辑。</div>):<><Canvas /></>}
-        {readOnly?<aside className="property-panel online-properties"><div className="panel-header">在线只读 · {selected?(selected.data.name||NODE_CONFIG[selected.type].label):'行为准入数据'}</div><div className="panel-content">{file?<pre>{JSON.stringify(selected&&selected.type!=='start'?selected.data:file.config.behavior,null,2)}</pre>:<p>选择在线文件查看。另存为到本地后可编辑。</p>}</div></aside>:<PropertyPanel/>}
+        {shared?<CollaborativeEditor key={file.name} file={file} onClose={()=>setCollaborating(false)}/>:readOnly?(file?<OnlinePreview key={file.sha+file.name} file={file}/>:<div className="online-empty">从左侧选择在线行为文件。<br/>{liveGitlabMode?'验证个人权限后，点击文件直接进入协作编辑。':'下载到本地保存目录后即可编辑。'}</div>):<><Canvas /></>}
+        {shared?null:readOnly?<aside className="property-panel online-properties"><div className="panel-header">在线预览 · {selected?(selected.data.name||NODE_CONFIG[selected.type].label):'行为准入数据'}</div><div className="panel-content">{liveGitlabMode&&<div className="online-edit-entry"><strong>{onlineAccess.canEdit?'此文件可以在线编辑':'当前为只读预览'}</strong><p>{onlineAccess.message}</p>{file&&<button className="toolbar-btn" disabled={!onlineAccess.canEdit} onClick={requestOnlineEdit}>进入在线编辑</button>}</div>}{file?<details className="online-json-details"><summary>查看原始 JSON</summary><pre>{JSON.stringify(selected&&selected.type!=='start'?selected.data:file.config.behavior,null,2)}</pre></details>:<p>选择在线文件查看。</p>}</div></aside>:<PropertyPanel/>}
       </div>
       </div>
       {workspace==='preview'&&<Suspense fallback={<p>正在加载行为预览…</p>}><BehaviorPreview navigation={<WorkspaceNavigation workspace={workspace} onChange={setWorkspace}/>}/></Suspense>}

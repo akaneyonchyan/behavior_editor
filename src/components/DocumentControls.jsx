@@ -5,10 +5,11 @@ import example from '../../examples/external-exits.json'
 import PngExport from './PngExport'
 import {useFileView} from '../store/fileView'
 import {downloadBehavior} from '../utils/downloadBehavior'
+import {liveGitlabMode} from '../utils/onlineProvider'
 
 export default function DocumentControls() {
   const s = useDocumentSession(), name = useBehaviorStore(state => state.behaviorInfo.name)
-  const {tab,file}=useFileView(),readOnly=tab==='online'
+  const {tab,file,collaborating,onlineControls}=useFileView(),readOnly=tab==='online',shared=readOnly&&collaborating
   const [onlineSaving,setOnlineSaving]=useState(false)
   const saveOnline=async()=>{if(onlineSaving||!file)return;setOnlineSaving(true);try{const result=await downloadBehavior(file);if(result)useFileView.getState().setTab('local')}catch(e){useDocumentSession.setState({error:e.message})}finally{setOnlineSaving(false)}}
   const input = useRef(null), [drafts, setDrafts] = useState(null)
@@ -29,8 +30,8 @@ export default function DocumentControls() {
       <div className="document-actions">
         <button className="toolbar-btn" disabled={s.busy||readOnly} onClick={newDocument}>新建</button>
         <button className="toolbar-btn" disabled={s.busy||readOnly} onClick={() => openDocument(input.current)}>打开</button>
-        <button className="toolbar-btn" disabled={s.busy||readOnly} onClick={() => saveDocument()} title="Ctrl+S">保存</button>
-        <button className="toolbar-btn" disabled={s.busy||onlineSaving||(readOnly&&!file)} onClick={() => readOnly?saveOnline():saveDocument(true)} title="Ctrl+Shift+S">另存为</button>
+        <button className="toolbar-btn" aria-label={shared?'保存到 GitLab':'保存'} disabled={shared?!onlineControls?.canSave:s.busy||readOnly} onClick={() => shared?onlineControls?.save():saveDocument()} title={shared?'保存到 GitLab · Ctrl+S':'Ctrl+S'}>保存</button>
+        <button className="toolbar-btn" disabled={s.busy||onlineSaving||(readOnly&&!file)||(shared&&!onlineControls?.canEdit)} onClick={() => shared?onlineControls?.download():readOnly?saveOnline():saveDocument(true)} title="Ctrl+Shift+S">另存为</button>
         <span inert={readOnly?'':undefined} aria-disabled={readOnly}><PngExport /></span>
         <button className="toolbar-btn" disabled={s.busy} onClick={chooseDirectory}>保存目录</button>
         {s.needsAuthorization&&<button className="toolbar-btn" disabled={s.busy||readOnly} onClick={authorizeStoredAccess}>恢复访问授权</button>}
@@ -43,7 +44,7 @@ export default function DocumentControls() {
         <span>{s.fileName || '仅缓存，尚未保存为正式文件'} · 浏览器草稿 {s.draftTime || '等待保存'}</span>
         <span>{s.directoryName ? '本地目录：' + s.directoryName + ' / .behavior-editor-cache · 每15秒备份 · ' + (s.backupTime || '等待备份／授权') : '未设置本地备份目录 · 当前仅有浏览器草稿'}</span>
       </div>
-{readOnly&&<div className="save-status"><strong>在线只读：{file?.name||'请选择文件'}</strong><span>点击“另存为”保存到本地后编辑。</span></div>}
+{readOnly&&<div className="save-status"><strong>{shared?'在线编辑：':liveGitlabMode?'在线预览：':'在线只读：'}{file?.name||'请选择文件'}</strong><span>{shared?'点击节点获取编辑权；修改实时同步，顶部“保存”写入 GitLab。':liveGitlabMode?'验证个人权限后，点击在线文件直接进入协作编辑。':'点击“另存为”保存到本地后编辑。'}</span></div>}
     </div>
     {(s.error || s.notice) && <div className={'document-message ' + (s.error ? 'error' : '')} role={s.error ? 'alert' : 'status'}>
       <span>{s.error}{s.error&&s.notice?' · ':''}{s.notice}</span><button onClick={() => useDocumentSession.setState({ error: '', notice: '' })} aria-label="关闭保存提示">×</button>

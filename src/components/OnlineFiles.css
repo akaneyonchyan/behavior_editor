@@ -42,3 +42,7 @@
 .online-properties .panel-content {overflow:auto;padding:16px}
 .online-preview .online-preview-body {height:100%}
 .document-actions [aria-disabled=true] {opacity:.5}
+.online-edit-entry {display:grid;gap:10px;margin-bottom:16px;padding:14px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7}
+.online-edit-entry p {color:var(--text-secondary)}
+.online-edit-entry button {width:100%;font:inherit}
+.online-json-details summary {cursor:pointer;color:var(--text-secondary);font-size:12px;margin-bottom:12px}

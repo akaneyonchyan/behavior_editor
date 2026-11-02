@@ -18,7 +18,7 @@ const edgeTypes={default:FlowingEdge}
 export default function OnlinePreview({file}){
  const mode=useCanvasView(s=>s.mode)
  useEffect(()=>{
-  const key=e=>{if((e.ctrlKey||e.metaKey)&&['z','y','d','s'].includes(e.key.toLowerCase())){e.preventDefault();e.stopImmediatePropagation()}}
+  const key=e=>{if(document.querySelector('.collab-dialog'))return;if((e.ctrlKey||e.metaKey)&&['z','y','d','s'].includes(e.key.toLowerCase())){e.preventDefault();e.stopImmediatePropagation()}}
   window.addEventListener('keydown',key,true);return()=>window.removeEventListener('keydown',key,true)
  },[])
  const initial=useMemo(()=>{

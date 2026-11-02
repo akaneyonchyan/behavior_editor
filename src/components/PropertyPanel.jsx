@@ -1,6 +1,6 @@
 import BranchDestination from './BranchDestination'
 import React from 'react'
-import { useBehaviorStore } from '../store/behaviorStore'
+import {useEditorStore as useBehaviorStore} from '../store/editorStore'
 import { NODE_CONFIG, NODE_TYPES } from '../constants/behaviorTypes'
 import './PropertyPanel.css'
 import LoopFields from './LoopEditor'

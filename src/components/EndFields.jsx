@@ -1,5 +1,5 @@
 import React from 'react'
-import {useBehaviorStore} from '../store/behaviorStore'
+import {useEditorStore as useBehaviorStore} from '../store/editorStore'
 import {useState} from 'react'
 import {END_REASONS,isLegacyEnd,inferredEndReason} from '../utils/endings'
 import {ReleaseSummary} from './OccupiedResources'
@@ -8,7 +8,7 @@ import {PLAY_MODES} from '../utils/nodeDesign'
 export default function EndFields({node}) {
  const [assignments,setAssignments]=useState({}),[error,setError]=useState('')
  const graph=useBehaviorStore(),legacy=isLegacyEnd(node.data)
- const update=patch=>useBehaviorStore.getState().updateNode(node.id,patch),d=node.data
+ const update=patch=>graph.updateNode(node.id,patch),d=node.data
  if(legacy)return <div className="weight-factors">
    <h4>旧结束节点需要拆分</h4><p className="form-hint">原始表演与结算配置已保留。确认每条入线对应的旧表演后，拆成两个独立节点；可撤销。</p>
    <p>完成表演：{d.successAnimation||'未配置'}</p><p>中断表演：{d.failAnimation||'未配置'}</p>

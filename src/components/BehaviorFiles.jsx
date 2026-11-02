@@ -4,6 +4,8 @@ import {listBehaviorFiles} from '../utils/behaviorFiles'
 import './BehaviorFiles.css'
 import OnlineFiles from './OnlineFiles'
 import {useFileView} from '../store/fileView'
+import {liveGitlabMode} from '../utils/onlineProvider'
+import GitLabAccessGate from './GitLabAccessGate'
 
 function LocalBehaviorFiles(){
  const session=useDocumentSession(),[view,setView]=useState({files:[],permission:'missing'}),[busy,setBusy]=useState(false),[error,setError]=useState(''),[query,setQuery]=useState('')
@@ -44,5 +46,5 @@ export default function BehaviorFiles(){
  const change=next=>{setTab(next);if(next==='online')setVisited(true)}
  return <div className="file-browser"><div className="palette-header file-browser-title">行为图文件</div><div className="file-browser-tabs" role="tablist" aria-label="行为文件来源"><button className="file-browser-tab" role="tab" aria-selected={tab==='local'} onClick={()=>change('local')}>本地</button><button className="file-browser-tab" role="tab" aria-selected={tab==='online'} onClick={()=>change('online')}>在线</button></div>
  <div className="file-browser-page" hidden={tab!=='local'}><LocalBehaviorFiles/></div>
- <div className="file-browser-page" hidden={tab!=='online'}>{visited&&<OnlineFiles onLocal={()=>change('local')}/>}</div></div>
+ <div className="file-browser-page" hidden={tab!=='online'}>{visited&&(liveGitlabMode?<GitLabAccessGate onLocal={()=>change('local')}/>:<OnlineFiles onLocal={()=>change('local')}/>)}</div></div>
 }

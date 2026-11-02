@@ -3,7 +3,7 @@ import {createPortal} from 'react-dom'
 import {DndContext,DragOverlay,PointerSensor,KeyboardSensor,useSensor,useSensors,pointerWithin,closestCorners} from '@dnd-kit/core'
 import {SortableContext,useSortable,verticalListSortingStrategy,arrayMove} from '@dnd-kit/sortable'
 import {CSS} from '@dnd-kit/utilities'
-import {useBehaviorStore} from '../store/behaviorStore'
+import {useEditorStore as useBehaviorStore} from '../store/editorStore'
 import './SortableList.css'
 
 // Transient UI identities keep duplicate strings/legacy objects distinct without changing JSON.

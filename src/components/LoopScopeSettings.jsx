@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from 'react'
-import {useBehaviorStore} from '../store/behaviorStore'
+import {useEditorStore as useBehaviorStore} from '../store/editorStore'
 import {inferLoopScope,checkScope} from '../utils/loopStructure'
 import {NODE_CONFIG} from '../constants/behaviorTypes'
 import './StructuredCanvas.css'

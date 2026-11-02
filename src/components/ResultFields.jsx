@@ -1,6 +1,6 @@
 import React from 'react'
 import SortableList from './SortableList'
-import {useBehaviorStore} from '../store/behaviorStore'
+import {useEditorStore as useBehaviorStore} from '../store/editorStore'
 import TextChoice from './TextChoice'
 import {PropertyInputs} from './DesignInputs'
 import {resultRules,CHANGES,PLAY_MODES} from '../utils/nodeDesign'
