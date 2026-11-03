@@ -1,0 +1,23 @@
+.readonly-page{height:100dvh;display:flex;flex-direction:column;min-width:0;background:var(--surface-0);color:var(--text-primary)}
+.readonly-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)}
+.readonly-header h1{font-size:18px;overflow-wrap:anywhere}
+.readonly-header p,.readonly-properties p{font-size:12px;color:var(--text-secondary)}
+.readonly-share{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 12px;border-bottom:1px solid var(--border);font-size:12px}
+.readonly-share input{width:100%;min-width:0;padding:6px;background:var(--surface-2);color:var(--text-primary);border:1px solid var(--border)}
+.readonly-page button{background:var(--surface-2);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px 10px;cursor:pointer}
+.readonly-header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.readonly-header-actions>button{min-height:40px}
+.readonly-content{position:relative;display:flex;flex:1;min-height:0;min-width:0}
+.readonly-properties{position:absolute;z-index:10;top:60px;right:12px;bottom:12px;width:min(360px,calc(100% - 24px));overflow:auto;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-1)}
+.readonly-details-heading{display:flex;align-items:start;justify-content:space-between;gap:8px}
+.readonly-details-heading button{flex-shrink:0;min-height:40px}
+.readonly-properties h2{font-size:15px;overflow-wrap:anywhere}
+.readonly-properties pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin-top:12px}
+.readonly-message{padding:24px;overflow-wrap:anywhere}
+.readonly-page .react-flow__controls-button svg{fill:currentColor}
+.readonly-page .start-summary .form-hint,.readonly-page .canvas-view-tools>span{display:none}
+.toolbar .readonly-share{padding:0;border:0;flex-shrink:0}
+.toolbar .readonly-share [role=status]:not(:empty){position:fixed;top:58px;right:16px;z-index:30;max-width:calc(100vw - 32px);padding:8px;background:var(--surface-2);border:1px solid var(--border)}
+.toolbar .readonly-share input{position:fixed;top:100px;right:16px;z-index:30;width:min(560px,calc(100vw - 32px))}
+@media(max-width:600px){.readonly-content{flex-direction:column}.readonly-content>.online-preview{min-height:220px}.readonly-properties{top:auto;left:12px;right:12px;bottom:12px;width:auto;max-height:42%}.readonly-header{padding:8px}.readonly-share{padding:4px 0}.readonly-page .canvas-view-tools{flex-wrap:wrap}}
+@media(max-width:600px){.readonly-page .react-flow__minimap{display:none}.readonly-page .react-flow__controls-button{box-sizing:border-box;width:40px;height:40px}.readonly-page .canvas-view-tools button{min-height:40px}.readonly-page .readonly-share button{min-height:40px}}

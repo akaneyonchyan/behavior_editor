@@ -20,6 +20,10 @@ export function singleScenario(config,lib,source,actor,params={},prepare=true){
   // Give maintenance graphs a visible result and event graphs their real triggering relationship.
   if(['repair','clean'].includes(id)){const target=world.find(o=>o.name==='桌子');if(target){owner.previewTarget=target.id;set(target,id==='repair'?'durability':'cleanliness',30)}}
   if(id==='wash')set(owner,'cleanliness',30)
+  if(id==='fishCore'){
+   set(owner,'fishingLevel',Math.min(10,Number(owner.attrs.fishingLevel)||0));
+   const env=world.find(e=>e.type==='environmen');if(env)set(env,'weather',source.find(e=>e.id===env.id)?.attrs.weather==='0'?'晴天':source.find(e=>e.id===env.id)?.attrs.weather||'晴天');
+  }
   if(id==='unstick'){
    const tree=world.find(o=>o.name==='乔木'),axe=world.find(o=>o.name==='斧头');if(!tree||!axe)throw Error('测试场景缺少树或斧头')
    axe.location='stuck:'+tree.id;tree.stuckTool=axe.id;set(tree,'reczz28PBpzFKg4B','1');addBuff(tree,'buff_be_stuck',0,'单行为测试');addBuff(axe,'buff_stuck',0,'单行为测试');notes.push('建立树与斧头的卡住关系')

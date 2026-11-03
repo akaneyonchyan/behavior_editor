@@ -4,6 +4,7 @@ import {OP_NAMES,previewCondition,previewEffect,previewGate,previewNodeComplete}
 import {effectiveValue,addBuff,removeBuff,completeBuffNode,expireWorldBuffs} from './state.mjs'
 import {layoutIsland} from './mapLayout.mjs'
 import {attachRhythm,rhythmDuration,applyRhythm,rhythmEffect,inferredDelta,NEEDS} from './rhythm.mjs'
+import {fishingFactor,consumeFishingBait,prepareFishingWorld,inspectFishingRoutes,finishFishing} from './fishingCore.mjs'
 export const CHARACTERS=[['pip','皮普','兔子','种植 · 自然观察','#f4a6ad'],['banban','斑斑','鹿','雕塑 · 自然采集','#cf9a72'],['nana','娜娜','马','唱歌 · 吉他','#a99bd0'],['pietro','裴洛','猫','摄影 · 家居布置','#e7cb8b'],['finn','芬恩','垂耳兔','绘本插画 · 画云','#9bbfc4'],['granny','古奶奶','仓鼠','读书 · 收集贝壳','#c0b598']].map(([id,name,species,hobby,color])=>({id,name,species,hobby,color}))
 export const DEFAULTS={initial:50,delta:10,seconds:3,count:3,threshold:70,specific:70,seed:42,maxSteps:500}
 export const WEIGHTS={'极高':9,'高':6,'中':3,'低':2,'极低':1}
@@ -23,9 +24,9 @@ export function allRules(config){
  return rows
 }
 export function makeWorld(lib,p=DEFAULTS,config=null){
- const attrs=type=>Object.fromEntries(lib.attributes.filter(a=>a.enabled&&a.objectTypes?.includes(type)).map(a=>[a.id,a.kind==='数值'?p.initial:'0']))
+ const attrs=type=>Object.fromEntries(lib.attributes.filter(a=>a.enabled&&a.objectTypes?.includes(type)).map(a=>[a.id,a.previewDefault??(a.kind==='数值'?p.initial:'0')]))
  const actors=CHARACTERS.map((c,i)=>({...c,type:'partner',x:35+i*5,z:56+(i%2)*7,attrs:attrs('partner'),buffs:{},inventory:{}}))
- const objects=(lib.items||[]).filter(i=>i.enabled&&!['partner','buff'].includes(i.objectType)).map((item,i)=>{
+ const objects=(lib.items||[]).filter(i=>i.enabled&&!i.previewOnly&&!['partner','buff'].includes(i.objectType)).map((item,i)=>{
   const water=/钓|鱼|水/.test(item.name),forest=/树|木|斧|石/.test(item.name)
   const zone=water?'水边':forest?'资源区':['food','container','furniture'].includes(item.objectType)?'生活区':'创作区'
   const group=(lib.items||[]).filter(a=>a.enabled&&a.objectType===item.objectType).indexOf(item)
@@ -38,6 +39,11 @@ export function makeWorld(lib,p=DEFAULTS,config=null){
   const id='placeholder-'+world.length;world.push({id,name,type,placeholder:true,x:22+(world.length*7)%55,z:22+(world.length*11)%50,zone:'行为测试区',attrs:attrs(type),buffs:{},inventory:{},color:'#cbbba7'})
  }
  if(config&&allRules(config).some(({r})=>(r.source||r.objectType)==='object:environmen'||r.objectType==='environmen')&&!world.some(o=>o.type==='environmen'))world.push({id:'preview-environment',name:'当前环境',type:'environmen',placeholder:true,x:80,z:50,attrs:attrs('environmen'),buffs:{},inventory:{}})
+ if(config?.behavior?.name==='钓鱼细分-核心行为'){
+  prepareFishingWorld(world)
+  for(const a of actors){a.attrs.fishingLevel=3;a.attrs.fishing_experience=0}
+  for(const e of world)if(e.type==='environmen')e.attrs.weather='晴天'
+ }
  return layoutIsland(world)
 }
 export function bindingsFor(config,lib,world,actor){
@@ -53,7 +59,7 @@ export function bindingsFor(config,lib,world,actor){
 const conditions=['较低时','较高时','具有指定 Buff 时','不具有指定 Buff 时','增加','减少','改变','增','减','消除','移除指定 Buff','获得指定 Buff','提升至期望状态','降低至期望状态','恢复至正常状态','为空','不为空','具有（1）','不具有（0）','处于指定状态时：小雨或大雨']
 const effects=['归零','概率消除','增','减','增加','减少','添加 Buff','移除 Buff','消除','恢复','有概率提升']
 export function inspect(config,lib,world,bindings){
- const issues=[]
+ const issues=config.previewIntegration==='fishCore'?inspectFishingRoutes(config):[]
  const check=(text,where)=>issues.push({where,text})
  for(const {r,where,mode} of allRules(config)){
   if(mode==='factor'&&r.influenceRule==='不影响')continue
@@ -63,6 +69,11 @@ export function inspect(config,lib,world,bindings){
   if(['object','occupy'].includes(mode))continue
   if(r.previewOp){if(!OP_NAMES.includes(r.previewOp))check('未知预览操作：'+r.previewOp,where);continue}
   if(r.previewFactor&&['size','weight','age'].includes(r.previewFactor))continue
+  if(mode==='factor'&&r.previewFactor==='fishing'&&config.previewIntegration==='fishCore'&&['weather','fishingLevel','认真钓鱼buff','情绪-心烦','情绪-安适','fishing_posture','nearby_butterfly','nearby_dragonfly'].includes(r.previewFishingFactor)){
+   if(r.previewFishingFactor==='fishing_posture'&&!['站姿','坐姿','未钓鱼'].includes(r.fishingPostureValue))check('钓鱼姿态缺少明确取值',where)
+   if(!['概率越高','概率越低','允许选中','排除选中'].includes(r.influenceRule))check('未支持影响规则：'+r.influenceRule,where)
+   continue
+  }
   const def=definition(lib,r.attribute)
   if(!def)check('公共库未支持判断项：'+(r.attribute||'空'),where)
   else if(entity&&!def.objectTypes?.includes(entity.type))check('判断项不适用于绑定对象：'+def.name,where)
@@ -90,11 +101,12 @@ export class Simulation{
  constructor(config,lib,world,bindings,actor,params={}){
   this.config=structuredClone(config);this.lib=structuredClone(lib);this.world=structuredClone(world);this.bindings={...bindings};this.actor=actor;this.params={...DEFAULTS,...params};this.random=this.params.seed>>>0;this.current=config.graph.nodes.find(n=>n.type==='start')?.id;this.status='ready';this.elapsed=0;this.progress=0;this.steps=0;this.logs=[];this.loops={};this.held=new Set();this.visited=[];this.edges=[];this.initial=structuredClone(this.world);this.metrics={};this.previewTool=this.world.find(e=>e.id===this.bindings[JSON.stringify(['object:equippedItem',''])])?.id||this.world.find(e=>e.id===actor)?.attrs.equipped_slot_tool
   this.experience=experience({actor,name:config.behavior.name||'未命名行为'});this.recordOffset=0
+  this.loopStartedAt={}
   const issues=inspect(config,lib,world,bindings);if(issues.length){this.status='blocked';this.error=issues.map(i=>i.where+'：'+i.text).join('\n')}
   if(this.params.rhythm&&this.config.previewIntegration)attachRhythm(this)
  }
  node(){return this.config.graph.nodes.find(n=>n.id===this.current)}
- describeRule(r){let value;try{value=this.value(r)}catch{value='未记录'}return (definition(this.lib,r.attribute)?.name||r.tool||r.previewOp||'条件')+' = '+value+'；'+(r.influence||'预览条件')}
+ describeRule(r){if(r.previewOp==='fishingTime')return '循环已用 '+(this.elapsed-(this.loopStartedAt[r.loopId]??this.elapsed)).toFixed(2)+' / '+r.amount+' 游戏分钟';if(r.previewOp==='fishingGoal')return ({experience:'经验增加',rounds:'完整提竿',fish:'鱼类获得',meat:'肉类获得'}[r.metric]||r.metric)+' '+(this.metrics[r.metric]||0)+' / '+r.amount;let value;try{value=this.value(r)}catch{value='未记录'}return (definition(this.lib,r.attribute)?.name||r.tool||r.previewOp||'条件')+' = '+value+'；'+(r.influence||'预览条件')}
  log(text,kind='debug'){event(this.experience,(this.recordOffset||0)+this.elapsed,text,kind,{node:this.current});this.logs.unshift({time:this.elapsed,node:this.current,text});this.logs=this.logs.slice(0,200)}
  entity(r){const e=this.world.find(o=>o.id===this.bindings[refKey(r)]);if(!e)throw Error('对象未绑定');return e}
  value(r,initial=false){const entity=this.entity(r),e=initial?this.initial.find(o=>o.id===entity.id):entity,def=definition(this.lib,r.attribute);if(!def)throw Error('属性定义缺失');if(r.attribute.startsWith('buff:')||def.isBuff)return e.buffs[def.id]||0;if(!(def.id in e.attrs))throw Error('属性值缺失：'+r.attribute);return this.params.stateRules?effectiveValue(e,def.id):e.attrs[def.id]}
@@ -114,7 +126,15 @@ export class Simulation{
   throw Error('未支持条件：'+s)
  }
  duration(n){if(this.rhythm)return rhythmDuration(this,n);if(!['result','wait','end'].includes(n.type))return 0.4;const d=n.data,number=String(d.playExpectation||'').match(/^\s*(\d+(?:\.\d+)?)\s*(秒|次|s)?\s*$/)?.[1];return d.playMode==='计时'?Math.max(.2,Number(number)||this.params.seconds):d.playMode==='计次'?Math.max(1,Number(number)||this.params.count)*this.params.seconds:this.params.seconds}
- tick(dt){if(['blocked','done','exited'].includes(this.status))return;this.status='running';this.elapsed+=dt;if(this.params.selfClock){this.params.worldNow=this.elapsed*60;expireWorldBuffs(this.world,this.params.worldNow)}const moving=this.approach(dt);if(this.rhythm)applyRhythm(this,dt,moving);if(moving)return;this.progress+=dt;if(this.progress>=this.duration(this.node())){this.progress=0;this.step(false)}}
+ tick(dt){
+  // Keep accelerated single-fishing playback on the same clock steps as 1x.
+  // Otherwise a 60x frame can expire bait before admission and skip timed-loop checks.
+  if(this.config.previewIntegration==='fishCore'&&this.params.selfClock&&dt>.100000001){
+   const steps=Math.ceil(dt/.1);for(let i=0;i<steps&&!['blocked','done','exited'].includes(this.status);i++)this.tick(dt/steps)
+   return
+  }
+  if(['blocked','done','exited'].includes(this.status))return;this.status='running';this.elapsed+=dt;if(this.params.selfClock){this.params.worldNow=this.elapsed*60;expireWorldBuffs(this.world,this.params.worldNow)}const moving=this.approach(dt);if(this.rhythm)applyRhythm(this,dt,moving);if(moving)return;this.progress+=dt;if(this.progress>=this.duration(this.node())){this.progress=0;this.step(false)}
+ }
  approach(dt){const actor=this.world.find(o=>o.id===this.actor),n=this.node();if(n?.type!=='start')return false;if(!(this.config.behavior.preconditions?.attributeRules||[]).every(r=>this.condition(r)))return false;const rule=this.config.behavior.preconditions?.interactObjectRules?.[0];if(!rule)return false;const target=this.entity(rule);if(target.id===actor.id)return false;const dx=target.x-3-actor.x,dz=target.z-actor.z,d=Math.hypot(dx,dz);if(d<.2)return false;const ratio=Math.min(1,dt*12/d);actor.x+=dx*ratio;actor.z+=dz*ratio;return true}
  next(handle=''){
   const n=this.node();if(n.data.externalExits?.some(e=>(e.handle||'')===handle)){this.status='exited';this.log('跳出行为，交由外部策略处理；不自动执行结束节点');return}
@@ -124,7 +144,10 @@ export class Simulation{
   if(!target)throw Error('连线目标不存在')
   if(target.type==='loop'){
    const scope=this.config.graph.layout?.scopes?.find(s=>s.loopId===target.id)
-   if(scope?.members.includes(n.id))this.loops[target.id]=(this.loops[target.id]||0)+1
+   if(this.config.previewIntegration==='fishCore'){
+    if(this.loopStartedAt[target.id]!=null)this.loops[target.id]=(this.loops[target.id]||0)+1
+    else{this.loops[target.id]=0;this.loopStartedAt[target.id]=this.elapsed}
+   }else if(scope?.members.includes(n.id))this.loops[target.id]=(this.loops[target.id]||0)+1
    else this.loops[target.id]=0
   }
   this.edges.push(e.id);this.current=e.target
@@ -135,7 +158,15 @@ export class Simulation{
   let w=WEIGHTS[b.weightExpectation]
   for(const f of b.weightFactors||[]){
    if(f.influenceRule==='不影响')continue
-   const v=this.factorValue(f)
+   if(f.previewFactor==='fishing'){
+    const strength=fishingFactor(this,f)
+    if(f.influenceRule==='允许选中'&&strength<.5)w=0
+    if(f.influenceRule==='排除选中'&&strength>=.5)w=0
+    if(f.influenceRule==='概率越高')w*=1+strength
+    if(f.influenceRule==='概率越低')w*=1-strength*.8
+    continue
+   }
+   const v=f.previewFactor==='fishing'?fishingFactor(this,f):this.factorValue(f)
    const max=f.attribute==='freshness'?(this.entity(f).freshnessMax||100):100
    const strength=f.previewFactor==='age'?1:f.influenceType==='小'?(Number(v)<40?1:0):f.influenceType==='未达目标'?(Number(v)<(this.rhythmTargets?.[f.attribute]??this.params.threshold)?1:0):f.influenceType==='达到目标'?(Number(v)>=(this.rhythmTargets?.[f.attribute]??this.params.threshold)?1:0):f.influenceType==='数值高'?Number(v)/max:f.influenceType==='数值低'?1-Number(v)/max:f.influenceType==='具体值'?(definition(this.lib,f.attribute)?.kind==='数值'?(Number(v)===(f.previewSpecific??this.params.specific)?1:0):(Number(v)>0?1:0)):f.influenceType==='具有（1）'?(Number(v)>0?1:0):(Number(v)===0?1:0)
    if(!Number.isFinite(strength))throw Error('无法比较属性值')
@@ -158,17 +189,19 @@ export class Simulation{
     const rs=this.config.behavior.preconditions?.attributeRules||[];if(!rs.every(r=>this.condition(r)))throw Error('准入条件不满足：'+rs.filter(r=>!this.condition(r)).map(r=>this.describeRule(r)).join('；'))
     const targets=(this.config.behavior.preconditions?.interactObjectRules||[]).map(r=>this.entity(r)).filter(o=>o.type!=='environmen');if(targets.some(o=>o.occupied&&o.occupied!==this.actor))throw Error('交互对象被其他伙伴占用')
     for(const o of targets){o.occupied=this.actor;this.held.add(o.id);this.log('预约 '+o.name)}
+    if(this.config.previewIntegration==='fishCore')consumeFishingBait(this)
     this.next()
    }else if(n.type==='judge'){
     const weighted=(d.branches||[]).map(b=>({b,w:this.branchWeight(b)}))
     const forced=weighted.find(x=>x.b.previewPriority&&x.w>0);if(forced)for(const x of weighted)if(x!==forced)x.w=0
-    const total=weighted.reduce((a,x)=>a+x.w,0);if(!total)throw Error('没有可选择的分支');this.random=(Math.imul(1664525,this.random)+1013904223)>>>0;let x=this.random/4294967296*total;const selected=weighted.find(a=>(x-=a.w)<0)||weighted.at(-1);this.log(weighted.map(a=>a.b.name+' '+Math.round(a.w/total*100)+'%').join(' / ')+' → '+selected.b.name);event(this.experience,(this.recordOffset||0)+this.elapsed,(forced?'优先规则选中':weighted.filter(a=>a.w>0).length===1?'唯一可选分支':'随机选中')+'「'+selected.b.name+'」（'+Math.round(selected.w/total*100)+'%）','branch',{node:n.id,candidates:weighted.map(a=>({name:a.b.name,probability:a.w/total,evidence:(a.b.weightFactors||[]).map(f=>{let v;try{v=this.factorValue(f)}catch{v='未记录'}return (definition(this.lib,f.attribute)?.name||f.attribute)+' = '+v+'；'+f.influenceType+' → '+f.influenceRule}),gate:a.b.previewGate||null})),selected:selected.b.id});this.next(selected.b.id)
+    const total=weighted.reduce((a,x)=>a+x.w,0);if(!total)throw Error('没有可选择的分支');this.random=(Math.imul(1664525,this.random)+1013904223)>>>0;let x=this.random/4294967296*total;const selected=weighted.find(a=>(x-=a.w)<0)||weighted.at(-1);this.log(weighted.map(a=>a.b.name+' '+Math.round(a.w/total*100)+'%').join(' / ')+' → '+selected.b.name);event(this.experience,(this.recordOffset||0)+this.elapsed,(forced?'优先规则选中':weighted.filter(a=>a.w>0).length===1?'唯一可选分支':'随机选中')+'「'+selected.b.name+'」（'+Math.round(selected.w/total*100)+'%）','branch',{node:n.id,candidates:weighted.map(a=>({name:a.b.name,probability:a.w/total,evidence:(a.b.weightFactors||[]).map(f=>{let v;try{v=f.previewFactor==='fishing'?fishingFactor(this,f):this.factorValue(f)}catch{v='未记录'}return (definition(this.lib,f.attribute)?.name||f.attribute)+' = '+v+'；'+f.influenceType+' → '+f.influenceRule}),gate:a.b.previewGate||null})),selected:selected.b.id});this.next(selected.b.id)
    }else if(n.type==='loop'){
+    if(this.config.previewIntegration==='fishCore')this.loopStartedAt[n.id]??=this.elapsed
     const count=this.loops[n.id]||0;const conditions=d.loopConditions||[]
     const hit=conditions.find(c=>c.kind==='count'?(this.config.previewProfile==='eat'&&this.world.find(o=>o.id===this.world.find(a=>a.id===this.actor)?.foodRef)?.bites===0)||count>=(c.maxIterations==null||c.maxIterations===''||c.maxIterations==='默认次数'?this.params.count:Number(c.maxIterations)):(c.rules?.length?c.rules:this.config.behavior.targetRules||[]).length>0&&(c.rules?.length?c.rules:this.config.behavior.targetRules||[]).every(r=>this.condition(r)))
     this.log('已完成 '+count+' 轮；'+(hit?'结束：'+hit.kind:'进入下一轮'))
     event(this.experience,(this.recordOffset||0)+this.elapsed,'已完成 '+count+' 轮 → '+(hit?'满足'+(hit.kind==='count'?(this.config.previewProfile==='eat'&&this.world.find(o=>o.id===this.world.find(a=>a.id===this.actor)?.foodRef)?.bites===0?'食物已耗尽':'次数条件（'+(hit.maxIterations==null||hit.maxIterations===''||hit.maxIterations==='默认次数'?this.params.count:hit.maxIterations)+'）'):'目标条件（'+(hit.rules?.length?hit.rules:this.config.behavior.targetRules||[]).map(r=>this.describeRule(r)).join('；')+'）')+'，离开循环':'未满足结束条件，继续循环'),'condition',{node:n.id,condition:hit||null});
-    if(hit)this.next('complete');else {const scope=this.config.graph.layout.scopes.find(s=>s.loopId===n.id);this.current=scope.entry;if(this.node()?.type==='loop')this.loops[this.current]=0}
+    if(hit){delete this.loopStartedAt[n.id];this.next('complete')}else {const scope=this.config.graph.layout.scopes.find(s=>s.loopId===n.id);this.current=scope.entry;if(this.node()?.type==='loop'){this.loops[this.current]=0;delete this.loopStartedAt[this.current]}}
    }else{
     // Stage all effects on a clone; a malformed rule cannot partially settle a node.
     const before=structuredClone(this.world),metricsBefore=structuredClone(this.metrics),randomBefore=this.random,heldBefore=new Set(this.held),logsBefore=[...this.logs],eventsBefore=structuredClone(this.experience.events),omittedBefore=this.experience.omitted;try{
@@ -184,11 +217,11 @@ export class Simulation{
       this.log('消耗 '+food.name+' 一口，剩余 '+food.bites+' 口');
      }
      const o=this.entity(r),v=this.value(r),def=definition(this.lib,r.attribute),minus=['减','减少','移除 Buff','消除','概率消除'].includes(r.influence);if(r.influence==='有概率提升'){this.random=(Math.imul(1664525,this.random)+1013904223)>>>0;if(this.random/4294967296>=.1){this.log('模拟生病概率10%：未触发');continue}}if(r.attribute.startsWith('buff:')||def.isBuff){if(this.params.stateRules){if(minus)removeBuff(o,def.id);else addBuff(o,def.id,this.params.worldNow||0,this.actor)}else o.buffs[def.id]=minus?Math.max(0,Number(v)-1):Number(v)+1;}else if(def.kind==='数值')o.attrs[def.id]=Math.max(0,Math.min(100,r.influence==='归零'?0:r.influence==='恢复'?this.params.initial:Number(o.attrs[def.id])+(minus?-1:1)*inferredDelta(this,r)));else o.attrs[def.id]=minus||r.influence==='归零'?'0':'1';this.log(o.name+' · '+def.name+'：'+v+' → '+this.value(r))}
-     for(const output of d.outputs||[]){const item=this.lib.items.find(i=>i.name===output||'item:'+i.id===output),actor=this.world.find(o=>o.id===this.actor);actor.inventory[item.id]=(actor.inventory[item.id]||0)+(this.rhythm?.id==='fish'?2:1);this.log('获得 '+item.name+' ×'+(this.rhythm?.id==='fish'?2:1))}
+     for(const output of d.outputs||[]){const item=this.lib.items.find(i=>i.name===output||'item:'+i.id===output),actor=this.world.find(o=>o.id===this.actor);actor.inventory[item.id]=(actor.inventory[item.id]||0)+(['fish','fishCore'].includes(this.rhythm?.id)?2:1);this.log('获得 '+item.name+' ×'+(['fish','fishCore'].includes(this.rhythm?.id)?2:1))}
      previewNodeComplete(this,n)
     }catch(e){this.world=before;this.metrics=metricsBefore;this.random=randomBefore;this.held=heldBefore;this.logs=logsBefore;this.experience.events=eventsBefore;this.experience.omitted=omittedBefore;throw e}
     if(this.params.stateRules)for(const e of this.world)completeBuffNode(e,n.id,this.actor+':'+this.params.executionId+':'+this.steps,eligibleBuffs.get(e.id));effect(this.experience,changes(before,this.world,this.lib));if(n.type==='end'){for(const id of this.held){const o=this.world.find(o=>o.id===id);if(o?.occupied===this.actor)delete o.occupied}this.held.clear();this.status='done';const goals=this.config.behavior.targetRules||[];this.experience.goalResult=goals.length?(goals.every(r=>this.condition(r))?'行为目标已满足':'行为目标未满足'):'未配置行为目标';this.log('行为结束；目标策略：'+this.experience.goalResult)}else this.next()
    }
-  }catch(e){this.status='blocked';this.error=e.message;this.log('暂停：'+e.message,'status')}finally{syncSimulation(this)}
+  }catch(e){this.status='blocked';this.error=e.message;this.log('暂停：'+e.message,'status')}finally{finishFishing(this);syncSimulation(this)}
  }
 }

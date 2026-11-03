@@ -27,7 +27,7 @@ export class RhythmScheduler extends GoalScheduler{
   if(g.id==='home')return ['wood','banyan','repair','clean','wash'].includes(id)
   if(g.id==='energy')return ['rest','chair'].includes(id)
   if(g.id==='satiety')return id==='eat'
-  if(g.id==='leisure')return ['fish','play'].includes(id)
+  if(g.id==='leisure')return ['fish','fishCore','play'].includes(id)
   if(g.id==='social')return false // Paired interactions are disabled; no fabricated social graph.
   return super.supports(f,g)
  }
@@ -39,7 +39,7 @@ export class RhythmScheduler extends GoalScheduler{
    if(['wood','banyan'].includes(id)&&!(this.world.find(o=>o.name==='乔木')?.attrs.reczz28PBhFkUjct>0))row.reasons.push('可采产量已耗尽')
    row.weight=['wash','repair','clean'].includes(id)?200-Number(target?.attrs[key]??100):100
   }else if(g.id==='energy')row.weight=(schedule('energy',this.elapsed)?id==='rest':id==='chair')?200:100
-  else if(g.id==='leisure')row.weight=(this.baseScore(g)<DATA.hobbyThreshold?id==='fish':id==='play')?200:100
+  else if(g.id==='leisure')row.weight=(this.baseScore(g)<DATA.hobbyThreshold?['fish','fishCore'].includes(id):id==='play')?200:100
   else row.weight=100
   if(row.reasons.length)row.weight=0
   return row

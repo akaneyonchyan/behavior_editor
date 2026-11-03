@@ -6,14 +6,14 @@ import {useCanvasView} from '../store/canvasView'
 
 export default function PngExport(){
   const directoryName=useDocumentSession(s=>s.directoryName),canChoose=typeof window.showSaveFilePicker==='function'
-  const [open,setOpen]=useState(false),[scope,setScope]=useState('all'),[scale,setScale]=useState(2),[busy,setBusy]=useState(false),[error,setError]=useState('')
+  const [open,setOpen]=useState(false),[scope,setScope]=useState('all'),[scale,setScale]=useState(2),[busy,setBusy]=useState(false),[error,setError]=useState(''),[progress,setProgress]=useState('')
   async function run(){
     if(busy)return
-    setBusy(true);setError('')
+    setBusy(true);setError('');setProgress('正在准备图片…')
     let snapshot
     try{
       let source=document.querySelector('.canvas > .react-flow')
-      const state=useBehaviorStore.getState(),options={scope,scale,name:state.behaviorInfo.name}
+      const state=useBehaviorStore.getState(),options={scope,scale,name:state.behaviorInfo.name,onProgress:setProgress}
       captureCanvas(source,options) // Reject invalid/oversized canvases before showing a save dialog.
       const destination=await preparePngDestination(options.name,getSaveDirectory())
       if(destination.cancelled)return
@@ -36,6 +36,8 @@ export default function PngExport(){
         <label>清晰度<select value={scale} disabled={busy} onChange={e=>setScale(Number(e.target.value))}><option value={2}>高清 2 倍</option><option value={1}>标准 1 倍</option></select></label>
         <p>保留深色背景、节点与静态曲线箭头，隐藏流光和编辑辅助元素。图片导出不会保存或修改行为 JSON。</p>
         <p>{canChoose?(directoryName?'保存弹窗默认打开本地存储目录「'+directoryName+'」，也可以另选位置。':'尚未设置本地存储目录，保存时可自行选择位置。'):'当前浏览器不支持指定保存目录，PNG 将按浏览器下载设置保存。'}</p>
+        <p>大图自动分块渲染并合成为一张 PNG，保留所选清晰度。</p>
+        {busy&&<p role="status">{progress}</p>}
         {scope==='visible'&&<p>按当前视口裁切，边缘节点可能不完整。</p>}
         {error&&<p role="alert" className="unsaved">{error}</p>}
       </div>

@@ -46,6 +46,8 @@ export function preparationPath(file,files,lib,world,actor,params,stack=[]){
       const take=files.find(f=>f.config.previewIntegration==='take');if(!take)throw Error('缺少在线前置行为：从工具架拿取斧头');prepare(take)
      }else{service('equip',r.tool);predicted.find(e=>e.id===actor).attrs.equipped_slot_tool=t.id;t.location=actor}
     }
+   }else if(file.config.previewIntegration==='fishCore'&&r.attribute==='buff:design_fishing_bait'){
+    const bait=files.find(f=>f.config.previewIntegration==='bait');if(!bait)throw Error('缺少在线前置行为：制作鱼饵');prepare(bait)
    }else throw Error('前置条件尚未满足：'+(definition(lib,r.attribute)?.name||r.attribute||r.previewOp)+' / '+r.influence)
   }
   // Bait is optional: use its real online preparation graph if available, never make it mandatory.

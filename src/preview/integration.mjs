@@ -1,5 +1,6 @@
 // Preview-only interpretations. Never writes source graphs or the public library.
 import {addBuff,removeBuff} from './state.mjs'
+import {integrateFishing,fishingLibrary,prepareFishingWorld,fishingCondition,fishingEffect,fishingNodeComplete} from './fishingCore.mjs'
 export const CATALOG=[
  ['从工具架拿取斧头','take','准备'],['伙伴原地晕倒','dizzy','事件'],['原地摔倒','fall','事件'],
  ['向任意伙伴炫耀装备物','showoff','事件'],['在床上睡觉','rest','需求'],['在搓饵台制作鱼饵Buff','bait','准备'],
@@ -8,8 +9,8 @@ export const CATALOG=[
  ['用扳手维修交互物','repair','对象维护'],['用抹布打扫交互物','clean','对象维护'],
  ['用斧头砍伐树木获取木材','wood','采集'],['用斧头砍榕树','banyan','采集'],['钓鱼','fish','采集'],['雨中踩水坑','play','需求'],
 ].map(([name,id,category])=>({name:name+'.json',id,category}))
-export const profileOf=file=>CATALOG.find(x=>x.name===file.name)
-export const OP_NAMES=['tool','available','quantity','rounds','craft','equip','unequip','yield','damage','weightCost','stuck','unstick','flight','finished']
+export const profileOf=file=>file.name==='钓鱼细分-核心行为.json'?{name:file.name,id:'fishCore',category:'采集'}:CATALOG.find(x=>x.name===file.name)
+export const OP_NAMES=['tool','available','quantity','rounds','craft','equip','unequip','yield','damage','weightCost','stuck','unstick','flight','finished','fishingGoal','fishingTime','fishingEffect']
 const key=r=>JSON.stringify([r.source||r.objectType||'',r.objectName||''])
 function rows(c){return [...(c.behavior.targetRules||[]),...(c.behavior.preconditions?.attributeRules||[]),...(c.behavior.preconditions?.interactObjectRules||[]),...c.graph.nodes.flatMap(n=>[...(n.data.effectRules||[]),...(n.data.occupiedResources||[]),...(n.data.branches||[]).flatMap(b=>b.weightFactors||[]),...(n.data.loopConditions||[]).flatMap(x=>x.rules||[])])]}
 export const actorRule=(attribute,influence)=>({source:'object:partner',objectName:'',attribute,influence})
@@ -17,10 +18,11 @@ export function integrationLibrary(source){
  const lib=structuredClone(source)
  const dur=lib.attributes.find(x=>x.id==='durability');if(dur&&!dur.objectTypes.includes('equippedItem'))dur.objectTypes.push('equippedItem')
  for(const [id,name]of [['preview_pain','疼痛（预览占位）'],['preview_early','提前咬钩（预览占位）']])if(!lib.buffs.some(b=>b.id===id))lib.buffs.push({id,name,kind:'枚举',enabled:true,objectTypes:['partner'],previewOnly:true})
- return lib
+ return fishingLibrary(lib)
 }
 export function integrateFile(file){
  const profile=profileOf(file);if(!profile)return file
+ if(profile.id==='fishCore')return integrateFishing(file)
  const config=structuredClone(file.config),notes=[...(file.notes||[])],id=profile.id
  config.previewIntegration=id
  const note=t=>notes.push(t),node=n=>config.graph.nodes.find(x=>x.id===n),op=(r,name,extra={})=>Object.assign(r,{previewOp:name,...extra})
@@ -111,6 +113,7 @@ export function integrateFile(file){
  return {...file,config,notes:[...new Set(notes)],profile}
 }
 export function prepareIntegrationWorld(world){
+ prepareFishingWorld(world)
  const cabinet=world.find(e=>e.name==='工具柜')
  // Disabled library items are not re-enabled; separate, labelled preview stand-ins.
  for(const name of ['扳手','抹布'])if(!world.some(e=>e.type==='equippedItem'&&e.name===name))world.push({id:'preview-tool-'+name,name,type:'equippedItem',previewOnly:true,placeholder:true,zone:'工具柜 · 预览占位',x:cabinet?.x||50,z:cabinet?.z||30,attrs:{durability:100},buffs:{},inventory:{},color:'#94a3b8'})
@@ -123,7 +126,7 @@ export function prepareIntegrationWorld(world){
 export function toolFor(world,actor,name){return world.find(e=>e.type==='equippedItem'&&e.name===name&&(!e.location||e.location===actor||(!world.some(a=>a.type==='partner'&&a.id===e.location)&&!e.location.startsWith('stuck:'))))}
 export function integrationBindings(bindings,config,world,actor){
  const p=config.previewIntegration;if(!p)return bindings
- const a=world.find(e=>e.id===actor),toolName=['wood','banyan','take','put','unstick'].includes(p)?'斧头':p==='fish'?'鱼竿':p==='repair'?'扳手':p==='clean'?'抹布':null
+ const a=world.find(e=>e.id===actor),toolName=['wood','banyan','take','put','unstick'].includes(p)?'斧头':['fish','fishCore'].includes(p)?'鱼竿':p==='repair'?'扳手':p==='clean'?'抹布':null
  const tool=world.find(e=>e.id===a.attrs.equipped_slot_tool)||world.find(e=>e.type==='equippedItem'&&e.name===toolName)
  const tree=world.find(e=>e.type==='environmentItem'&&e.name==='乔木'),target=world.find(e=>e.id===a.previewTarget)||world.find(e=>e.type==='interactObject'&&e.name==='桌子')
  for(const r of rows(config)){
@@ -142,6 +145,7 @@ const actor=s=>s.world.find(e=>e.id===s.actor)
 const tree=s=>s.world.find(e=>e.type==='environmentItem'&&e.name==='乔木')
 const tool=s=>s.world.find(e=>e.id===actor(s).attrs.equipped_slot_tool)||s.world.find(e=>e.id===s.previewTool)
 export function previewCondition(s,r){
+ if(['fishingGoal','fishingTime'].includes(r.previewOp))return fishingCondition(s,r)
  const a=actor(s),e=s.world.find(e=>e.id===s.bindings[key(r)])
  switch(r.previewOp){
   case 'tool':return tool(s)?.name===r.tool&&tool(s)?.location===s.actor
@@ -154,6 +158,7 @@ export function previewCondition(s,r){
  }
 }
 export function previewEffect(s,r){
+ if(r.previewOp==='fishingEffect')return fishingEffect(s,r)
  const a=actor(s),e=s.world.find(e=>e.id===s.bindings[key(r)]),t=tool(s)
  switch(r.previewOp){
   case 'equip':{const item=toolFor(s.world,s.actor,r.tool);if(!item||item.attrs.durability<=0)throw Error('没有可用的'+r.tool);if(a.attrs.equipped_slot_tool&&a.attrs.equipped_slot_tool!=='0'&&a.attrs.equipped_slot_tool!==item.id)throw Error('工具槽未清空');a.attrs.equipped_slot_tool=item.id;item.location=s.actor;break}
@@ -180,6 +185,7 @@ export function previewGate(s,gate){
  throw Error('未知分支门槛：'+gate)
 }
 export function previewNodeComplete(s,n){
+ if(s.config.previewIntegration==='fishCore')fishingNodeComplete(s,n)
  if(n.data.previewAction==='craft')s.metrics.craft=(s.metrics.craft||0)+s.duration(n)
  if(n.data.previewAction==='fishingRound'){s.metrics.rounds=(s.metrics.rounds||0)+1;removeBuff(actor(s),'preview_early')}
  if(n.data.previewAction==='treasure'){if(!tree(s).treasure)throw Error('宝藏已被取走');tree(s).treasure=false;actor(s).inventory['preview:treasure']=(actor(s).inventory['preview:treasure']||0)+1;s.log('获得 宝箱（预览占位）×1')}

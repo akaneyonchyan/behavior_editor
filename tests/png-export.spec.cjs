@@ -98,6 +98,59 @@ test('render failure and concurrent requests release lock and remove detached sn
  expect(await snapshot(page)).toBe(before)
 })
 
+test('failed tile prevents partial download and releases the export lock',async({page})=>{
+ const result=await page.evaluate(async()=>{
+  const {exportCanvasPng}=await import('/src/utils/pngExport.js')
+  const toBlob=(_,options)=>{const c=document.createElement('canvas');c.width=options.width*options.pixelRatio;c.height=options.height*options.pixelRatio;return new Promise(resolve=>c.toBlob(blob=>{c.width=0;c.height=0;resolve(blob)}))}
+  const source=document.createElement('div')
+  Object.assign(source.style,{width:'800px',height:'600px',position:'fixed'})
+  source.innerHTML='<div class="react-flow__viewport" style="transform:translate(0px,0px) scale(1)"><div class="react-flow__node" style="width:2200px;height:100px">tile failure</div></div>'
+  document.body.append(source)
+  let renders=0,downloads=0,error
+  try {
+   try {await exportCanvasPng(source,{}, {render:(node,options)=>{if(++renders===2)throw Error('tile failed');return toBlob(node,options)},download:()=>downloads++})}catch(e){error=e.message}
+   const remaining=document.querySelectorAll('.png-export-snapshot').length
+   await exportCanvasPng(source,{}, {download:()=>downloads++})
+   return {renders,downloads,error,remaining}
+  } finally {source.remove()}
+ })
+ expect(result).toEqual({renders:2,downloads:1,error:'tile failed',remaining:0})
+})
+
+test('9234 by 8130 export stitches all tiles without seams or cropped edges',async({page},info)=>{
+ test.setTimeout(120000)
+ const before=await snapshot(page)
+ const result=await page.evaluate(async()=>{
+  const {exportCanvasPng}=await import('/src/utils/pngExport.js')
+  const source=document.createElement('div')
+  Object.assign(source.style,{width:'800px',height:'600px',position:'fixed',left:'0',top:'0'})
+  source.innerHTML='<div class="react-flow__viewport" style="transform:translate(0px,0px) scale(1);position:absolute"><div class="react-flow__node" style="position:absolute;width:4521px;height:3969px;background:rgb(20,40,80)"><div style="position:absolute;left:970px;top:0;width:20px;height:3969px;background:rgb(220,30,40)"></div><div style="position:absolute;top:970px;left:0;height:20px;width:4521px;background:rgb(30,220,40)"></div><svg width="4521" height="3969" style="position:absolute;inset:0"><path class="react-flow__edge-path" d="M 0 0 L 4521 3969" stroke="white" stroke-width="6" fill="none"/></svg><span style="position:absolute;left:965px;top:1100px;color:white;font-size:28px">跨块文字 PNG</span></div></div>'
+  document.body.append(source)
+  const progress=[];let png
+  try {
+   const frame=await exportCanvasPng(source,{scale:2,onProgress:p=>progress.push(p)},{download:blob=>{png=blob}})
+   const bitmap=await createImageBitmap(png), canvas=document.createElement('canvas')
+   canvas.width=1;canvas.height=1;const ctx=canvas.getContext('2d')
+   const sample=(x,y)=>{ctx.clearRect(0,0,1,1);ctx.drawImage(bitmap,x,y,1,1,0,0,1,1);return [...ctx.getImageData(0,0,1,1).data]}
+   const pixels=[[2047,400],[2048,400],[400,2047],[400,2048],[9120,200],[200,8010],[10,10],[2048,1810]].map(([x,y])=>sample(x,y))
+   bitmap.close()
+   const base64=await new Promise(resolve=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.readAsDataURL(png)})
+   return {frame,progress,pixels,base64}
+  } finally {source.remove()}
+ })
+ expect(result.frame.pixelWidth).toBe(9234);expect(result.frame.pixelHeight).toBe(8130)
+ expect(result.progress).toHaveLength(21)
+ expect(result.progress.at(-1)).toContain('合成')
+ expect(result.pixels.slice(0,2)).toEqual([[220,30,40,255],[220,30,40,255]])
+ expect(result.pixels.slice(2,4)).toEqual([[30,220,40,255],[30,220,40,255]])
+ expect(result.pixels.slice(4,6)).toEqual([[20,40,80,255],[20,40,80,255]])
+ expect(result.pixels[6]).toEqual([5,7,12,255])
+ expect(result.pixels[7]).toEqual([131,144,159,255])
+ await fs.writeFile(info.outputPath('large-9234x8130.png'),Buffer.from(result.base64,'base64'))
+ expect(await snapshot(page)).toBe(before)
+ expect(await page.locator('.png-export-snapshot').count()).toBe(0)
+})
+
 
 test('PNG save picker starts in the chosen directory and cancellation preserves the graph',async({page})=>{
  await page.evaluate(async()=>{

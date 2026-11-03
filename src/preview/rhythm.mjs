@@ -1,6 +1,7 @@
 import DATA from './balance-data.json' with {type:'json'}
 export const NEEDS=['energy','satiety','social','leisure']
 export const RHYTHM_MAP={rest:['睡觉','原值：睡眠恢复99/420分钟；一个睡眠段按420分钟补时，循环仍由原图判断'],chair:['打盹','类比：坐姿休息借用打盹5分钟恢复10'],eat:['小吃','小吃原值；用餐时段借用正餐数值，仍执行原进食图'],fish:['钓鱼','原值：每轮5分钟、娱乐恢复2；等待/提竿分配为推导'],wood:['伐木','原值：每轮5分钟、木材2'],banyan:['伐木','类比：榕树使用伐木耗时消耗'],take:['拿取并装备工具','原值：拿取2分钟'],put:['归还工具','原值：归还2分钟'],bait:['小家具','类比：制作消耗借小家具；制作有效段沿用12分钟映射，不虚构材料配方'],play:['散步','类比：踩水借休闲30分钟恢复15，三轮各10分钟'],wash:['小吃','推导：清洗每轮5分钟，清洁恢复2/分钟；需求按日常活动消耗'],clean:['小家具','类比：打扫按轻工作消耗，清洁恢复2/分钟'],repair:['小家具','类比：维修按轻工作消耗，耐久恢复2/分钟'],unstick:['伐木','类比：解卡按重体力消耗，每次尝试2分钟'],dizzy:['打盹','推导：趴地恢复按打盹消耗，Buff仍按原图'],fall:['等待（无候选）','推导：摔倒恢复用日常活动消耗，Buff仍按原图'],laugh:['散步','推导：大笑用轻娱乐消耗，Buff仍按原图'],showoff:['社交','类比：炫耀用社交消耗；自主多人暂不调度双人图']}
+RHYTHM_MAP.fishCore=['钓鱼','钓鱼细分：等鱼7.5分钟/轮、抛竿4轮；新增经验/产物/情绪为预览补值，详见本图配置。']
 export function schedule(attribute,minute){const key=attribute==='energy'?'睡眠日程':attribute==='satiety'?'用餐日程':'';return DATA.schedules.find(s=>s.goal===key&&minute%1440>=s.start&&minute%1440<s.end)}
 export function profile(config,minute=0){
  const id=config.previewIntegration,mapping=RHYTHM_MAP[id];if(!mapping)throw Error('缺少行为数值映射：'+config.behavior?.name)
@@ -22,6 +23,7 @@ export function rhythmDuration(s,n){
  // Explicit timings in the authored graph keep their units. Missing prose receives a mapping.
  const explicit=n.data.playMode==='计时'&&String(n.data.playExpectation||'').match(/^\s*(\d+(?:\.\d+)?)\s*(秒|分钟|小时|s)\s*$/)
  if(explicit)return Number(explicit[1])*({秒:1/60,s:1/60,分钟:1,小时:60}[explicit[2]])
+ if(id==='fishCore')return n.data.previewFishingAction==='cast'?.5:.25
  if(id==='rest'&&key==='sleep')return 420
  if(id==='chair'&&key==='rest')return 5
  if(id==='eat'&&key==='bite')return s.rhythm.minutes/3
@@ -43,6 +45,7 @@ export function applyRhythm(s,dt,moving=false){
  const n=s.node(),actor=s.world.find(o=>o.id===s.actor),p=s.rhythm,active=!moving&&recoveryNode(s,n)
  for(let i=0;i<4;i++){const k=NEEDS[i];if(typeof actor.attrs[k]!=='number')continue
   let gain=active?p.recovery[i]/p.minutes*dt:0
+  if(p.id==='fishCore')gain=(n.data.effectRules||[]).some(r=>r.previewFishingRecovery&&r.attribute===k)?(k==='energy'?2:.4)*dt:0
   if(p.id==='eat'){const food=s.world.find(o=>o.id===actor.foodRef);if(!food||food.bites<=0||food.attrs.freshness<=0)gain=0;else if(food.attrs.freshness<(food.freshnessMax||100)*.1)gain*=.5}
   s.rhythmRecovery[i]+=gain
   actor.attrs[k]=Math.max(0,Math.min(100,actor.attrs[k]+gain)-p.cost[i]/60*dt)

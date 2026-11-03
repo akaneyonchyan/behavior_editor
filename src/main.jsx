@@ -1,11 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
+const App = React.lazy(()=>import('./App'))
+const ReadOnlyPage = React.lazy(()=>import('./components/ReadOnlyPage'))
 import AuthBoundary from './components/AuthBoundary'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthBoundary><App /></AuthBoundary>
+    <AuthBoundary><React.Suspense fallback={<p>正在加载行为图…</p>}>{new URLSearchParams(location.search).get('view')==='readonly'?<ReadOnlyPage/>:<App />}</React.Suspense></AuthBoundary>
   </React.StrictMode>
 )

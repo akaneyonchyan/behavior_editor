@@ -1,5 +1,5 @@
 // Keep geometry independent of the browser so limits and framing can be tested.
-export const PNG_LIMITS = { edge: 8192, pixels: 24000000 }
+export const PNG_LIMITS = { edge: 16384, pixels: 128000000 }
 export function exportFrame(rects, viewport, size, scope = 'all', scale = 2) {
   if (!['all', 'visible'].includes(scope) || ![1, 2].includes(scale)) throw new Error('导出选项无效')
   if (!Number.isFinite(viewport.zoom) || viewport.zoom <= 0) throw new Error('画布尚未准备好，请稍后重试')
@@ -18,6 +18,51 @@ export function exportFrame(rects, viewport, size, scope = 'all', scale = 2) {
     throw new Error('图片过大（' + pixelWidth + '×' + pixelHeight + '），请降低到标准 1 倍或改为当前可见区域')
   }
   return {width,height,x,y,zoom,pixelWidth,pixelHeight,scale}
+}
+// Integer output coordinates keep tile boundaries aligned at either scale.
+export function exportTiles(frame, edge = 2048) {
+  const tiles = []
+  for (let y=0; y<frame.pixelHeight; y+=edge) {
+    for (let x=0; x<frame.pixelWidth; x+=edge) {
+      tiles.push({x,y,width:Math.min(edge,frame.pixelWidth-x),height:Math.min(edge,frame.pixelHeight-y)})
+    }
+  }
+  return tiles
+}
+async function renderTiled(clone, frame, render, onProgress) {
+  const canvas=document.createElement('canvas'), crop=document.createElement('div')
+  const parent=clone.parentNode
+  parent.append(crop);crop.append(clone)
+  Object.assign(crop.style,{position:'relative',overflow:'hidden',backgroundColor:'#05070c'})
+  try {
+    canvas.width=frame.pixelWidth;canvas.height=frame.pixelHeight
+    const ctx=canvas.getContext('2d')
+    if(!ctx)throw new Error('无法创建大图画布，请降低清晰度后重试')
+    const tiles=exportTiles(frame)
+    for(let i=0;i<tiles.length;i++){
+      const tile=tiles[i]
+      // Render overlapping edges, then copy only the core to preserve antialiasing.
+      const left=Math.max(0,tile.x-2),top=Math.max(0,tile.y-2)
+      const width=Math.min(frame.pixelWidth,tile.x+tile.width+2)-left
+      const height=Math.min(frame.pixelHeight,tile.y+tile.height+2)-top
+      Object.assign(crop.style,{width:width/frame.scale+'px',height:height/frame.scale+'px'})
+      Object.assign(clone.style,{position:'absolute',left:-left/frame.scale+'px',top:-top/frame.scale+'px'})
+      onProgress?.('正在渲染分块 '+(i+1)+' / '+tiles.length+'…')
+      await new Promise(resolve=>setTimeout(resolve,0))
+      const blob=await render(crop,{width:width/frame.scale,height:height/frame.scale,pixelRatio:frame.scale,backgroundColor:'#05070c',skipAutoScale:true,fontEmbedCSS:''})
+      if(!blob?.size)throw new Error('分块图片生成失败，请重试')
+      const bitmap=await createImageBitmap(blob)
+      try {
+        if(bitmap.width!==width||bitmap.height!==height)throw new Error('分块图片尺寸异常，请重试')
+        ctx.drawImage(bitmap,tile.x-left,tile.y-top,tile.width,tile.height,tile.x,tile.y,tile.width,tile.height)
+      } finally {bitmap.close()}
+    }
+    onProgress?.('正在合成 PNG…')
+    return await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?.size?resolve(blob):reject(new Error('大图合成失败，请降低清晰度后重试')),'image/png'))
+  } finally {
+    canvas.width=0;canvas.height=0
+    parent.append(clone);crop.remove()
+  }
 }
 export function pngName(name, date = new Date()) {
   const pad = n => String(n).padStart(2,'0')
@@ -80,7 +125,10 @@ export async function exportCanvasPng(source, options={}, services={}) {
     Object.assign(host.style,{position:'fixed',left:'-100000px',top:'0',pointerEvents:'none'})
     host.setAttribute('aria-hidden','true');host.append(clone);document.body.append(host)
     const render=services.render || (await import('html-to-image')).toBlob
-    const blob=await render(clone,{width:frame.width,height:frame.height,pixelRatio:frame.scale,backgroundColor:'#05070c',skipAutoScale:true,fontEmbedCSS:''})
+    const tiled=frame.pixelWidth>4096||frame.pixelHeight>4096||frame.pixelWidth*frame.pixelHeight>16000000
+    const blob=tiled
+      ? await renderTiled(clone,frame,render,options.onProgress)
+      : await render(clone,{width:frame.width,height:frame.height,pixelRatio:frame.scale,backgroundColor:'#05070c',skipAutoScale:true,fontEmbedCSS:''})
     if(!blob || !blob.size)throw new Error('图片生成失败，请降低清晰度后重试')
     await (services.download || download)(blob,pngName(options.name))
     return frame

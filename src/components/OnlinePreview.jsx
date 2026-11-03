@@ -12,10 +12,11 @@ import BehaviorNode from './BehaviorNode'
 import StartNode from './StartNode'
 import FlowingEdge from './FlowingEdge'
 import './OnlineFiles.css'
+import './Canvas.css'
 import {useFileView} from '../store/fileView'
 const nodeTypes={...Object.fromEntries(Object.keys(NODE_CONFIG).map(t=>[t,BehaviorNode])),start:StartNode}
 const edgeTypes={default:FlowingEdge}
-export default function OnlinePreview({file}){
+export default function OnlinePreview({file,onSelect}){
  const mode=useCanvasView(s=>s.mode)
  useEffect(()=>{
   const key=e=>{if(document.querySelector('.collab-dialog'))return;if((e.ctrlKey||e.metaKey)&&['z','y','d','s'].includes(e.key.toLowerCase())){e.preventDefault();e.stopImmediatePropagation()}}
@@ -25,7 +26,7 @@ export default function OnlinePreview({file}){
   const c=normalizeBehavior(file.config)
   return {...ensureStart(c.graph.nodes.map((n,i)=>({...n,position:n.position||{x:i*380,y:0},selected:false})),c.graph.edges.map((e,i)=>({...e,id:'preview_'+i,type:'default'}))),layout:c.graph.layout,behaviorInfo:normalizeMetadata(c.behavior)}
  },[file])
- const [nodes,setNodes]=useState(initial.nodes),setSelected=useFileView(s=>s.selectOnline)
+ const [nodes,setNodes]=useState(initial.nodes),selectOnline=useFileView(s=>s.selectOnline),setSelected=onSelect||selectOnline
  const edges=initial.edges.filter(e=>!e.sourceHandle||!nodes.some(n=>n.id===e.source&&n.type==='loop'&&!isLoopOutputEnabled(n.data,e.sourceHandle)))
  return <section className="online-preview" aria-label="在线行为只读画布">
    <div className="online-preview-body">{mode==='structure'?<StructuredCanvas graph={initial} readOnly onSelect={setSelected}/>:<><CanvasViewTabs/><GraphDisplayContext.Provider value={{...initial,nodes}}>
