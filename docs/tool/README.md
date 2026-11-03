@@ -1,5 +1,7 @@
 # 工具说明
 
+GitHub恢复与资源范围以[GitHub完整资源版](github-complete-version.md)为准；新公共库重建见[备份与重建](../content-library/github-restore.md)。下文保留GitLab生产使用与历史部署资料。
+
 第一次参与项目，按 [小白上手手册](beginner-guide.md) 找到仓库、克隆项目、使用编辑器，再用 Cindy 修改编辑器。
 
 新同事先读 [开发入门：GitLab + Cindy](team-onboarding.md)，按当前 XD Sites 方案申请权限、启动和提交修改。

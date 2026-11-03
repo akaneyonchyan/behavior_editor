@@ -1,0 +1,350 @@
+{
+  "version": 1,
+  "capturedAt": "2026-11-03T09:35:39.929Z",
+  "codeCommit": "5e45efdc0a919002e7fcff441b512c1699d11dc2",
+  "behaviorCommit": "4c18a6e8c18d7143b38d13525db28b1ae790daa0",
+  "libraryCounts": {
+    "objects": 13,
+    "attributes": 104,
+    "buffs": 56,
+    "items": 98
+  },
+  "files": [
+    {
+      "sourcePath": "β行为图/.behavior-editor-cache/当前行为缓存.json",
+      "targetPath": "resources/behavior-source/.behavior-editor-cache/当前行为缓存.json",
+      "gitBlob": "5be84398556f8198f71a616621acfcb8fc36a53a",
+      "sha256": "491d3e08938d13ab174c100d46d73f264813814d65ed9d5239637fba634c85fe",
+      "bytes": 96931,
+      "kind": "cache"
+    },
+    {
+      "sourcePath": "β行为图/.behavior-editor-cache/空白行为模板.json",
+      "targetPath": "resources/behavior-source/.behavior-editor-cache/空白行为模板.json",
+      "gitBlob": "d0d5b04c6275c4f9ed3c16a1f058542a6bf861f2",
+      "sha256": "6ab9d1b442af3dae86d84f76464e5e70550fb0a95b72b6eae4487bffa2019445",
+      "bytes": 5071,
+      "kind": "cache"
+    },
+    {
+      "sourcePath": "β行为图/从工具架拿取斧头-行为图-20261020-220937.png",
+      "targetPath": "resources/behavior-source/从工具架拿取斧头-行为图-20261020-220937.png",
+      "gitBlob": "63bbdb2c6d8e80bce077e206b518d56b50089479",
+      "sha256": "710ede19701316b68b269cfa86e13d6332fef0aada736d0beb444454f130ac47",
+      "bytes": 582465,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/从工具架拿取斧头.json",
+      "targetPath": "behaviors/从工具架拿取斧头.json",
+      "gitBlob": "1a54b9ad23de75f8f8e370e6b2bc103d1c7a87d4",
+      "sha256": "9bb8963d1d29d5c381c8e831c7aaf93ae58794383902220c2dc928dbb2df193f",
+      "bytes": 10262,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/伙伴原地晕倒-行为图-20261019-223852.png",
+      "targetPath": "resources/behavior-source/伙伴原地晕倒-行为图-20261019-223852.png",
+      "gitBlob": "4f9e5ed41015e71b058862a24cd2c957806c3ec3",
+      "sha256": "c8135110c17f1b6bd3665f66b0654893fdbb9cc5501551cb0a5d22707060a744",
+      "bytes": 1023283,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/伙伴原地晕倒.json",
+      "targetPath": "behaviors/伙伴原地晕倒.json",
+      "gitBlob": "0bb919b64e298a320c37c7da308c3824e94fdfc3",
+      "sha256": "31c2b3f35ea72ad8a57d1f54efe8ea83ca5cc237369d97c579bb71ba70427ac3",
+      "bytes": 17269,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/原地摔倒-行为图-20261020-111453.png",
+      "targetPath": "resources/behavior-source/原地摔倒-行为图-20261020-111453.png",
+      "gitBlob": "382cf56b77ad9785c011a733ec249f8be1692bbd",
+      "sha256": "3f2e2faaf25ece1d75e3ad98701e9895148795805e31b4c4316c2dc1f64a57c0",
+      "bytes": 530462,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/原地摔倒.json",
+      "targetPath": "behaviors/原地摔倒.json",
+      "gitBlob": "7b339712bc4bffd3c3b6e5dd68cf93a37cbb024d",
+      "sha256": "6d608ee435b4a1f66132cd2026478ed27d268f2423753459ceff3875eebdb3f9",
+      "bytes": 9189,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/向任意伙伴炫耀装备物-行为图-20261019-175537.png",
+      "targetPath": "resources/behavior-source/向任意伙伴炫耀装备物-行为图-20261019-175537.png",
+      "gitBlob": "c4d7b8265b64b2f1b4032cd0a6d7626e0b5ccf37",
+      "sha256": "0459e529f88feca9710a644ec2b81942326cebbbb6a8e466b3f1a1df0fcaf635",
+      "bytes": 1096291,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/向任意伙伴炫耀装备物.json",
+      "targetPath": "behaviors/向任意伙伴炫耀装备物.json",
+      "gitBlob": "9208bf4ff85b436ea4eb3ddbf289177340f5178a",
+      "sha256": "62c477fb45d28bba6a4dc402fcf83dae387d20364ae49a393428982268dbde39",
+      "bytes": 14053,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/在床上睡觉-行为图-20261020-233050.png",
+      "targetPath": "resources/behavior-source/在床上睡觉-行为图-20261020-233050.png",
+      "gitBlob": "390d79c7675aaa94d99d00a40abbbc06a4dece50",
+      "sha256": "2751ff074528eb29566c8cf6c5c29130802c6fb0848acaf040c46e015b51dc6d",
+      "bytes": 767295,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/在床上睡觉.json",
+      "targetPath": "behaviors/在床上睡觉.json",
+      "gitBlob": "9c1c8d8dfae241f41eaa5452a313a08beb64ddf0",
+      "sha256": "e1e126b73121cb524e8caacf437b4ae2b5dba9d68e327ebe9f9168cfdf1f4a44",
+      "bytes": 9903,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/在搓饵台制作鱼饵Buff-行为图-20261020-233138.png",
+      "targetPath": "resources/behavior-source/在搓饵台制作鱼饵Buff-行为图-20261020-233138.png",
+      "gitBlob": "2de7206e5d216693f1448bccb7f7ce9eea7de613",
+      "sha256": "887d103b11d321be29cd46e2bbcb984a44b5bae63ab684ae3960bdb91558fae4",
+      "bytes": 590812,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/在搓饵台制作鱼饵Buff.json",
+      "targetPath": "behaviors/在搓饵台制作鱼饵Buff.json",
+      "gitBlob": "8f1a72e66b280aa425db8f04059ca447e7aecdf3",
+      "sha256": "73917fe01c39342587ae04203fcf862078e2c317d1976c622375c71f2d5f8a3c",
+      "bytes": 14240,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/在空地吃小吃-行为图-20261020-230658.png",
+      "targetPath": "resources/behavior-source/在空地吃小吃-行为图-20261020-230658.png",
+      "gitBlob": "08d4d7c4421895e7ffc161847621adea088c0ebb",
+      "sha256": "19c7412e2d59ff4453eb2db33d0b9a93d9e6d61ed76a61500b023dc834641733",
+      "bytes": 1064940,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/在空地吃小吃.json",
+      "targetPath": "behaviors/在空地吃小吃.json",
+      "gitBlob": "62ea34e4809ab3b234dbd9a28620747cbad7269b",
+      "sha256": "a747ac9d5a3d131bb0a3f9c15ec7cb632def58c179140f69903e24bd9a917674",
+      "bytes": 13545,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/坐在椅子上休息恢复精力-行为图-20261020-232008.png",
+      "targetPath": "resources/behavior-source/坐在椅子上休息恢复精力-行为图-20261020-232008.png",
+      "gitBlob": "0f6685d6801867b11db4f08ec3f9c774a388a0c6",
+      "sha256": "9c7214c52fdc01c54297bc33cee436bede5c087784ae08c74c2839a563c0d1c0",
+      "bytes": 1096220,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/坐在椅子上休息恢复精力.json",
+      "targetPath": "behaviors/坐在椅子上休息恢复精力.json",
+      "gitBlob": "dc23796ceb5f5b330366ff218a8342221c6e119a",
+      "sha256": "8de59b97df17eac3d04c6e3d0bc43207e286ee4a400cfe05ca0b52f4f7bd3137",
+      "bytes": 16437,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/寻找一个空地散步-行为图-20261021-104921.png",
+      "targetPath": "resources/behavior-source/寻找一个空地散步-行为图-20261021-104921.png",
+      "gitBlob": "368586cced209d195d006d1eab511a8f5466c682",
+      "sha256": "9d1f3a0a1f1359ccd0e054299edcfa0d06ddfb2fd65d9eabd4945762cb719c00",
+      "bytes": 251996,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/寻找一个空地散步.json",
+      "targetPath": "behaviors/寻找一个空地散步.json",
+      "gitBlob": "c940a918fbbe86fcea18531478931189db863316",
+      "sha256": "91952c60231719cce55fb37aae9c7f86a938f8ae483ee0448dc9424e7a41e9fe",
+      "bytes": 3430,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/将装备槽中的斧头放入工具柜-行为图-20261020-215249.png",
+      "targetPath": "resources/behavior-source/将装备槽中的斧头放入工具柜-行为图-20261020-215249.png",
+      "gitBlob": "61c704261fb3dff85bf629ab007064ecb98ba2f0",
+      "sha256": "c96ed9d1cec6bad91b204da4e4b10110ba016907c4399cbf9a2b928933af8e7c",
+      "bytes": 620527,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/将装备槽中的斧头放入工具柜.json",
+      "targetPath": "behaviors/将装备槽中的斧头放入工具柜.json",
+      "gitBlob": "b782ebebd5fc6a025c1bad2fb6a1842039616018",
+      "sha256": "583facfa73af4ad0d4de21c3f648ddc13dce1660ef14c38f134648b9f784056c",
+      "bytes": 11059,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/斧头被树卡住-行为图-20261019-160946.png",
+      "targetPath": "resources/behavior-source/斧头被树卡住-行为图-20261019-160946.png",
+      "gitBlob": "0f5b7feabd3d38246f1330a19d128bf8d2e8ad82",
+      "sha256": "b31cd62e5d101cdb5c3804e5641230288008b5c1ce2ae6172541773e1254c805",
+      "bytes": 1132702,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/斧头被树卡住.json",
+      "targetPath": "behaviors/斧头被树卡住.json",
+      "gitBlob": "4fd6e9cd6312c587b3a91989d26a6cfc772fd547",
+      "sha256": "ffd812d446c078e602459257aa53c972660cea2c7bb2ef010e9aa57c93c85e9a",
+      "bytes": 21079,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/极度兴奋大笑-行为图-20261020-171126.png",
+      "targetPath": "resources/behavior-source/极度兴奋大笑-行为图-20261020-171126.png",
+      "gitBlob": "2ce9f4d1fc2172de60e2ead7d38dd313310ca9cb",
+      "sha256": "a678b4cd501a5d42e7b98dc15bf7aeb6b9d3c2e0c724c1dc47531e0febbd6da7",
+      "bytes": 888721,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/极度兴奋大笑.json",
+      "targetPath": "behaviors/极度兴奋大笑.json",
+      "gitBlob": "8c429b9b3d5474ade9f9a101cf21c4fbbb88314a",
+      "sha256": "c47364c77a181c301ab1d3d4bdedc6dd6c3973d81df41e2e2ca2b5db27faf1ea",
+      "bytes": 18780,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/洗手池清洗自己-行为图-20261019-161331.png",
+      "targetPath": "resources/behavior-source/洗手池清洗自己-行为图-20261019-161331.png",
+      "gitBlob": "30743b3d204da77246de9f0745fb8c3e693db4bd",
+      "sha256": "c3a539e585337109685f9392eefd71273fbafd47d3867a0fe78446b9fd960208",
+      "bytes": 1124916,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/洗手池清洗自己.json",
+      "targetPath": "behaviors/洗手池清洗自己.json",
+      "gitBlob": "df9ded06b396f4b82a47031c62c7d1b7645a5130",
+      "sha256": "6321268a99c1e0aba0929701251aab9baefe2a68314e46bd572291d942b43b4a",
+      "bytes": 14562,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/用扳手维修不可移动交互物-行为图-20261019-171943.png",
+      "targetPath": "resources/behavior-source/用扳手维修不可移动交互物-行为图-20261019-171943.png",
+      "gitBlob": "d0f889ab2faf7a1e3a9a714bcd5bc03dc9aeee53",
+      "sha256": "ac2a42dfedb02b06c0514a8cc1d150fa729d38ec394f97ed74c9c8840f2517e0",
+      "bytes": 1122547,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/用扳手维修交互物.json",
+      "targetPath": "behaviors/用扳手维修交互物.json",
+      "gitBlob": "40a640621d095cd32393ff6a014ad6b61e026b0f",
+      "sha256": "c22b9b018c862ce82bb0eee009ca4045ea6ba267a597485f0853c23b06265342",
+      "bytes": 18221,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/用抹布打扫交互物-行为图-20261019-163825.png",
+      "targetPath": "resources/behavior-source/用抹布打扫交互物-行为图-20261019-163825.png",
+      "gitBlob": "4ab1bc1df08ecec142f18c3c60280064ab68985a",
+      "sha256": "72b123f89be36c73e29ae0d788da1b7a1dd0d8e50df8b36182d99236b52fc4a0",
+      "bytes": 932174,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/用抹布打扫交互物.json",
+      "targetPath": "behaviors/用抹布打扫交互物.json",
+      "gitBlob": "f0ed190e741a1a9706552dad180c24a424e98d6d",
+      "sha256": "849895bd835c8f83a4c7c6d2986523084fdd38d3644cde6e9a96b1e0a6dcf185",
+      "bytes": 15185,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/用斧头砍伐树木获取木材-行为图-20261020-223613.png",
+      "targetPath": "resources/behavior-source/用斧头砍伐树木获取木材-行为图-20261020-223613.png",
+      "gitBlob": "577ebb63320729504adae0ba83866b383333e56b",
+      "sha256": "9ccd314a1a5dad233b3fa0213d6dcc8d539925b50fb2f546f1dcbed10b0b4ec1",
+      "bytes": 1456735,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/用斧头砍伐树木获取木材.json",
+      "targetPath": "behaviors/用斧头砍伐树木获取木材.json",
+      "gitBlob": "0ac0c2a1a4b552f68b74bd346cbc83e7679fdcc9",
+      "sha256": "77d596094fc44cfeeb6046387df54bfec43a044fa80aa3cc103f2a6d4dcb91cb",
+      "bytes": 22772,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/用斧头砍榕树-行为图-20261021-225341.png",
+      "targetPath": "resources/behavior-source/用斧头砍榕树-行为图-20261021-225341.png",
+      "gitBlob": "add4a920c79d351f8cec18886507475303606310",
+      "sha256": "379c8525dac7edcb3c08d1d441a35249cdb591acc2083a0c5e8e585495560d97",
+      "bytes": 693853,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/用斧头砍榕树.json",
+      "targetPath": "behaviors/用斧头砍榕树.json",
+      "gitBlob": "ea018f4781520b8159499620296f4dc9ba740467",
+      "sha256": "c3f94251a0d8444332b863d2fd64974ec94fe84d01a49c4ef8c22998085e453f",
+      "bytes": 36534,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/钓鱼-行为图-20261019-135736.png",
+      "targetPath": "resources/behavior-source/钓鱼-行为图-20261019-135736.png",
+      "gitBlob": "c153533e00e48c080d3128fd06daaf8c1bc76f57",
+      "sha256": "0f14ae1c7bda9e9a716306620ac69781b7f5e7b0acda638ec56c006f04fb403c",
+      "bytes": 1085520,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/钓鱼.json",
+      "targetPath": "behaviors/钓鱼.json",
+      "gitBlob": "702216fd6135bb983446d4f8d4c08f284229f3b7",
+      "sha256": "52be8a4e73c239c60d98f47f69d9e9c96a809053dc2a31db9894813b82ba090e",
+      "bytes": 42535,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/钓鱼细分-核心行为-行为图-20261102-173813.png",
+      "targetPath": "resources/behavior-source/钓鱼细分-核心行为-行为图-20261102-173813.png",
+      "gitBlob": "17506c853637c3c33a527f9e56dd3e52db658654",
+      "sha256": "89e9001623c9393b5c17061c3bbd1d3a9169be9aa99dc3a7b18928e98d7c7104",
+      "bytes": 5212268,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/钓鱼细分-核心行为.json",
+      "targetPath": "behaviors/钓鱼细分-核心行为.json",
+      "gitBlob": "16e3cfca31311951873a9be653f470afbb5f4cd1",
+      "sha256": "e1f7fa3d9b51d24de2a97e2b04327aee3fcf16b02ada1e89c281a7f74f49ddf7",
+      "bytes": 257378,
+      "kind": "behavior"
+    },
+    {
+      "sourcePath": "β行为图/雨中踩水坑-行为图-20261019-193135.png",
+      "targetPath": "resources/behavior-source/雨中踩水坑-行为图-20261019-193135.png",
+      "gitBlob": "1f2a847ce0f528cadd7f24c2cd8f6895757c75fe",
+      "sha256": "4b4f96dea6fb46acf0cf760c6ae4124655f0d1be11cae145c1e4d57a7bbb3f3e",
+      "bytes": 877593,
+      "kind": "image"
+    },
+    {
+      "sourcePath": "β行为图/雨中踩水坑.json",
+      "targetPath": "behaviors/雨中踩水坑.json",
+      "gitBlob": "e1e8d1b55b1bc65c01a38de0cea6867d9349144b",
+      "sha256": "7345c678a5088aa347b9dd8ea917acf4c92e62651db84903d8b828c4401e5546",
+      "bytes": 15963,
+      "kind": "behavior"
+    }
+  ]
+}

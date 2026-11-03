@@ -1,0 +1,2 @@
+const {defineConfig}=require('@playwright/test')
+module.exports=defineConfig({testDir:'./tests',testMatch:'github-resources.spec.cjs',timeout:60000,workers:1,use:{baseURL:'http://127.0.0.1:5201/behavior_editor/',channel:process.env.PW_CHANNEL||'chrome',viewport:{width:1440,height:1000}},webServer:{command:'npm run preview -- --host 127.0.0.1 --port 5201 --strictPort',url:'http://127.0.0.1:5201/behavior_editor/',env:{PAGES_BASE:'/behavior_editor/'},reuseExistingServer:false}})

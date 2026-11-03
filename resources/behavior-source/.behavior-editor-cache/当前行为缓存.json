@@ -1,0 +1,2802 @@
+{
+  "behavior": {
+    "name": "钓鱼细分-核心行为",
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "bd752aa1-31ad-4011-b8f6-ec4c19a2d041",
+          "objectType": "interactPlace",
+          "objectName": "item:interactPlace/reczz28P8vM5Gf9F"
+        },
+        {
+          "id": "76504b85-5cc6-4afb-b6fe-d5239346e5c4",
+          "objectType": "equippedItem",
+          "objectName": "item:equippedItem/reczz28P8wcbRpgX"
+        }
+      ],
+      "consumableRules": [
+        {
+          "id": "02f77e10-3a12-457d-afa6-b385aeda72f9",
+          "objectType": "buff",
+          "requirement": "有可用存量",
+          "objectName": "item:buff/design_fishing_bait"
+        }
+      ],
+      "attributeRules": []
+    },
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "goal_initial",
+        "source": "object:partner",
+        "attribute": "fishing_experience",
+        "influence": "增加X点"
+      },
+      {
+        "id": "749196de-31be-47ec-838b-75ff3fac6b6c",
+        "source": "object:partner",
+        "attribute": "钓鱼行为",
+        "influence": "进行X次"
+      },
+      {
+        "id": "13f4b424-9a86-4d90-940b-67d19a5ce707",
+        "source": "object:collectible",
+        "attribute": "数量",
+        "influence": "增加X份",
+        "objectName": "鱼类"
+      },
+      {
+        "id": "08af7f51-7451-431d-90e1-65ac0d30cd16",
+        "source": "object:material",
+        "attribute": "数量",
+        "influence": "增加X份",
+        "objectName": "item:material/reczz28P81TfjMNa"
+      },
+      {
+        "id": "80be6571-8b5d-44be-8b2e-6f1c8d44ab1e",
+        "source": "object:partner",
+        "attribute": "钓鱼行为",
+        "influence": "进行X次",
+        "objectName": "指定伙伴"
+      }
+    ],
+    "templateVersion": 4
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "template_loop",
+          "entry": "template_judge",
+          "members": [
+            "template_judge",
+            "template_result_1",
+            "template_result_2",
+            "judge_1793589475150",
+            "judge_1793589477438",
+            "judge_1793590288951",
+            "result_1793590463283",
+            "4afb717b-8e80-46d0-a716-a0c4c985b3c9",
+            "1f248d88-9bea-44ed-b96a-dbf9f7c2338b",
+            "35f4bd4f-bd31-4d1e-8720-22ea6ab23fb9",
+            "c6266aef-9b7f-4849-bd39-657ddcd80da5",
+            "97e90977-6c8c-4698-b7e1-7a56de922f24",
+            "8d383fef-df77-4f93-ae7b-dbad85c38c7b"
+          ]
+        },
+        {
+          "loopId": "4eaa4ba8-3065-4cd4-932c-aef0ce2f5f30",
+          "entry": "8e1d9efa-7ef9-4427-82b6-0aa2437c1408",
+          "members": [
+            "8e1d9efa-7ef9-4427-82b6-0aa2437c1408"
+          ]
+        },
+        {
+          "loopId": "1c376e4d-3b1f-4901-874e-127be949455c",
+          "entry": "d6f9e64b-13ec-45c4-83e6-8431a36e3c79",
+          "members": [
+            "d6f9e64b-13ec-45c4-83e6-8431a36e3c79",
+            "a72d94f4-21d7-4efd-8691-4d9d4f5eaa8b",
+            "36f966ac-6ef7-436b-974a-f4dd1c41eb4b",
+            "1f44dbfe-97be-46dc-aa7b-91d3d97a4780"
+          ]
+        },
+        {
+          "loopId": "9ce35380-7021-4500-9fc4-4b9277b0c5e8",
+          "entry": "ba0e8720-9fdc-4d1e-8d51-49104d92dfbf",
+          "members": [
+            "ba0e8720-9fdc-4d1e-8d51-49104d92dfbf"
+          ]
+        },
+        {
+          "loopId": "loop_1793603226409",
+          "entry": "result_1793589228796",
+          "members": [
+            "template_judge",
+            "template_result_1",
+            "template_result_2",
+            "template_loop",
+            "result_1793589228796",
+            "judge_1793589475150",
+            "judge_1793589477438",
+            "judge_1793590288951",
+            "result_1793590463283",
+            "4afb717b-8e80-46d0-a716-a0c4c985b3c9",
+            "1f248d88-9bea-44ed-b96a-dbf9f7c2338b",
+            "35f4bd4f-bd31-4d1e-8720-22ea6ab23fb9",
+            "c6266aef-9b7f-4849-bd39-657ddcd80da5",
+            "97e90977-6c8c-4698-b7e1-7a56de922f24",
+            "8d383fef-df77-4f93-ae7b-dbad85c38c7b",
+            "judge_1793597259145",
+            "judge_1793599286767",
+            "f7248fd6-6ce8-472b-a4d6-864aaa67b2ab",
+            "6f2c5ff5-3f2b-4b2c-8585-b11d6b1f2991",
+            "d978af45-4565-4177-8549-9af494ac6c26",
+            "judge_1793601343114",
+            "939f3791-89c1-43e0-878f-b9d2250d3fff",
+            "32019383-1b03-41c3-a66d-87fe72af0b3c",
+            "ec596dce-fb7d-4389-8b66-6e90863c43d0",
+            "4eaa4ba8-3065-4cd4-932c-aef0ce2f5f30",
+            "8e1d9efa-7ef9-4427-82b6-0aa2437c1408",
+            "fecefb19-8365-4223-a7ff-72767bdc019a",
+            "1c376e4d-3b1f-4901-874e-127be949455c",
+            "d6f9e64b-13ec-45c4-83e6-8431a36e3c79",
+            "a72d94f4-21d7-4efd-8691-4d9d4f5eaa8b",
+            "36f966ac-6ef7-436b-974a-f4dd1c41eb4b",
+            "1f44dbfe-97be-46dc-aa7b-91d3d97a4780",
+            "9ce35380-7021-4500-9fc4-4b9277b0c5e8",
+            "ba0e8720-9fdc-4d1e-8d51-49104d92dfbf",
+            "35691d70-d9c6-4bda-9302-2cfbff9c8596",
+            "c0a177cb-427d-4b80-a2e5-c66e24c57962",
+            "1b4c82c5-3641-438d-b6ec-e8c8f584eb3b",
+            "4c22cbc8-7df7-498e-8318-def16b5f894b",
+            "b15045da-f55f-4cc4-93f9-57eb65c678a1"
+          ]
+        }
+      ],
+      "positions": {}
+    },
+    "nodes": [
+      {
+        "id": "behavior_start",
+        "type": "start",
+        "data": {},
+        "position": {
+          "x": -832.5977111759021,
+          "y": -97.63023039162499
+        }
+      },
+      {
+        "id": "template_judge",
+        "type": "judge",
+        "data": {
+          "judgeAttributes": [
+            {
+              "id": "6687dbe4-e88c-482a-871a-89658891e67c",
+              "source": "object:partner",
+              "attribute": "fishingLevel"
+            },
+            {
+              "id": "b572a684-a966-4a6e-af3e-8a2a65170580",
+              "source": "object:partner",
+              "attribute": "personality_rigorous"
+            },
+            {
+              "id": "eebe5338-9be2-4213-b454-feb9ab12343b",
+              "source": "object:partner",
+              "attribute": "energy"
+            },
+            {
+              "id": "8493a4f1-e2c4-470b-a2ab-b07a6a10b21f",
+              "source": "object:environmen",
+              "attribute": "weather"
+            }
+          ],
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "站姿等鱼",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "6687dbe4-e88c-482a-871a-89658891e67c",
+                  "attributeId": "6687dbe4-e88c-482a-871a-89658891e67c",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "等级高 · 概率越低",
+                  "influenceType": "等级高",
+                  "influenceRule": "概率越低"
+                },
+                {
+                  "version": 2,
+                  "id": "b572a684-a966-4a6e-af3e-8a2a65170580",
+                  "attributeId": "b572a684-a966-4a6e-af3e-8a2a65170580",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "属于 · 概率越高",
+                  "influenceType": "属于",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "eebe5338-9be2-4213-b454-feb9ab12343b",
+                  "attributeId": "eebe5338-9be2-4213-b454-feb9ab12343b",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "数值低 · 概率越低",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越低"
+                },
+                {
+                  "version": 2,
+                  "id": "8493a4f1-e2c4-470b-a2ab-b07a6a10b21f",
+                  "attributeId": "8493a4f1-e2c4-470b-a2ab-b07a6a10b21f",
+                  "source": "object:environmen",
+                  "attribute": "weather",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ]
+            },
+            {
+              "id": "branch_2",
+              "name": "坐姿等鱼",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "6687dbe4-e88c-482a-871a-89658891e67c",
+                  "attributeId": "6687dbe4-e88c-482a-871a-89658891e67c",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "等级高 · 概率越高",
+                  "influenceType": "等级高",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "b572a684-a966-4a6e-af3e-8a2a65170580",
+                  "attributeId": "b572a684-a966-4a6e-af3e-8a2a65170580",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "属于 · 概率越低",
+                  "influenceType": "属于",
+                  "influenceRule": "概率越低"
+                },
+                {
+                  "version": 2,
+                  "id": "eebe5338-9be2-4213-b454-feb9ab12343b",
+                  "attributeId": "eebe5338-9be2-4213-b454-feb9ab12343b",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "数值低 · 概率越高",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "8493a4f1-e2c4-470b-a2ab-b07a6a10b21f",
+                  "attributeId": "8493a4f1-e2c4-470b-a2ab-b07a6a10b21f",
+                  "source": "object:environmen",
+                  "attribute": "weather",
+                  "influence": "雨天 · 排除选中",
+                  "influenceType": "雨天",
+                  "influenceRule": "排除选中"
+                }
+              ]
+            }
+          ],
+          "name": "等鱼姿势分支",
+          "externalExits": []
+        },
+        "position": {
+          "x": 573.5651875651547,
+          "y": -85.46788222189434
+        }
+      },
+      {
+        "id": "template_result_1",
+        "type": "result",
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "effectRules": [],
+          "outputs": [],
+          "name": "吹着风发呆",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2048.988543703276,
+          "y": 662.0002320415321
+        }
+      },
+      {
+        "id": "template_result_2",
+        "type": "result",
+        "data": {
+          "animation": "好奇地探头看水中的鱼影，时而紧张，时而意外，时而凝重",
+          "playMode": "计次",
+          "effectRules": [
+            {
+              "id": "d11efb8b-d66e-4fdc-89f2-eec127eb7d40",
+              "source": "object:partner",
+              "attribute": "认真buff",
+              "influence": "+1",
+              "kind": "buff"
+            }
+          ],
+          "outputs": [],
+          "name": "坐着观察水里的鱼群",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2027.9211350536953,
+          "y": 1500.6989528911884
+        }
+      },
+      {
+        "id": "template_loop",
+        "type": "loop",
+        "data": {
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "5~10min"
+            }
+          ],
+          "loopVersion": 3,
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "maxIterations": "",
+          "completionCondition": "",
+          "completionRules": [],
+          "name": "等鱼循环",
+          "legacyLoopRouting": {
+            "checkTiming": "before",
+            "edges": []
+          }
+        },
+        "position": {
+          "x": 233.6623799226477,
+          "y": -93.63226685843142
+        }
+      },
+      {
+        "id": "template_end",
+        "type": "end",
+        "data": {
+          "animation": "收起鱼竿扛在肩膀上",
+          "playMode": "单次",
+          "playExpectation": "",
+          "name": "收杆结束本次钓鱼"
+        },
+        "position": {
+          "x": 37.58761436414295,
+          "y": 2718.924743617744
+        }
+      },
+      {
+        "id": "result_1793589228796",
+        "type": "result",
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "抛竿",
+          "externalExits": []
+        },
+        "position": {
+          "x": -87.9826880458968,
+          "y": -92.37628560010944
+        }
+      },
+      {
+        "id": "judge_1793589475150",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "观察鱼群",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "819bc064-e471-45e3-9dd5-5ace7c3d5f4c",
+                  "attributeId": "819bc064-e471-45e3-9dd5-5ace7c3d5f4c",
+                  "source": "object:partner",
+                  "attribute": "personality_fantasy",
+                  "influence": "属于 · 概率越高",
+                  "influenceType": "属于",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "6a72d439-dda4-4122-8e63-249a73204773",
+                  "attributeId": "6a72d439-dda4-4122-8e63-249a73204773",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "59fac76e-d075-46a8-ae16-54e142fb5c6e",
+                  "attributeId": "59fac76e-d075-46a8-ae16-54e142fb5c6e",
+                  "source": "object:partner",
+                  "attribute": "情绪-心烦",
+                  "influence": "属于 · 概率越高",
+                  "influenceType": "属于",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "4c207513-2cd1-4dcd-b606-e0f7faa17b92",
+                  "attributeId": "4c207513-2cd1-4dcd-b606-e0f7faa17b92",
+                  "source": "object:partner",
+                  "attribute": "情绪-安适",
+                  "influence": "属于 · 概率越低",
+                  "influenceType": "属于",
+                  "influenceRule": "概率越低"
+                },
+                {
+                  "version": 2,
+                  "id": "232229df-a90b-483a-9933-1234ed73f427",
+                  "attributeId": "232229df-a90b-483a-9933-1234ed73f427",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "23dbc1fe-7cfb-4442-929e-357a2a053e56",
+                  "attributeId": "23dbc1fe-7cfb-4442-929e-357a2a053e56",
+                  "source": "object:partner",
+                  "attribute": "获得娱乐",
+                  "influence": "概率越低",
+                  "influenceType": "",
+                  "influenceRule": "概率越低",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "f22be392-c1f8-459b-b404-9a5df11f0d86",
+                  "attributeId": "f22be392-c1f8-459b-b404-9a5df11f0d86",
+                  "source": "object:partner",
+                  "attribute": "获得成长",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "default",
+              "name": "看自己的倒影",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "819bc064-e471-45e3-9dd5-5ace7c3d5f4c",
+                  "attributeId": "819bc064-e471-45e3-9dd5-5ace7c3d5f4c",
+                  "source": "object:partner",
+                  "attribute": "personality_fantasy",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "6a72d439-dda4-4122-8e63-249a73204773",
+                  "attributeId": "6a72d439-dda4-4122-8e63-249a73204773",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "59fac76e-d075-46a8-ae16-54e142fb5c6e",
+                  "attributeId": "59fac76e-d075-46a8-ae16-54e142fb5c6e",
+                  "source": "object:partner",
+                  "attribute": "情绪-心烦",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "4c207513-2cd1-4dcd-b606-e0f7faa17b92",
+                  "attributeId": "4c207513-2cd1-4dcd-b606-e0f7faa17b92",
+                  "source": "object:partner",
+                  "attribute": "情绪-安适",
+                  "influence": "属于 · 概率越高",
+                  "influenceType": "属于",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "232229df-a90b-483a-9933-1234ed73f427",
+                  "attributeId": "232229df-a90b-483a-9933-1234ed73f427",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "23dbc1fe-7cfb-4442-929e-357a2a053e56",
+                  "attributeId": "23dbc1fe-7cfb-4442-929e-357a2a053e56",
+                  "source": "object:partner",
+                  "attribute": "获得娱乐",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "f22be392-c1f8-459b-b404-9a5df11f0d86",
+                  "attributeId": "f22be392-c1f8-459b-b404-9a5df11f0d86",
+                  "source": "object:partner",
+                  "attribute": "获得成长",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "27affce7-6620-4f12-9420-b090fa8c0086",
+              "name": "吹着风发呆",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "819bc064-e471-45e3-9dd5-5ace7c3d5f4c",
+                  "attributeId": "819bc064-e471-45e3-9dd5-5ace7c3d5f4c",
+                  "source": "object:partner",
+                  "attribute": "personality_fantasy",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "6a72d439-dda4-4122-8e63-249a73204773",
+                  "attributeId": "6a72d439-dda4-4122-8e63-249a73204773",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "59fac76e-d075-46a8-ae16-54e142fb5c6e",
+                  "attributeId": "59fac76e-d075-46a8-ae16-54e142fb5c6e",
+                  "source": "object:partner",
+                  "attribute": "情绪-心烦",
+                  "influence": "属于 · 概率越低",
+                  "influenceType": "属于",
+                  "influenceRule": "概率越低"
+                },
+                {
+                  "version": 2,
+                  "id": "4c207513-2cd1-4dcd-b606-e0f7faa17b92",
+                  "attributeId": "4c207513-2cd1-4dcd-b606-e0f7faa17b92",
+                  "source": "object:partner",
+                  "attribute": "情绪-安适",
+                  "influence": "属于 · 概率越高",
+                  "influenceType": "属于",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "232229df-a90b-483a-9933-1234ed73f427",
+                  "attributeId": "232229df-a90b-483a-9933-1234ed73f427",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "23dbc1fe-7cfb-4442-929e-357a2a053e56",
+                  "attributeId": "23dbc1fe-7cfb-4442-929e-357a2a053e56",
+                  "source": "object:partner",
+                  "attribute": "获得娱乐",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "f22be392-c1f8-459b-b404-9a5df11f0d86",
+                  "attributeId": "f22be392-c1f8-459b-b404-9a5df11f0d86",
+                  "source": "object:partner",
+                  "attribute": "获得成长",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                }
+              ]
+            }
+          ],
+          "name": "站姿等鱼分支",
+          "judgeAttributes": [
+            {
+              "id": "819bc064-e471-45e3-9dd5-5ace7c3d5f4c",
+              "source": "object:partner",
+              "attribute": "personality_fantasy"
+            },
+            {
+              "id": "6a72d439-dda4-4122-8e63-249a73204773",
+              "source": "object:partner",
+              "attribute": "personality_rigorous"
+            },
+            {
+              "id": "59fac76e-d075-46a8-ae16-54e142fb5c6e",
+              "source": "object:partner",
+              "attribute": "情绪-心烦"
+            },
+            {
+              "id": "4c207513-2cd1-4dcd-b606-e0f7faa17b92",
+              "source": "object:partner",
+              "attribute": "情绪-安适"
+            },
+            {
+              "id": "232229df-a90b-483a-9933-1234ed73f427",
+              "source": "object:partner",
+              "attribute": "获得{种类}{鱼}",
+              "objectName": "目标"
+            },
+            {
+              "id": "23dbc1fe-7cfb-4442-929e-357a2a053e56",
+              "source": "object:partner",
+              "attribute": "获得娱乐",
+              "objectName": "目标"
+            },
+            {
+              "id": "f22be392-c1f8-459b-b404-9a5df11f0d86",
+              "source": "object:partner",
+              "attribute": "获得成长",
+              "objectName": "目标"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1643.03095954843,
+          "y": -84.1650376336379
+        }
+      },
+      {
+        "id": "judge_1793589477438",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "default",
+              "name": "靠着椅子晒太阳",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "4fa6f7f2-139a-4653-a459-78519b986583",
+                  "attributeId": "4fa6f7f2-139a-4653-a459-78519b986583",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "19f344fe-0ee8-4835-b14a-82a992970ef2",
+                  "attributeId": "19f344fe-0ee8-4835-b14a-82a992970ef2",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "e0931ea5-67f7-454a-b699-679f36c79360",
+                  "attributeId": "e0931ea5-67f7-454a-b699-679f36c79360",
+                  "source": "object:partner",
+                  "attribute": "情绪-安适",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "fce2b98d-f68a-4191-b57e-17e39720d462",
+                  "attributeId": "fce2b98d-f68a-4191-b57e-17e39720d462",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "d9ba9ca9-8a87-4e05-8a47-7c9280c4b993",
+                  "attributeId": "d9ba9ca9-8a87-4e05-8a47-7c9280c4b993",
+                  "source": "object:partner",
+                  "attribute": "获得娱乐",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "0fa2f8c3-7f02-43e7-97a9-bf40e5212374",
+                  "attributeId": "0fa2f8c3-7f02-43e7-97a9-bf40e5212374",
+                  "source": "object:partner",
+                  "attribute": "获得成长",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "57426c03-8fff-427a-bbc5-b2c277c290e9",
+              "name": "等得犯困",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "4fa6f7f2-139a-4653-a459-78519b986583",
+                  "attributeId": "4fa6f7f2-139a-4653-a459-78519b986583",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "数值低 · 概率越高",
+                  "influenceType": "数值低",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "19f344fe-0ee8-4835-b14a-82a992970ef2",
+                  "attributeId": "19f344fe-0ee8-4835-b14a-82a992970ef2",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "e0931ea5-67f7-454a-b699-679f36c79360",
+                  "attributeId": "e0931ea5-67f7-454a-b699-679f36c79360",
+                  "source": "object:partner",
+                  "attribute": "情绪-安适",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "fce2b98d-f68a-4191-b57e-17e39720d462",
+                  "attributeId": "fce2b98d-f68a-4191-b57e-17e39720d462",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "d9ba9ca9-8a87-4e05-8a47-7c9280c4b993",
+                  "attributeId": "d9ba9ca9-8a87-4e05-8a47-7c9280c4b993",
+                  "source": "object:partner",
+                  "attribute": "获得娱乐",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "0fa2f8c3-7f02-43e7-97a9-bf40e5212374",
+                  "attributeId": "0fa2f8c3-7f02-43e7-97a9-bf40e5212374",
+                  "source": "object:partner",
+                  "attribute": "获得成长",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                }
+              ]
+            },
+            {
+              "id": "branch_1",
+              "name": "观察鱼群",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "4fa6f7f2-139a-4653-a459-78519b986583",
+                  "attributeId": "4fa6f7f2-139a-4653-a459-78519b986583",
+                  "source": "object:partner",
+                  "attribute": "energy",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "19f344fe-0ee8-4835-b14a-82a992970ef2",
+                  "attributeId": "19f344fe-0ee8-4835-b14a-82a992970ef2",
+                  "source": "object:partner",
+                  "attribute": "personality_rigorous",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "e0931ea5-67f7-454a-b699-679f36c79360",
+                  "attributeId": "e0931ea5-67f7-454a-b699-679f36c79360",
+                  "source": "object:partner",
+                  "attribute": "情绪-安适",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "fce2b98d-f68a-4191-b57e-17e39720d462",
+                  "attributeId": "fce2b98d-f68a-4191-b57e-17e39720d462",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "d9ba9ca9-8a87-4e05-8a47-7c9280c4b993",
+                  "attributeId": "d9ba9ca9-8a87-4e05-8a47-7c9280c4b993",
+                  "source": "object:partner",
+                  "attribute": "获得娱乐",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                },
+                {
+                  "version": 2,
+                  "id": "0fa2f8c3-7f02-43e7-97a9-bf40e5212374",
+                  "attributeId": "0fa2f8c3-7f02-43e7-97a9-bf40e5212374",
+                  "source": "object:partner",
+                  "attribute": "获得成长",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            }
+          ],
+          "name": "坐姿等鱼分支",
+          "judgeAttributes": [
+            {
+              "id": "4fa6f7f2-139a-4653-a459-78519b986583",
+              "source": "object:partner",
+              "attribute": "energy"
+            },
+            {
+              "id": "19f344fe-0ee8-4835-b14a-82a992970ef2",
+              "source": "object:partner",
+              "attribute": "personality_rigorous"
+            },
+            {
+              "id": "e0931ea5-67f7-454a-b699-679f36c79360",
+              "source": "object:partner",
+              "attribute": "情绪-安适"
+            },
+            {
+              "id": "fce2b98d-f68a-4191-b57e-17e39720d462",
+              "source": "object:partner",
+              "attribute": "获得{种类}{鱼}",
+              "objectName": "目标"
+            },
+            {
+              "id": "d9ba9ca9-8a87-4e05-8a47-7c9280c4b993",
+              "source": "object:partner",
+              "attribute": "获得娱乐",
+              "objectName": "目标"
+            },
+            {
+              "id": "0fa2f8c3-7f02-43e7-97a9-bf40e5212374",
+              "source": "object:partner",
+              "attribute": "获得成长",
+              "objectName": "目标"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1636.8715598796425,
+          "y": 884.2588284610524
+        }
+      },
+      {
+        "id": "judge_1793590288951",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "default",
+              "name": "坐姿切换为站姿",
+              "weightExpectation": "条件指定",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "attributeId": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "source": "object:partner",
+                  "attribute": "属于钓鱼站姿",
+                  "influence": "不满足 · 允许选中",
+                  "influenceType": "不满足",
+                  "influenceRule": "允许选中"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "branch_1",
+              "name": "保持姿态",
+              "weightExpectation": "条件指定",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "attributeId": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "source": "object:partner",
+                  "attribute": "属于钓鱼站姿",
+                  "influence": "满足 · 允许选中",
+                  "influenceType": "满足",
+                  "influenceRule": "允许选中"
+                }
+              ],
+              "nextNode": ""
+            }
+          ],
+          "name": "当前为站姿",
+          "judgeAttributes": [
+            {
+              "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+              "source": "object:partner",
+              "attribute": "属于钓鱼站姿"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 937.9051573163415,
+          "y": -87.69894247137336
+        }
+      },
+      {
+        "id": "result_1793590463283",
+        "type": "result",
+        "data": {
+          "animation": "坐姿切换为拿鱼竿站姿",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "拿着鱼竿站起来",
+          "externalExits": []
+        },
+        "position": {
+          "x": 1295.0971493920024,
+          "y": -90.144600706539
+        }
+      },
+      {
+        "id": "4afb717b-8e80-46d0-a716-a0c4c985b3c9",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "default",
+              "name": "站姿切换坐姿",
+              "weightExpectation": "条件指定",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "attributeId": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "source": "object:partner",
+                  "attribute": "属于钓鱼坐姿",
+                  "influence": "不满足 · 允许选中",
+                  "influenceType": "不满足",
+                  "influenceRule": "允许选中"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "branch_1",
+              "name": "保持姿态",
+              "weightExpectation": "条件指定",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "attributeId": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "source": "object:partner",
+                  "attribute": "属于钓鱼坐姿",
+                  "influence": "满足 · 允许选中",
+                  "influenceType": "满足",
+                  "influenceRule": "允许选中"
+                }
+              ],
+              "nextNode": ""
+            }
+          ],
+          "name": "当前姿态为坐姿",
+          "judgeAttributes": [
+            {
+              "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+              "source": "object:partner",
+              "attribute": "属于钓鱼坐姿"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 950.7403000090849,
+          "y": 885.8378050708886
+        }
+      },
+      {
+        "id": "1f248d88-9bea-44ed-b96a-dbf9f7c2338b",
+        "type": "result",
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "坐到钓鱼椅上",
+          "externalExits": [],
+          "description": "坐到椅子上，将鱼竿放在支架上等待"
+        },
+        "position": {
+          "x": 1300.7491715450624,
+          "y": 889.1111848287164
+        }
+      },
+      {
+        "id": "35f4bd4f-bd31-4d1e-8720-22ea6ab23fb9",
+        "type": "result",
+        "data": {
+          "animation": "好奇地探头看水中的鱼影，时而紧张，时而意外，时而凝重",
+          "playMode": "单次",
+          "effectRules": [
+            {
+              "id": "b77d1ef0-1dfb-415f-942e-1fdb0a38c189",
+              "source": "object:partner",
+              "attribute": "leisure",
+              "influence": "增",
+              "kind": "attribute"
+            },
+            {
+              "id": "d24902e5-5202-4e41-b344-4d34515c10cd",
+              "source": "object:partner",
+              "attribute": "认真buff",
+              "influence": "+1",
+              "kind": "buff"
+            }
+          ],
+          "outputs": [],
+          "name": "站着观察水里的鱼",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2027.1996609393855,
+          "y": -91.60789557196131
+        }
+      },
+      {
+        "id": "c6266aef-9b7f-4849-bd39-657ddcd80da5",
+        "type": "result",
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "effectRules": [
+            {
+              "id": "530d254c-e99d-4ad5-9e42-be3c896619ce",
+              "source": "object:partner",
+              "attribute": "情绪buff",
+              "influence": "P→A→D→（变平静）",
+              "kind": "buff"
+            },
+            {
+              "id": "83d038ff-a8bd-4206-a859-2389b73b3615",
+              "source": "object:partner",
+              "attribute": "leisure",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "name": "站着看水里得自己",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2046.1904222350408,
+          "y": 318.3194994339185
+        }
+      },
+      {
+        "id": "97e90977-6c8c-4698-b7e1-7a56de922f24",
+        "type": "result",
+        "data": {
+          "animation": "迎着阳光从坐姿变为靠着椅背",
+          "playMode": "计次",
+          "effectRules": [],
+          "outputs": [],
+          "name": "靠着椅子晒太阳",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2034.0358714322524,
+          "y": 887.4694174513545
+        }
+      },
+      {
+        "id": "8d383fef-df77-4f93-ae7b-dbad85c38c7b",
+        "type": "result",
+        "data": {
+          "animation": "坐姿逐渐犯困，倚靠在椅子上",
+          "playMode": "单次",
+          "effectRules": [],
+          "outputs": [],
+          "name": "等得犯困",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2028.4022132632622,
+          "y": 1257.278941325888
+        }
+      },
+      {
+        "id": "judge_1793597259145",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "上鱼",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "7f5029f9-bf7e-48f7-a40f-4588bad40810",
+                  "attributeId": "7f5029f9-bf7e-48f7-a40f-4588bad40810",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "等级高 · 概率越高",
+                  "influenceType": "等级高",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+                  "attributeId": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "层数多 · 概率越高",
+                  "influenceType": "层数多",
+                  "influenceRule": "概率越高"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "default",
+              "name": "没上鱼",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "7f5029f9-bf7e-48f7-a40f-4588bad40810",
+                  "attributeId": "7f5029f9-bf7e-48f7-a40f-4588bad40810",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+                  "attributeId": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ],
+              "nextNode": ""
+            }
+          ],
+          "name": "提竿分支",
+          "judgeAttributes": [
+            {
+              "id": "7f5029f9-bf7e-48f7-a40f-4588bad40810",
+              "source": "object:partner",
+              "attribute": "fishingLevel"
+            },
+            {
+              "id": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+              "source": "object:partner",
+              "attribute": "认真buff"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1268.7496629756172,
+          "y": 1888.9024384382633
+        }
+      },
+      {
+        "id": "judge_1793599286767",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "普通上鱼",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "ad32aaf1-edbb-4a47-b6b4-823a4fc58bd1",
+                  "attributeId": "ad32aaf1-edbb-4a47-b6b4-823a4fc58bd1",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "a360c5db-a2e6-4562-899d-94b4d586b712",
+                  "attributeId": "a360c5db-a2e6-4562-899d-94b4d586b712",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": ""
+                },
+                {
+                  "version": 2,
+                  "id": "e56b95c9-9ad5-4726-9495-6695752b5c9e",
+                  "attributeId": "e56b95c9-9ad5-4726-9495-6695752b5c9e",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "default",
+              "name": "一钩多鱼",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "ad32aaf1-edbb-4a47-b6b4-823a4fc58bd1",
+                  "attributeId": "ad32aaf1-edbb-4a47-b6b4-823a4fc58bd1",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "数值高 · 概率越高",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "a360c5db-a2e6-4562-899d-94b4d586b712",
+                  "attributeId": "a360c5db-a2e6-4562-899d-94b4d586b712",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "层数高 · 概率越高",
+                  "influenceType": "层数高",
+                  "influenceRule": "概率越高",
+                  "objectName": ""
+                },
+                {
+                  "version": 2,
+                  "id": "e56b95c9-9ad5-4726-9495-6695752b5c9e",
+                  "attributeId": "e56b95c9-9ad5-4726-9495-6695752b5c9e",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "属于mu'biao · 概率越高",
+                  "influenceType": "属于mu'biao",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "1005abff-d9fb-4c71-8a8e-dd089afd508a",
+              "name": "巨大的鱼",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "ad32aaf1-edbb-4a47-b6b4-823a4fc58bd1",
+                  "attributeId": "ad32aaf1-edbb-4a47-b6b4-823a4fc58bd1",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "a360c5db-a2e6-4562-899d-94b4d586b712",
+                  "attributeId": "a360c5db-a2e6-4562-899d-94b4d586b712",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": ""
+                },
+                {
+                  "version": 2,
+                  "id": "e56b95c9-9ad5-4726-9495-6695752b5c9e",
+                  "attributeId": "e56b95c9-9ad5-4726-9495-6695752b5c9e",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                }
+              ]
+            }
+          ],
+          "name": "上鱼分支",
+          "judgeAttributes": [
+            {
+              "id": "ad32aaf1-edbb-4a47-b6b4-823a4fc58bd1",
+              "source": "object:partner",
+              "attribute": "fishingLevel"
+            },
+            {
+              "id": "a360c5db-a2e6-4562-899d-94b4d586b712",
+              "source": "object:partner",
+              "attribute": "认真buff",
+              "objectName": ""
+            },
+            {
+              "id": "e56b95c9-9ad5-4726-9495-6695752b5c9e",
+              "source": "object:partner",
+              "attribute": "获得{种类}{鱼}",
+              "objectName": "目标"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1638.106312207805,
+          "y": 1888.073579278848
+        }
+      },
+      {
+        "id": "f7248fd6-6ce8-472b-a4d6-864aaa67b2ab",
+        "type": "result",
+        "data": {
+          "animation": "用力拉杆，鱼随着钓竿跃出水面落在怀里，伙伴将鱼收入囊中",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [
+            "肉类"
+          ],
+          "nextNode": "",
+          "name": "普通上鱼",
+          "externalExits": [],
+          "description": "",
+          "effectRules": [
+            {
+              "id": "718bec17-e416-403e-81a2-fe5436152540",
+              "source": "object:partner",
+              "attribute": "fishing_experience",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ]
+        },
+        "position": {
+          "x": 2029.6671638708885,
+          "y": 1894.6959169781662
+        }
+      },
+      {
+        "id": "6f2c5ff5-3f2b-4b2c-8585-b11d6b1f2991",
+        "type": "result",
+        "data": {
+          "animation": "用力提竿和鱼反复搏斗若干回合终于提上，两条鱼一起跃出水面",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "一钩多鱼",
+          "externalExits": [],
+          "description": "",
+          "effectRules": [
+            {
+              "id": "fb30d9d1-c6ae-4e01-bef1-8ad0a43bd39a",
+              "source": "object:buff",
+              "attribute": "一钩多鱼",
+              "influence": "+1",
+              "kind": "buff"
+            },
+            {
+              "id": "61fcf1c1-3a90-42c9-bbce-844f73e87476",
+              "source": "object:partner",
+              "attribute": "fishing_experience",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ]
+        },
+        "position": {
+          "x": 2033.1872640293122,
+          "y": 2295.3597204163075
+        }
+      },
+      {
+        "id": "d978af45-4565-4177-8549-9af494ac6c26",
+        "type": "result",
+        "data": {
+          "animation": "用力提竿和鱼反复搏斗若干回合终于提上，一条巨大的鱼跃出水面，伙伴发动全身抱住，将其收纳",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "巨大的鱼",
+          "externalExits": [],
+          "description": "",
+          "effectRules": [
+            {
+              "id": "11945401-9557-46d9-9dc5-c0675992374f",
+              "source": "object:partner",
+              "attribute": "fishing_experience",
+              "influence": "增",
+              "kind": "attribute"
+            },
+            {
+              "id": "d5d3d914-17db-4df7-ba36-e293758536b9",
+              "source": "object:buff",
+              "attribute": "巨大的鱼",
+              "influence": "+1",
+              "kind": "buff",
+              "objectName": ""
+            },
+            {
+              "id": "e2288ace-fe0c-4436-b3ac-28c22ace6b41",
+              "source": "object:partner",
+              "attribute": "buff:buff_showoff",
+              "influence": "+1",
+              "kind": "buff"
+            }
+          ]
+        },
+        "position": {
+          "x": 2030.148942891034,
+          "y": 2697.4098134029337
+        }
+      },
+      {
+        "id": "judge_1793601343114",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "普通品种",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "0d88690d-8a7f-4fcb-8b75-0a751a86aad7",
+                  "attributeId": "0d88690d-8a7f-4fcb-8b75-0a751a86aad7",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+                  "attributeId": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+                  "attributeId": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "c4f9552b-686b-4eb4-8eba-d24ea1af4d51",
+              "name": "特定品种",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "0d88690d-8a7f-4fcb-8b75-0a751a86aad7",
+                  "attributeId": "0d88690d-8a7f-4fcb-8b75-0a751a86aad7",
+                  "source": "object:partner",
+                  "attribute": "fishingLevel",
+                  "influence": "数值高 · 概率越高",
+                  "influenceType": "数值高",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+                  "attributeId": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+                  "attributeId": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                }
+              ]
+            }
+          ],
+          "name": "品种分支1",
+          "judgeAttributes": [
+            {
+              "id": "0d88690d-8a7f-4fcb-8b75-0a751a86aad7",
+              "source": "object:partner",
+              "attribute": "fishingLevel"
+            },
+            {
+              "id": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+              "source": "object:partner",
+              "attribute": "认真buff"
+            },
+            {
+              "id": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+              "source": "object:partner",
+              "attribute": "获得{种类}{鱼}",
+              "objectName": "目标"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 2413.635584628,
+          "y": 1895.5570062236227
+        }
+      },
+      {
+        "id": "loop_1793603226409",
+        "type": "loop",
+        "data": {
+          "loopVersion": 3,
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "3~5"
+            },
+            {
+              "id": "count",
+              "kind": "count",
+              "maxIterations": ""
+            }
+          ],
+          "loopMode": "goal",
+          "maxIterations": "",
+          "checkTiming": "before",
+          "completionCondition": "",
+          "completionRules": [],
+          "name": "抛竿循环",
+          "legacyLoopRouting": {
+            "checkTiming": "before",
+            "edges": []
+          }
+        },
+        "position": {
+          "x": -460.94446081412207,
+          "y": -92.52297533864544
+        }
+      },
+      {
+        "id": "939f3791-89c1-43e0-878f-b9d2250d3fff",
+        "type": "result",
+        "data": {
+          "animation": "观察鱼，并高高举起",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "发现新鱼",
+          "externalExits": [],
+          "description": "",
+          "effectRules": [
+            {
+              "id": "718bec17-e416-403e-81a2-fe5436152540",
+              "source": "object:partner",
+              "attribute": "fishing_experience",
+              "influence": "大增",
+              "kind": "attribute"
+            },
+            {
+              "id": "32da080c-3c9b-44e0-acd6-24fd55ec1ad5",
+              "source": "object:buff",
+              "attribute": "获得{鱼类名称}",
+              "influence": "+1",
+              "kind": "buff"
+            },
+            {
+              "id": "a3bf5bc0-0d98-4904-b914-fc2df909251c",
+              "source": "object:partner",
+              "attribute": "情绪buff",
+              "influence": "P↑A↑D→",
+              "kind": "buff"
+            },
+            {
+              "id": "180a99d7-015b-4816-b726-30c681732505",
+              "source": "object:partner",
+              "attribute": "buff:buff_showoff",
+              "influence": "+1",
+              "kind": "buff"
+            }
+          ]
+        },
+        "position": {
+          "x": 3095.0735017416396,
+          "y": 1913.7662713604532
+        }
+      },
+      {
+        "id": "32019383-1b03-41c3-a66d-87fe72af0b3c",
+        "type": "result",
+        "data": {
+          "animation": "观察鱼并高高举起",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "得到指定鱼",
+          "externalExits": [],
+          "description": "",
+          "effectRules": [
+            {
+              "id": "76e5b784-1988-4758-ad9f-74421fd9149a",
+              "source": "object:partner",
+              "attribute": "fishing_experience",
+              "influence": "小增",
+              "kind": "attribute"
+            },
+            {
+              "id": "32da080c-3c9b-44e0-acd6-24fd55ec1ad5",
+              "source": "object:buff",
+              "attribute": "获得{鱼类名称}",
+              "influence": "+1",
+              "kind": "buff"
+            },
+            {
+              "id": "2a6d6035-daec-4ac3-9517-c25beec75c75",
+              "source": "object:partner",
+              "attribute": "情绪buff",
+              "influence": "P↑A→D→",
+              "kind": "buff"
+            }
+          ]
+        },
+        "position": {
+          "x": 3093.9216936071125,
+          "y": 2322.8644651538343
+        }
+      },
+      {
+        "id": "ec596dce-fb7d-4389-8b66-6e90863c43d0",
+        "type": "result",
+        "data": {
+          "animation": "用力提竿反复数次，一个宝箱被甩出水面，落在伙伴脚下，自动弹开获得奖励",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "钓出宝藏",
+          "externalExits": [],
+          "description": "",
+          "effectRules": [
+            {
+              "id": "d5d3d914-17db-4df7-ba36-e293758536b9",
+              "source": "object:buff",
+              "attribute": "宝箱buff",
+              "influence": "+1",
+              "kind": "buff",
+              "objectName": ""
+            },
+            {
+              "id": "20ea67c2-e6d3-4860-80a2-a597a339e16e",
+              "source": "object:partner",
+              "attribute": "fishing_experience",
+              "influence": "小增",
+              "kind": "attribute"
+            }
+          ]
+        },
+        "position": {
+          "x": 2032.6562623395303,
+          "y": 3191.25397726202
+        }
+      },
+      {
+        "id": "4eaa4ba8-3065-4cd4-932c-aef0ce2f5f30",
+        "type": "loop",
+        "data": {
+          "loopVersion": 3,
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "5~10"
+            }
+          ],
+          "loopMode": "goal",
+          "maxIterations": "",
+          "checkTiming": "before",
+          "completionCondition": "",
+          "completionRules": [],
+          "name": "打瞌睡循环"
+        },
+        "position": {
+          "x": 2394.266906318308,
+          "y": 1255.4986978126847
+        }
+      },
+      {
+        "id": "8e1d9efa-7ef9-4427-82b6-0aa2437c1408",
+        "type": "result",
+        "data": {
+          "animation": "头随着呼吸一点一点地睡着",
+          "playMode": "计次",
+          "effectRules": [
+            {
+              "id": "a1ebf810-1087-47dd-a830-25d9e0c5d958",
+              "source": "object:partner",
+              "attribute": "energy",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "name": "瞌睡中",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2728.5613644996088,
+          "y": 1250.6452089697123
+        }
+      },
+      {
+        "id": "fecefb19-8365-4223-a7ff-72767bdc019a",
+        "type": "result",
+        "data": {
+          "animation": "头一垂惊醒过来，坐着看看四周松一口气，坐着伸个懒腰，回到普通坐姿",
+          "playMode": "单次",
+          "effectRules": [],
+          "outputs": [],
+          "name": "突然惊醒",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2737.6688277979147,
+          "y": 1554.5049253345696
+        }
+      },
+      {
+        "id": "1c376e4d-3b1f-4901-874e-127be949455c",
+        "type": "loop",
+        "data": {
+          "loopVersion": 3,
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "5~10"
+            }
+          ],
+          "loopMode": "goal",
+          "maxIterations": "",
+          "checkTiming": "before",
+          "completionCondition": "",
+          "completionRules": [],
+          "name": "晒太阳循环",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2395.675954495411,
+          "y": 885.3244447303509
+        }
+      },
+      {
+        "id": "d6f9e64b-13ec-45c4-83e6-8431a36e3c79",
+        "type": "result",
+        "data": {
+          "animation": "半眯眼感受阳光",
+          "playMode": "计次",
+          "effectRules": [
+            {
+              "id": "dee127e0-5df5-46e1-9219-7660cd9a02e8",
+              "source": "object:partner",
+              "attribute": "leisure",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "name": "晒太阳",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2729.081393508569,
+          "y": 899.8252836532931
+        }
+      },
+      {
+        "id": "a72d94f4-21d7-4efd-8691-4d9d4f5eaa8b",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "摸阳光",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "c4c53f03-94c4-49b7-9154-cf00acface6f",
+                  "attributeId": "c4c53f03-94c4-49b7-9154-cf00acface6f",
+                  "source": "object:environmen",
+                  "attribute": "有蝴蝶",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "8a66d39f-82da-4f26-a8f3-32fb3607b8e4",
+                  "attributeId": "8a66d39f-82da-4f26-a8f3-32fb3607b8e4",
+                  "source": "object:environmen",
+                  "attribute": "有蜻蜓",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "05fb1fb4-bc41-43a4-a31e-a5d020a2801d",
+                  "attributeId": "05fb1fb4-bc41-43a4-a31e-a5d020a2801d",
+                  "source": "object:partner",
+                  "attribute": "personality_fantasy",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "719f7d70-13df-448d-a75e-c4345996ae33",
+              "name": "摸蝴蝶/蜻蜓",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "c4c53f03-94c4-49b7-9154-cf00acface6f",
+                  "attributeId": "c4c53f03-94c4-49b7-9154-cf00acface6f",
+                  "source": "object:environmen",
+                  "attribute": "有蝴蝶",
+                  "influence": "允许选中",
+                  "influenceType": "",
+                  "influenceRule": "允许选中"
+                },
+                {
+                  "version": 2,
+                  "id": "8a66d39f-82da-4f26-a8f3-32fb3607b8e4",
+                  "attributeId": "8a66d39f-82da-4f26-a8f3-32fb3607b8e4",
+                  "source": "object:environmen",
+                  "attribute": "有蜻蜓",
+                  "influence": "允许选中",
+                  "influenceType": "",
+                  "influenceRule": "允许选中"
+                },
+                {
+                  "version": 2,
+                  "id": "05fb1fb4-bc41-43a4-a31e-a5d020a2801d",
+                  "attributeId": "05fb1fb4-bc41-43a4-a31e-a5d020a2801d",
+                  "source": "object:partner",
+                  "attribute": "personality_fantasy",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高"
+                }
+              ]
+            },
+            {
+              "id": "default",
+              "name": "不伸手",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "c4c53f03-94c4-49b7-9154-cf00acface6f",
+                  "attributeId": "c4c53f03-94c4-49b7-9154-cf00acface6f",
+                  "source": "object:environmen",
+                  "attribute": "有蝴蝶",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "8a66d39f-82da-4f26-a8f3-32fb3607b8e4",
+                  "attributeId": "8a66d39f-82da-4f26-a8f3-32fb3607b8e4",
+                  "source": "object:environmen",
+                  "attribute": "有蜻蜓",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "05fb1fb4-bc41-43a4-a31e-a5d020a2801d",
+                  "attributeId": "05fb1fb4-bc41-43a4-a31e-a5d020a2801d",
+                  "source": "object:partner",
+                  "attribute": "personality_fantasy",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ],
+              "nextNode": ""
+            }
+          ],
+          "name": "向上伸手",
+          "judgeAttributes": [
+            {
+              "id": "c4c53f03-94c4-49b7-9154-cf00acface6f",
+              "source": "object:environmen",
+              "attribute": "有蝴蝶"
+            },
+            {
+              "id": "8a66d39f-82da-4f26-a8f3-32fb3607b8e4",
+              "source": "object:environmen",
+              "attribute": "有蜻蜓"
+            },
+            {
+              "id": "05fb1fb4-bc41-43a4-a31e-a5d020a2801d",
+              "source": "object:partner",
+              "attribute": "personality_fantasy"
+            }
+          ],
+          "externalExits": [],
+          "description": "靠着椅背朝前上方伸手感受"
+        },
+        "position": {
+          "x": 3056.794288466294,
+          "y": 904.2862609577751
+        }
+      },
+      {
+        "id": "36f966ac-6ef7-436b-974a-f4dd1c41eb4b",
+        "type": "result",
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "effectRules": [
+            {
+              "id": "a69ae390-c926-45af-8fe3-4ef6325909d3",
+              "source": "object:partner",
+              "attribute": "情绪buff",
+              "influence": "P↑A↓D↓",
+              "kind": "buff"
+            },
+            {
+              "id": "a27a23c3-e86e-4414-b340-31832565ead9",
+              "source": "object:partner",
+              "attribute": "leisure",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "name": "摸阳光",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 3383.9087790552453,
+          "y": 908.3985370175585
+        }
+      },
+      {
+        "id": "1f44dbfe-97be-46dc-aa7b-91d3d97a4780",
+        "type": "result",
+        "data": {
+          "animation": "蝴蝶/蜻蜓在手上停靠一会儿，飞开",
+          "playMode": "单次",
+          "effectRules": [
+            {
+              "id": "9c32ca4b-1405-4511-ba5b-707344786b16",
+              "source": "object:partner",
+              "attribute": "情绪buff",
+              "influence": "P↑A↓D↓",
+              "kind": "buff"
+            },
+            {
+              "id": "c946f466-3352-452b-acae-26d92d00b400",
+              "source": "object:partner",
+              "attribute": "leisure",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "name": "摸蝴蝶/蜻蜓",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 3385.145159424638,
+          "y": 1233.0045773039246
+        }
+      },
+      {
+        "id": "9ce35380-7021-4500-9fc4-4b9277b0c5e8",
+        "type": "loop",
+        "data": {
+          "loopVersion": 3,
+          "loopConditions": [
+            {
+              "id": "goal",
+              "kind": "count",
+              "condition": "",
+              "rules": [],
+              "maxIterations": "3~5"
+            }
+          ],
+          "loopMode": "goal",
+          "maxIterations": "",
+          "checkTiming": "before",
+          "completionCondition": "",
+          "completionRules": [],
+          "name": "风场循环"
+        },
+        "position": {
+          "x": 2406.240854887943,
+          "y": 310.25746029667494
+        }
+      },
+      {
+        "id": "ba0e8720-9fdc-4d1e-8d51-49104d92dfbf",
+        "type": "result",
+        "data": {
+          "animation": "握着鱼竿感受风吹过来的惬意",
+          "playMode": "计次",
+          "effectRules": [
+            {
+              "id": "a0c429f3-6a30-4dc5-8e0f-4005baa236b1",
+              "source": "object:partner",
+              "attribute": "情绪buff",
+              "influence": "P↑A↓D↓",
+              "kind": "buff"
+            },
+            {
+              "id": "cc795c8b-40ee-4b83-be83-29ef1af5f1e2",
+              "source": "object:partner",
+              "attribute": "leisure",
+              "influence": "增",
+              "kind": "attribute"
+            }
+          ],
+          "outputs": [],
+          "name": "感受风",
+          "description": "",
+          "externalExits": []
+        },
+        "position": {
+          "x": 2738.693604350139,
+          "y": 309.37229161416667
+        }
+      },
+      {
+        "id": "35691d70-d9c6-4bda-9302-2cfbff9c8596",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "default",
+              "name": "切换站姿",
+              "weightExpectation": "条件指定",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "attributeId": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "source": "object:partner",
+                  "attribute": "属于钓鱼站姿",
+                  "influence": "不属于 · 允许选中",
+                  "influenceType": "不属于",
+                  "influenceRule": "允许选中"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "branch_1",
+              "name": "保持站姿",
+              "weightExpectation": "条件指定",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "attributeId": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+                  "source": "object:partner",
+                  "attribute": "属于钓鱼站姿",
+                  "influence": "属于 · 允许选中",
+                  "influenceType": "属于",
+                  "influenceRule": "允许选中"
+                }
+              ],
+              "nextNode": ""
+            }
+          ],
+          "name": "当前姿态",
+          "judgeAttributes": [
+            {
+              "id": "23689ae3-fd9b-4d8e-8d1e-c8656b58cff9",
+              "source": "object:partner",
+              "attribute": "属于钓鱼站姿"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 601.4427390983012,
+          "y": 1889.8034089060993
+        }
+      },
+      {
+        "id": "c0a177cb-427d-4b80-a2e5-c66e24c57962",
+        "type": "result",
+        "data": {
+          "animation": "",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "拿着鱼竿站起来",
+          "externalExits": []
+        },
+        "position": {
+          "x": 936.3159730720793,
+          "y": 1891.5245085513159
+        }
+      },
+      {
+        "id": "1b4c82c5-3641-438d-b6ec-e8c8f584eb3b",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "branch_1",
+              "name": "宝箱",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+                  "attributeId": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "层数多 · 概率越高",
+                  "influenceType": "层数多",
+                  "influenceRule": "概率越高"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "default",
+              "name": "空军",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+                  "attributeId": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                }
+              ],
+              "nextNode": ""
+            }
+          ],
+          "name": "空杆分支",
+          "judgeAttributes": [
+            {
+              "id": "a40c09ef-2277-475b-b145-5a3b8a89c4b2",
+              "source": "object:partner",
+              "attribute": "认真buff"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 1676.3211913828536,
+          "y": 3192.663447054876
+        }
+      },
+      {
+        "id": "4c22cbc8-7df7-498e-8318-def16b5f894b",
+        "type": "result",
+        "data": {
+          "animation": "钓竿提上来，空空如也，伙伴愣住，叹口气",
+          "playMode": "单次",
+          "attributeChanges": [],
+          "outputs": [],
+          "nextNode": "",
+          "name": "空军",
+          "externalExits": [],
+          "description": "",
+          "effectRules": [
+            {
+              "id": "20ea67c2-e6d3-4860-80a2-a597a339e16e",
+              "source": "object:partner",
+              "attribute": "fishing_experience",
+              "influence": "小增",
+              "kind": "attribute"
+            }
+          ]
+        },
+        "position": {
+          "x": 2035.6908436865242,
+          "y": 3595.083817898926
+        }
+      },
+      {
+        "id": "b15045da-f55f-4cc4-93f9-57eb65c678a1",
+        "type": "judge",
+        "data": {
+          "branches": [
+            {
+              "id": "default",
+              "name": "全新品种",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+                  "attributeId": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响"
+                },
+                {
+                  "version": 2,
+                  "id": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+                  "attributeId": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "不影响",
+                  "influenceType": "",
+                  "influenceRule": "不影响",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            },
+            {
+              "id": "c4f9552b-686b-4eb4-8eba-d24ea1af4d51",
+              "name": "指定品种",
+              "weightExpectation": "中",
+              "weightFactors": [
+                {
+                  "version": 2,
+                  "id": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+                  "attributeId": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+                  "source": "object:partner",
+                  "attribute": "认真buff",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高"
+                },
+                {
+                  "version": 2,
+                  "id": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+                  "attributeId": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+                  "source": "object:partner",
+                  "attribute": "获得{种类}{鱼}",
+                  "influence": "概率越高",
+                  "influenceType": "",
+                  "influenceRule": "概率越高",
+                  "objectName": "目标"
+                }
+              ],
+              "nextNode": ""
+            }
+          ],
+          "name": "品种分支2",
+          "judgeAttributes": [
+            {
+              "id": "9de2ba46-6482-490d-b8c6-c32e88d81011",
+              "source": "object:partner",
+              "attribute": "认真buff"
+            },
+            {
+              "id": "51652e52-f8db-46ac-afa0-a13f15892b0a",
+              "source": "object:partner",
+              "attribute": "获得{种类}{鱼}",
+              "objectName": "目标"
+            }
+          ],
+          "externalExits": []
+        },
+        "position": {
+          "x": 2744.640514260539,
+          "y": 1894.4467945633949
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "8f3e5dda-eae8-4022-934a-9d91db543e15",
+        "source": "template_loop",
+        "target": "template_judge",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "db317814-239c-468a-bc42-92394b1b652e",
+        "source": "result_1793589228796",
+        "target": "template_loop"
+      },
+      {
+        "id": "6c8e0862-67d5-41b6-8854-b6449fb982ec",
+        "source": "template_judge",
+        "target": "judge_1793590288951",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "2653f714-8778-45cc-adb2-b3d41ef12f6f",
+        "source": "template_judge",
+        "target": "4afb717b-8e80-46d0-a716-a0c4c985b3c9",
+        "sourceHandle": "branch_2"
+      },
+      {
+        "id": "35ac3232-916c-43a4-a99b-0f38f11db942",
+        "source": "4afb717b-8e80-46d0-a716-a0c4c985b3c9",
+        "target": "1f248d88-9bea-44ed-b96a-dbf9f7c2338b",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "931b462e-1cb5-448e-9cf6-72d6ba336d4d",
+        "source": "result_1793590463283",
+        "target": "judge_1793589475150"
+      },
+      {
+        "id": "13425943-6483-4f9a-942e-a4bc17e04eef",
+        "source": "judge_1793590288951",
+        "target": "judge_1793589475150",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "cb9c716e-0667-4428-aa7d-c82a7b16b41f",
+        "source": "judge_1793590288951",
+        "target": "result_1793590463283",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "07c4b2d0-bda7-4626-8826-2af1f9cf7887",
+        "source": "1f248d88-9bea-44ed-b96a-dbf9f7c2338b",
+        "target": "judge_1793589477438"
+      },
+      {
+        "id": "e3020e3c-d6a7-4e37-b010-d9b8f206dec5",
+        "source": "4afb717b-8e80-46d0-a716-a0c4c985b3c9",
+        "target": "judge_1793589477438",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "998cbc0c-13c6-4ed8-8c10-ef561aba6f0e",
+        "source": "judge_1793589475150",
+        "target": "template_result_1",
+        "sourceHandle": "27affce7-6620-4f12-9420-b090fa8c0086"
+      },
+      {
+        "id": "3c7dc5a2-5175-42d3-a037-3d14972e278e",
+        "source": "judge_1793589477438",
+        "target": "template_result_2",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "128d8736-5bb1-4d5a-8cdf-564fd748c89f",
+        "source": "judge_1793589475150",
+        "target": "35f4bd4f-bd31-4d1e-8720-22ea6ab23fb9",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "3e1f2d23-15b1-496d-b866-2d1dd2c57fd1",
+        "source": "judge_1793589475150",
+        "target": "c6266aef-9b7f-4849-bd39-657ddcd80da5",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "8b895ea5-ddb4-4cd6-95d4-e385bbd5376b",
+        "source": "judge_1793589477438",
+        "target": "97e90977-6c8c-4698-b7e1-7a56de922f24",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "aa49f257-2f5a-4781-8c71-61a27d904c06",
+        "source": "judge_1793589477438",
+        "target": "8d383fef-df77-4f93-ae7b-dbad85c38c7b",
+        "sourceHandle": "57426c03-8fff-427a-bbc5-b2c277c290e9"
+      },
+      {
+        "id": "e160ad9e-f696-4b1e-b956-c93e5f337227",
+        "source": "template_result_2",
+        "target": "template_loop"
+      },
+      {
+        "id": "cce9cab9-ef91-4c91-b1ee-c040234b4881",
+        "source": "35f4bd4f-bd31-4d1e-8720-22ea6ab23fb9",
+        "target": "template_loop"
+      },
+      {
+        "id": "7a3297ae-c6fe-4dd6-93a5-8b7fed31b9d2",
+        "source": "c6266aef-9b7f-4849-bd39-657ddcd80da5",
+        "target": "template_loop"
+      },
+      {
+        "id": "a45bdbab-9a3d-407e-b807-8f0c41ca138e",
+        "source": "judge_1793597259145",
+        "target": "judge_1793599286767",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "c9b4049c-b9f8-4ee1-8d81-834ef416ff62",
+        "source": "judge_1793599286767",
+        "target": "f7248fd6-6ce8-472b-a4d6-864aaa67b2ab",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "1a6decc8-d7cb-4a31-8f65-830351c076ab",
+        "source": "judge_1793599286767",
+        "target": "6f2c5ff5-3f2b-4b2c-8585-b11d6b1f2991",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "8c6faa24-71dc-408b-b02d-731969f295ef",
+        "source": "judge_1793599286767",
+        "target": "d978af45-4565-4177-8549-9af494ac6c26",
+        "sourceHandle": "1005abff-d9fb-4c71-8a8e-dd089afd508a"
+      },
+      {
+        "id": "39281b8a-5f7a-4559-b047-efd3ba824c6b",
+        "source": "f7248fd6-6ce8-472b-a4d6-864aaa67b2ab",
+        "target": "judge_1793601343114"
+      },
+      {
+        "id": "006d9ad7-cf98-45e0-870b-cde5b3ff1aa7",
+        "source": "6f2c5ff5-3f2b-4b2c-8585-b11d6b1f2991",
+        "target": "judge_1793601343114"
+      },
+      {
+        "id": "c559ac32-29e1-47cc-b709-062df5292d2b",
+        "source": "d978af45-4565-4177-8549-9af494ac6c26",
+        "target": "judge_1793601343114"
+      },
+      {
+        "id": "0e34b480-cf86-4598-b4cb-ab0cd71052f7",
+        "source": "behavior_start",
+        "target": "loop_1793603226409",
+        "sourceHandle": null,
+        "targetHandle": null
+      },
+      {
+        "id": "49ebd48a-5c01-431d-ac53-7830e28fee8f",
+        "source": "loop_1793603226409",
+        "target": "result_1793589228796",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "4d419377-a1e8-4cbf-bbf7-23d3c42ae6e3",
+        "source": "loop_1793603226409",
+        "target": "template_end",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "04347740-926c-40dd-a67e-042e592dafaa",
+        "source": "judge_1793601343114",
+        "target": "loop_1793603226409",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "cc76bda6-6df5-492f-b55d-edeedbca2516",
+        "source": "939f3791-89c1-43e0-878f-b9d2250d3fff",
+        "target": "loop_1793603226409"
+      },
+      {
+        "id": "4c987587-69a3-494d-a3e9-008da155e771",
+        "source": "8d383fef-df77-4f93-ae7b-dbad85c38c7b",
+        "target": "4eaa4ba8-3065-4cd4-932c-aef0ce2f5f30"
+      },
+      {
+        "id": "4b566230-e111-43f6-ab8c-7283af8abde3",
+        "source": "4eaa4ba8-3065-4cd4-932c-aef0ce2f5f30",
+        "target": "8e1d9efa-7ef9-4427-82b6-0aa2437c1408",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "47346080-8b15-4dad-ad9d-2391155aaddb",
+        "source": "4eaa4ba8-3065-4cd4-932c-aef0ce2f5f30",
+        "target": "fecefb19-8365-4223-a7ff-72767bdc019a",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "f40454ae-c580-4bf4-bb8e-e2f47922562d",
+        "source": "8e1d9efa-7ef9-4427-82b6-0aa2437c1408",
+        "target": "4eaa4ba8-3065-4cd4-932c-aef0ce2f5f30"
+      },
+      {
+        "id": "cfa92475-d6fe-4e79-b39d-deb93b51b144",
+        "source": "fecefb19-8365-4223-a7ff-72767bdc019a",
+        "target": "template_loop"
+      },
+      {
+        "id": "4d6615ae-81c5-4f3b-b0e5-b1c5883cc038",
+        "source": "97e90977-6c8c-4698-b7e1-7a56de922f24",
+        "target": "1c376e4d-3b1f-4901-874e-127be949455c"
+      },
+      {
+        "id": "b306b7bd-6bd1-4c27-99bc-15592263f790",
+        "source": "1c376e4d-3b1f-4901-874e-127be949455c",
+        "target": "d6f9e64b-13ec-45c4-83e6-8431a36e3c79",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "7ac65634-e16a-4db8-bb9e-7b635d48b3ac",
+        "source": "d6f9e64b-13ec-45c4-83e6-8431a36e3c79",
+        "target": "a72d94f4-21d7-4efd-8691-4d9d4f5eaa8b"
+      },
+      {
+        "id": "143ad2c9-9a1d-4401-bb13-85b81993186b",
+        "source": "a72d94f4-21d7-4efd-8691-4d9d4f5eaa8b",
+        "target": "1c376e4d-3b1f-4901-874e-127be949455c",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "d4b3bbaa-1117-4bb3-a8e8-909b94925624",
+        "source": "a72d94f4-21d7-4efd-8691-4d9d4f5eaa8b",
+        "target": "36f966ac-6ef7-436b-974a-f4dd1c41eb4b",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "eb821de4-6983-4ad8-b2e6-d60e62e5f8eb",
+        "source": "a72d94f4-21d7-4efd-8691-4d9d4f5eaa8b",
+        "target": "1f44dbfe-97be-46dc-aa7b-91d3d97a4780",
+        "sourceHandle": "719f7d70-13df-448d-a75e-c4345996ae33"
+      },
+      {
+        "id": "166533a3-3531-4d3b-b50a-41763b3087d2",
+        "source": "36f966ac-6ef7-436b-974a-f4dd1c41eb4b",
+        "target": "1c376e4d-3b1f-4901-874e-127be949455c"
+      },
+      {
+        "id": "2bf418f6-3d00-47b3-baa4-cd86263c4e25",
+        "source": "1f44dbfe-97be-46dc-aa7b-91d3d97a4780",
+        "target": "1c376e4d-3b1f-4901-874e-127be949455c"
+      },
+      {
+        "id": "59f75b15-34ff-4599-ba47-2a3c0c8308dc",
+        "source": "9ce35380-7021-4500-9fc4-4b9277b0c5e8",
+        "target": "ba0e8720-9fdc-4d1e-8d51-49104d92dfbf",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "a40cef51-f5d8-4e62-b562-854677b6d79c",
+        "source": "template_result_1",
+        "target": "9ce35380-7021-4500-9fc4-4b9277b0c5e8"
+      },
+      {
+        "id": "ad637222-b765-4ab9-98f5-33460b7a15b7",
+        "source": "9ce35380-7021-4500-9fc4-4b9277b0c5e8",
+        "target": "template_loop",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "7ee5ea3f-d5c2-4f31-9c44-c082b8179656",
+        "source": "ba0e8720-9fdc-4d1e-8d51-49104d92dfbf",
+        "target": "9ce35380-7021-4500-9fc4-4b9277b0c5e8"
+      },
+      {
+        "id": "cd3ee972-e2f1-4a0b-8073-7fcc03642874",
+        "source": "template_loop",
+        "target": "35691d70-d9c6-4bda-9302-2cfbff9c8596",
+        "sourceHandle": "complete"
+      },
+      {
+        "id": "3419598e-c62d-4908-99cb-942f80e546d9",
+        "source": "35691d70-d9c6-4bda-9302-2cfbff9c8596",
+        "target": "judge_1793597259145",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "7e944c09-a89c-4398-b3ee-06aca20055fe",
+        "source": "35691d70-d9c6-4bda-9302-2cfbff9c8596",
+        "target": "c0a177cb-427d-4b80-a2e5-c66e24c57962",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "2fb6a322-e351-438a-b6d6-d46f51ca9912",
+        "source": "c0a177cb-427d-4b80-a2e5-c66e24c57962",
+        "target": "judge_1793597259145"
+      },
+      {
+        "id": "8f1b954a-782f-4806-b304-371b6c33a18e",
+        "source": "judge_1793597259145",
+        "target": "1b4c82c5-3641-438d-b6ec-e8c8f584eb3b",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "e217c371-3042-4b1b-8345-8670d198e0b5",
+        "source": "1b4c82c5-3641-438d-b6ec-e8c8f584eb3b",
+        "target": "ec596dce-fb7d-4389-8b66-6e90863c43d0",
+        "sourceHandle": "branch_1"
+      },
+      {
+        "id": "a904a14e-5322-49e7-8bfa-cdb365e90c38",
+        "source": "ec596dce-fb7d-4389-8b66-6e90863c43d0",
+        "target": "loop_1793603226409"
+      },
+      {
+        "id": "300ef212-3622-4a6d-85b5-69aee67ec922",
+        "source": "1b4c82c5-3641-438d-b6ec-e8c8f584eb3b",
+        "target": "4c22cbc8-7df7-498e-8318-def16b5f894b",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "a70bcfac-3f3f-4648-a5eb-494b026e3595",
+        "source": "4c22cbc8-7df7-498e-8318-def16b5f894b",
+        "target": "loop_1793603226409"
+      },
+      {
+        "id": "cba62897-dbf5-4195-b499-4de611067b1f",
+        "source": "judge_1793601343114",
+        "target": "b15045da-f55f-4cc4-93f9-57eb65c678a1",
+        "sourceHandle": "c4f9552b-686b-4eb4-8eba-d24ea1af4d51"
+      },
+      {
+        "id": "e975c013-a8f8-4a17-a370-74802d4fb1f7",
+        "source": "b15045da-f55f-4cc4-93f9-57eb65c678a1",
+        "target": "939f3791-89c1-43e0-878f-b9d2250d3fff",
+        "sourceHandle": "default"
+      },
+      {
+        "id": "a65f421d-53b4-41cc-817c-3efcb0fc2f1a",
+        "source": "b15045da-f55f-4cc4-93f9-57eb65c678a1",
+        "target": "32019383-1b03-41c3-a66d-87fe72af0b3c",
+        "sourceHandle": "c4f9552b-686b-4eb4-8eba-d24ea1af4d51"
+      },
+      {
+        "id": "ca10efed-4c4f-47c2-9364-a6d169565aee",
+        "source": "32019383-1b03-41c3-a66d-87fe72af0b3c",
+        "target": "loop_1793603226409"
+      },
+      {
+        "id": "9c1036f2-f333-4a45-83ee-aa5816c68842",
+        "source": "1c376e4d-3b1f-4901-874e-127be949455c",
+        "target": "template_loop",
+        "sourceHandle": "complete"
+      }
+    ]
+  }
+}

@@ -32,6 +32,6 @@ test('downstream loops follow source exits after reflow, collapse and reload',as
  await page.getByRole('button',{name:'展开循环 source',exact:true}).click()
  await expect.poll(order).toEqual(['a','b','c']);await expect.poll(crossings).toBe(false)
  await page.evaluate(async()=>{const {flushDraft}=await import('/src/store/documentSession.js');flushDraft()})
- await page.reload();await expect.poll(order).toEqual(['a','b','c']);await expect.poll(crossings).toBe(false)
+ await page.reload();await expect(page.locator('[data-id=__scope_a]')).toBeVisible();await expect.poll(order).toEqual(['a','b','c']);await expect.poll(crossings).toBe(false)
  expect(errors).toEqual([])
 })

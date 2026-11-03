@@ -1,0 +1,2340 @@
+{
+  "syncedAt": "2026-11-03T09:35:39.929Z",
+  "library": {
+    "version": 1,
+    "objects": [
+      {
+        "id": "partner",
+        "name": "伙伴",
+        "description": "实际属性载体：角色实例。体力/饥饿/社交/娱乐为保存值；情绪分类由PAD计算。执行伙伴与互动伙伴是读取来源，不是两个对象类型。",
+        "enabled": true
+      },
+      {
+        "id": "food",
+        "name": "食物",
+        "description": "道具的业务子类；包含水果、菜品等。新鲜度由食物实例的变质时间计算；品质来自物品配置。",
+        "enabled": true
+      },
+      {
+        "id": "material",
+        "name": "原料",
+        "description": "道具的用途分类，非独立状态载体。数量、仓库归属及预留由库存/消耗业务读取，不建可任意加减的同名属性。",
+        "enabled": true
+      },
+      {
+        "id": "interactPlace",
+        "name": "地点",
+        "description": "保留编辑器场所筛选分类。对应可交互实例时按交互物读取；不能把场所分类当作全部实例都具有耐久/清洁。",
+        "enabled": true
+      },
+      {
+        "id": "furniture",
+        "name": "摆件",
+        "description": "编辑器业务筛选分类。按具体道具或交互物实例读取；持有、摆放时保持实例身份，不复制属性。",
+        "enabled": true
+      },
+      {
+        "id": "collectible",
+        "name": "收藏品",
+        "description": "道具业务子类。收藏登记与任务归属由收藏/任务系统管理；不把登记进度复制成通用属性。",
+        "enabled": true
+      },
+      {
+        "id": "container",
+        "name": "收藏容器",
+        "description": "保留业务筛选分类。容量、已用、剩余容量由容器/库存业务读取，不作为属性基础分条目。",
+        "enabled": true
+      },
+      {
+        "id": "item",
+        "name": "道具",
+        "description": "实际属性载体：具体道具实例。食物、原料、收藏品等为用途子类；同类实例不共用当前耐久或新鲜度。",
+        "enabled": true
+      },
+      {
+        "id": "interactObject",
+        "name": "交互物",
+        "description": "实际属性载体：可交互物件实例。功能标签用于查找，点位/占用归交互业务；缺少属性返回不适用，不能当0。",
+        "enabled": true
+      },
+      {
+        "id": "environmentItem",
+        "name": "环境物",
+        "description": "外部读取载体：天气、时段由环境系统提供，不复制到角色、不接受行为或Buff直接写值。",
+        "enabled": true
+      },
+      {
+        "id": "equippedItem",
+        "name": "装备物",
+        "description": "允许伙伴持有/装备状态的物品。包含原料、工具、食物、产出物等子类;装备状态变化来自与交互物交互。部分交互物也可装备。替代旧“手持物”对象类型。",
+        "enabled": true
+      },
+      {
+        "id": "buff",
+        "name": "Buff",
+        "description": "用于在行为设计中引用 Buff 本身的对象类型。具体效果定义仍在 Buff 类型表维护；本条目不改变既有 Buff 的适用对象。",
+        "enabled": true
+      },
+      {
+        "id": "environmen",
+        "name": "环境",
+        "description": "",
+        "enabled": true
+      }
+    ],
+    "attributes": [
+      {
+        "id": "satiety",
+        "name": "饱腹度",
+        "description": "工程映射：npc_attribute 10002；上传行为表进食小吃scoreWeights=10002_100。保存值，范围0～100，越高越满足，不是越高越饿。旧编辑器标识satiety保留；只由行为改变实际值。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "energy",
+        "name": "精力",
+        "description": "工程映射：npc_attribute 10001；上传行为表坐下休息/躺下睡觉引用10001。保存值，0～100，越高越充足。旧标识energy保留；无独立时间衰减。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "cleanliness",
+        "name": "清洁度",
+        "description": "规则确认、正式属性ID待核对（文档910003为示例，不能用于工程导出）。物件保存值，越高越干净；仅适用于具有此属性的具体道具/交互物。伙伴脏污单列，不默认为伙伴清洁度。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "item",
+          "interactObject",
+          "interactPlace",
+          "furniture",
+          "partner"
+        ]
+      },
+      {
+        "id": "durability",
+        "name": "耐久度",
+        "description": "规则确认、正式属性ID待核对（910002仅文档示例）。具体物件保存值，使用降低、修理提高；仅具有耐久的实例适用。耐久0提供“损坏”功能标签，不添加“损坏Buff”；不另建耐久上限属性。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "item",
+          "interactObject",
+          "interactPlace",
+          "furniture"
+        ]
+      },
+      {
+        "id": "freshness",
+        "name": "新鲜度",
+        "description": "规则确认、正式属性ID/类型枚举待接入（910005、0～600仅示例）。仅食物实例适用，按变质时间计算剩余保鲜时间；只读，不直接加减或接受Buff临时修正，不按固定0～100百分比解释。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "food",
+          "item"
+        ]
+      },
+      {
+        "id": "social",
+        "name": "社交",
+        "description": "文档定义：npc_attribute 10003，基础需求保存值，0～100，越高社交需求越满足；上传行为表赠送礼物提供“属性_社交”，当前行为为未启用占位。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "leisure",
+        "name": "娱乐",
+        "description": "工程映射：npc_attribute 10004。上传表垂钓休闲提供“属性_休闲”，scoreWeights引用10004；保存值0～100，越高越满足。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_excited",
+        "name": "兴奋",
+        "description": "已停用:情绪标签统一由Buff表示,不作为属性。工程映射npc_attribute 10043已废弃;行为表引用10043需迁移至mood_excited Buff。",
+        "enabled": false,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "dirt",
+        "name": "脏污",
+        "description": "规则确认、正式属性ID和范围待核对。保存值，脏污累积后保留，清理行为降低；不以脏污Buff有无判断。按用户选择以属性与Buff系统为准，取代涌现叙事中旧的脏污Buff示例。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishingLevel",
+        "name": "钓鱼等级",
+        "description": "设计定义、正式编号/类型待接入；910001与0～10为文档示例，不是工程事实。由技能经验和等级表计算，只读；不能把钓鱼偏好13009推定为钓鱼等级。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "sunny",
+        "name": "晴天",
+        "description": "文档定义17001；未由上传工程表交叉核验。环境外部读取，晴天1否则0，只读，不接受行为或Buff直接改写。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "environmen"
+        ]
+      },
+      {
+        "id": "dizzy",
+        "name": "晕眩",
+        "description": "伙伴是否处于晕眩状态。由buff_dizzy存在时读取为true,否则false。影响行为前置条件判断。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "sick",
+        "name": "生病",
+        "description": "伙伴是否处于生病状态。由buff_sick存在时读取为true,否则false。影响行为前置条件判断。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality",
+        "name": "个性",
+        "description": "伙伴的性格类型标签。当前定义待个性系统详细设计确认。用于行为前置条件筛选特定个性的伙伴。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "species",
+        "name": "种族",
+        "description": "伙伴的种族类型(如兔子/猫咪/狐狸等)。用于行为前置条件筛选特定种族。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "body_size",
+        "name": "体型",
+        "description": "伙伴的体型大小(小型/中型/大型)。影响交互动作适配性与行为前置条件。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "equipped_slot_tool",
+        "name": "工具装备槽",
+        "description": "伙伴当前装备的工具实例引用。用于判断是否装备工具及所装备的具体工具；为空表示该槽未装备工具。由工具的装备、替换或卸下行为更新。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "equipped_slot_material",
+        "name": "原料装备槽",
+        "description": "伙伴当前装备的原料实例引用。用于判断是否装备原料及所装备的具体原料；为空表示该槽未装备原料。由原料的装备、替换或卸下行为更新，数量由对应原料数据读取。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "equipped_slot_food",
+        "name": "食物装备槽",
+        "description": "伙伴当前装备的食物实例引用。用于判断是否装备食物及所装备的具体食物；为空表示该槽未装备食物。由食物的装备、替换或卸下行为更新，食物耗尽后清空该槽。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "is_new",
+        "name": "新的(物品)",
+        "description": "物品是否为全新未使用状态。用于行为前置条件判断(如“获得新道具”点歌行为)。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "food",
+          "item"
+        ]
+      },
+      {
+        "id": "quality",
+        "name": "品质",
+        "description": "物品的品质等级。枚举值:劣质/普通/高品质/金星。适用于食物与道具,影响效果与行为倾向。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "food",
+          "item"
+        ]
+      },
+      {
+        "id": "crafting_progress",
+        "name": "制作进度",
+        "description": "道具当前制作的完成百分比,0-100。用于制作类行为的进度跟踪与完成判定。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "item"
+        ]
+      },
+      {
+        "id": "satiety_recovery",
+        "name": "饱腹恢复值",
+        "description": "食物提供的饱腹度恢复数值。仅适用于食物,由进食行为读取并增加到satiety属性。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "food"
+        ]
+      },
+      {
+        "id": "construction_progress",
+        "name": "建造进度",
+        "description": "交互物当前建造的完成百分比,0-100。用于建造类行为的进度跟踪与完成判定。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "interactPlace",
+          "interactObject"
+        ]
+      },
+      {
+        "id": "construction_stage",
+        "name": "建造阶段",
+        "description": "交互物当前建造所处的阶段状态。枚举值待设计确认(如打地基/框架/封顶等)。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "interactPlace",
+          "interactObject"
+        ]
+      },
+      {
+        "id": "material_stock",
+        "name": "拥有原料",
+        "description": "交互物当前存储的原料清单与JSON对象。由存储/消耗业务读取和维护。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "interactPlace",
+          "interactObject"
+        ]
+      },
+      {
+        "id": "interaction_point_count",
+        "name": "交互点位数量",
+        "description": "交互物提供的交互点位总数。由资产配置提供,只读。替代旧交互点位对象类型。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "interactPlace",
+          "interactObject"
+        ]
+      },
+      {
+        "id": "interaction_point_occupied",
+        "name": "交互点位占用",
+        "description": "交互物各点位的占用状态数组。由交互业务系统维护。替代旧交互点位对象类型。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "interactPlace",
+          "interactObject"
+        ]
+      },
+      {
+        "id": "placement_point_count",
+        "name": "放置点位数量",
+        "description": "交互物提供的物品放置点位总数(如餐桌上的餐具位)。由资产配置提供,只读。行为图全集明确需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "interactPlace",
+          "interactObject"
+        ]
+      },
+      {
+        "id": "relationship_level",
+        "name": "关系等级",
+        "description": "伙伴之间的关系等级。枚举值:陌生人/认识/朋友/好友/挚友。由好感度数值计算得出,影响交互行为触发条件。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "affection",
+        "name": "好感度",
+        "description": "伙伴对另一伙伴的好感度数值,0-100。由社交互动行为改变,影响关系等级计算。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trust",
+        "name": "信任度",
+        "description": "伙伴对另一伙伴的信任度数值,0-100。由协作/承诺完成等行为改变,影响深度社交行为触发。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "cooking_level",
+        "name": "烹饺等级",
+        "description": "伙伴的烹饺技能等级,0-10。由烹饺经验值计算,影响烹饺品质与成功率。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "crafting_level",
+        "name": "制作等级",
+        "description": "伙伴的手工制作技能等级,0-10。由制作经验值计算,影响制作品质与效率。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "gardening_level",
+        "name": "园艺等级",
+        "description": "伙伴的园艺技能等级,0-10。由园艺经验值计算,影响种植成功率与作物品质。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_experience",
+        "name": "钓鱼经验",
+        "description": "伙伴的钓鱼经验值,累积计算。达到阈值后提升fishingLevel属性。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "time_of_day",
+        "name": "时段",
+        "description": "当前游戏时间所处的时段。枚举值:早晨/上午/中午/下午/傍晚/夜晚。环境外部读取,只读,影响行为触发条件。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "environmen"
+        ]
+      },
+      {
+        "id": "weather",
+        "name": "天气",
+        "description": "当前天气状态。枚举值:晴天/多云/阴天/小雨/大雨/雪天。环境外部读取,只读,影响行为触发条件与情绪。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "environmen"
+        ]
+      },
+      {
+        "id": "season",
+        "name": "季节",
+        "description": "当前季节。枚举值:春/夏/秋/冬。环境外部读取,只读,影响作物生长周期与环境效果。行为图全集P1需求。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "environmen"
+        ]
+      },
+      {
+        "id": "reczz28PBhFkUjct",
+        "name": "产量",
+        "description": "环境物当前可供采集或获取的产出数量。由相关行为读取或改变，具体消耗、恢复与补充规则由对应行为或系统定义。",
+        "enabled": true,
+        "kind": "数值",
+        "objectTypes": [
+          "environmentItem"
+        ]
+      },
+      {
+        "id": "reczz28PBpzFKg4B",
+        "name": "被卡住",
+        "description": "",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "environmentItem",
+          "interactObject"
+        ]
+      },
+      {
+        "id": "personality_sensitive",
+        "name": "敏感",
+        "description": "伙伴是否具有「敏感」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15001，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_unbothered",
+        "name": "豁达",
+        "description": "伙伴是否具有「豁达」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15002，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_rigorous",
+        "name": "严谨",
+        "description": "伙伴是否具有「严谨」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15003，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_casual",
+        "name": "随性",
+        "description": "伙伴是否具有「随性」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15004，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_fantasy",
+        "name": "幻想",
+        "description": "伙伴是否具有「幻想」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15005，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_pragmatic",
+        "name": "务实",
+        "description": "伙伴是否具有「务实」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15006，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_passion",
+        "name": "热情",
+        "description": "伙伴是否具有「热情」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15007，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_tranquility",
+        "name": "宁静",
+        "description": "伙伴是否具有「宁静」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15008，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_affectionate",
+        "name": "亲和",
+        "description": "伙伴是否具有「亲和」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15009，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "personality_frank",
+        "name": "坦率",
+        "description": "伙伴是否具有「坦率」个性标签；枚举语义：具有／不具有。工程 npc_attribute 15010，类型 NATR_PERSONALITY，范围0～1（1具有，0不具有）；从伙伴个性数据读取。来源：《伙伴特质设计》性格特质及 npc_attribute.csv。此条目仅定义标签，不附加行为效果或精确数值。2026-10-19按用户要求独立列为属性。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_dexterous",
+        "name": "心灵手巧",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「心灵手巧」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_all_thumbs",
+        "name": "笨手笨脚",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「笨手笨脚」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_spirited",
+        "name": "神采飞扬",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「神采飞扬」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_inactive",
+        "name": "四肢不勤",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「四肢不勤」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_coordinated",
+        "name": "肢体协调",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「肢体协调」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_clumsy",
+        "name": "动作笨拙",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「动作笨拙」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_knowledgeable",
+        "name": "博闻强识",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「博闻强识」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_superficial_learner",
+        "name": "不求甚解",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「不求甚解」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_nature_intuition",
+        "name": "自然直觉",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「自然直觉」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_city_dweller",
+        "name": "城市动物",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「城市动物」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_keen_senses",
+        "name": "耳聪目明",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「耳聪目明」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_casual_observer",
+        "name": "走马观花",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「走马观花」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_eager_explorer",
+        "name": "乐于探索",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「乐于探索」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_timid_cautious",
+        "name": "胆小谨慎",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「胆小谨慎」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_center_of_attention",
+        "name": "众星捧月",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「众星捧月」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_self_admiring",
+        "name": "孤芳自赏",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「孤芳自赏」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_resourceful",
+        "name": "物尽其用",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「物尽其用」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_self_reliant",
+        "name": "独善其身",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「独善其身」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_abundant_creation",
+        "name": "充裕创作",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「充裕创作」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_keen_taste",
+        "name": "味觉灵敏",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「味觉灵敏」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_ability_improviser",
+        "name": "即兴创作",
+        "description": "伙伴特质标签；分类：能力特质。表示伙伴是否具有「即兴创作」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_habitat_mountain",
+        "name": "高山主义",
+        "description": "伙伴特质标签；分类：生活环境偏好。表示伙伴是否具有「高山主义」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_habitat_conifer_forest",
+        "name": "归林隐居",
+        "description": "伙伴特质标签；分类：生活环境偏好。表示伙伴是否具有「归林隐居」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_habitat_maple_forest",
+        "name": "热情红枫",
+        "description": "伙伴特质标签；分类：生活环境偏好。表示伙伴是否具有「热情红枫」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_habitat_waterfall",
+        "name": "瀑布修行",
+        "description": "伙伴特质标签；分类：生活环境偏好。表示伙伴是否具有「瀑布修行」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_habitat_waterside",
+        "name": "水岸人家",
+        "description": "伙伴特质标签；分类：生活环境偏好。表示伙伴是否具有「水岸人家」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_habitat_seaside",
+        "name": "沧海听涛",
+        "description": "伙伴特质标签；分类：生活环境偏好。表示伙伴是否具有「沧海听涛」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_decor_minimalist",
+        "name": "大道至简",
+        "description": "伙伴特质标签；分类：家居风格偏好。表示伙伴是否具有「大道至简」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_decor_maximalist",
+        "name": "繁复主义",
+        "description": "伙伴特质标签；分类：家居风格偏好。表示伙伴是否具有「繁复主义」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_decor_heavy_classic",
+        "name": "厚重主义",
+        "description": "伙伴特质标签；分类：家居风格偏好。表示伙伴是否具有「厚重主义」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_decor_eclectic",
+        "name": "异质主义",
+        "description": "伙伴特质标签；分类：家居风格偏好。表示伙伴是否具有「异质主义」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_decor_forest",
+        "name": "森系主义",
+        "description": "伙伴特质标签；分类：家居风格偏好。表示伙伴是否具有「森系主义」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_decor_flamboyant",
+        "name": "张扬主义",
+        "description": "伙伴特质标签；分类：家居风格偏好。表示伙伴是否具有「张扬主义」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_oily_spicy",
+        "name": "重油重辣",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「重油重辣」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_bitter",
+        "name": "苦味美学",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「苦味美学」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_sweet",
+        "name": "甜蜜主义",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「甜蜜主义」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_sour",
+        "name": "酸爽过瘾",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「酸爽过瘾」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_noodles",
+        "name": "碳水教父",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「碳水教父」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_mushrooms",
+        "name": "喜食菌类",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「喜食菌类」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_rice",
+        "name": "米制爱好",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「米制爱好」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_vegetables",
+        "name": "享受素食",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「享受素食」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_regional_flavor",
+        "name": "风土原味",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「风土原味」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_low_fat",
+        "name": "健身达人",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「健身达人」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_food_high_sugar",
+        "name": "快乐饮食",
+        "description": "伙伴特质标签；分类：食物偏好。表示伙伴是否具有「快乐饮食」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_routine_healthy_schedule",
+        "name": "健康作息",
+        "description": "伙伴特质标签；分类：生活作息特质。表示伙伴是否具有「健康作息」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_routine_night_owl",
+        "name": "夜猫子",
+        "description": "伙伴特质标签；分类：生活作息特质。表示伙伴是否具有「夜猫子」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_routine_night_roamer",
+        "name": "秉烛夜游",
+        "description": "伙伴特质标签；分类：生活作息特质。表示伙伴是否具有「秉烛夜游」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_routine_early_riser",
+        "name": "夙兴夜寐",
+        "description": "伙伴特质标签；分类：生活作息特质。表示伙伴是否具有「夙兴夜寐」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_routine_methodical",
+        "name": "按部就班",
+        "description": "伙伴特质标签；分类：生活作息特质。表示伙伴是否具有「按部就班」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "trait_routine_spontaneous",
+        "name": "随性所欲",
+        "description": "伙伴特质标签；分类：生活作息特质。表示伙伴是否具有「随性所欲」，枚举语义：具有／不具有。来源：《伙伴特质设计》对应章节；2026-10-19按用户要求作为独立伙伴属性收录。只描述标签身份，具体效果由相关行为或业务规则定义；不在此配置精确数值。游戏工程属性ID及运行时读取映射待核对，本条标识仅用于编辑器引用。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_posture",
+        "name": "钓鱼姿态",
+        "description": "运行状态读数：未钓鱼／站姿／坐姿。由站起、坐下及退出钓鱼动作完成事件更新；不独立复制两个布尔值，不允许同时站坐。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "nearby_butterfly",
+        "name": "附近有蝴蝶",
+        "description": "枚举：有／无。来自当前钓点交互范围内的场景检测，只读；不代表整个世界存在蝴蝶。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "environmen"
+        ]
+      },
+      {
+        "id": "nearby_dragonfly",
+        "name": "附近有蜻蜓",
+        "description": "枚举：有／无。来自当前钓点交互范围内的场景检测，只读；不代表整个世界存在蜻蜓。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "kind": "枚举",
+        "objectTypes": [
+          "environmen"
+        ]
+      }
+    ],
+    "buffs": [
+      {
+        "id": "buff_10001",
+        "name": "雀跃",
+        "description": "文档Buff基础表编号10001、效果10001；情绪组，PAD增量+60/+30/+10，固定600秒为文档配置示例。实际工程Buff表尚未提供，参数不得作为已核验工程事实。Buff名不等于情绪分类；每次获得独立一层。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_10003",
+        "name": "得意",
+        "description": "文档Buff基础表编号10003、效果10003；情绪组，PAD增量+40/+60/-20，固定600秒为文档配置示例。实际工程Buff表尚未提供；添加/移除本层PAD贡献，分类由累计PAD决定。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_11001",
+        "name": "NPC速度上限",
+        "description": "文档Buff编号11001；速度组容量1，按节点完成结束。现有效果切换运动档位，不能把参数1当增加1点速度；参数语义待对齐，暂不作为可选项。",
+        "enabled": false,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "design_fishing_bait",
+        "name": "鱼饵",
+        "description": "状态Buff,容量1层,消耗型。钓鱼行为可选前置,影响上鱼概率并在结算时消耗。正式Buff编号待工程提供。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "design_super_excited",
+        "name": "超级兴奋",
+        "description": "状态Buff,禁止休息行为(坐下/睡觉)前置检查。不等于属性10043'兴奋'。正式Buff编号待工程提供。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "design_dizzy",
+        "name": "晕眩",
+        "description": "状态Buff,睡觉失败获得,影响移动表现。触发监听行为[晕倒]。正式Buff编号待工程提供。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_sick",
+        "name": "生病",
+        "description": "状态Buff,影响行为效率与表现。正式Buff编号待工程提供。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_startled",
+        "name": "吓一跳",
+        "description": "情绪波动Buff,PAD增量待文档确认。制作意外结果触发,瞬时情绪反应。正式Buff编号待工程提供。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_showoff",
+        "name": "炫耀",
+        "description": "情绪/行为Buff,获得时插入监听行为[炫耀]。正式Buff编号待工程提供。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_super_happy",
+        "name": "超开心",
+        "description": "情绪波动Buff,PAD增量待文档确认。制作超额产出/全新产物触发。正式Buff编号待工程提供。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_achievement",
+        "name": "成就感",
+        "description": "情绪波动Buff,PAD增量待文档确认。制作高品质产物触发。正式Buff编号待工程提供。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_blissful",
+        "name": "幸福",
+        "description": "情绪标签Buff,PAD区间P∈(0.7,1.0],A∈[-1,1],D∈(0,1]。满溢的满足感。对建造行为超强促进,促进表演/音乐/艺术/料理。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_enraptured",
+        "name": "陶醉",
+        "description": "情绪标签Buff,PAD区间P∈(0.7,1.0],A∈[-1,1],D∈[-1,0]。完全沉浸在快乐里。促进观星/童心/观鸟,抑制运动/探索/种田。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_excited",
+        "name": "兴奋",
+        "description": "情绪标签Buff,PAD区间P∈(0.2,0.7],A∈(0,1],D∈(0,1]。干劲十足。对建造行为强促进,促进运动/探索/表演/种田/捕虫,抑制研究/文学/钓鱻/手工。替代属性表旧mood_excited(10043)。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_eager",
+        "name": "热切",
+        "description": "情绪标签Buff,PAD区间P∈(0.2,0.7],A∈(0,1],D∈[-1,0]。满怀期待。对建造行为强促进,促进钓鱻/采集/考古/童心,抑制家务/园艺/研究。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_assured",
+        "name": "自得",
+        "description": "情绪标签Buff,PAD区间P∈(0.2,0.7],A∈[-1,0],D∈(0,1]。悠然自得。对建造行为强促进,促进研究/文学/益智/艺术/手工/音乐,抑制表演/运动/探索。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_content",
+        "name": "安适",
+        "description": "情绪标签Buff,PAD区间P∈(0.2,0.7],A∈[-1,0],D∈[-1,0]。软绵绵的,安全舒服。促进家务/园艺/料理/观鸟/观星,抑制探索/捕虫/运动/表演。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_calm",
+        "name": "平静",
+        "description": "情绪标签Buff,PAD区间P∈[-0.2,0.2],A任意,D任意。心如止水,最舒服的日常状态。无特定行为倾向。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_bothered",
+        "name": "心烦",
+        "description": "情绪标签Buff,PAD区间P∈[-0.7,-0.2),A∈(0,1],D∈(0,1]。心里像长了草。对建造弱抑制,弱促进休闲,促进运动/家务/种田,抑制钓鱻/益智/手工。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_uneasy",
+        "name": "不安",
+        "description": "情绪标签Buff,PAD区间P∈[-0.7,-0.2),A∈(0,1],D∈[-1,0]。心悬着,担心发生不好的事。对建造弱抑制,弱促进休闲,促进家务/园艺,抑制探索/表演/考古/捕虫。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_weary",
+        "name": "厌倦",
+        "description": "情绪标签Buff,PAD区间P∈[-0.7,-0.2),A∈[-1,0],D∈(0,1]。意兴阑珊,高冷拒绝。对建造强抑制,强促进休闲,促进文学/观星,抑制运动/表演/音乐/探索。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_down",
+        "name": "低落",
+        "description": "情绪标签Buff,PAD区间P∈[-0.7,-0.2),A∈[-1,0],D∈[-1,0]。闷闷不乐,需要安慰。对建造强抑制,强促进休闲,促进音乐/文学,抑制表演/料理/运动/童心。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_frantic",
+        "name": "抓狂",
+        "description": "情绪标签Buff,PAD区间P∈[-1,-0.7),A∈(0,1],D∈(0,1]。情绪快炸开,急得团团转。对建造超强抑制,抑制所有爱好行为。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_grieving",
+        "name": "悲恨",
+        "description": "情绪标签Buff,PAD区间P∈[-1,-0.7),A∈(0,1],D∈[-1,0]。巨大悲伤,泣不成声。对建造超强抑制,超强促进休闲,抑制所有爱好行为。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_slumped",
+        "name": "颓丧",
+        "description": "情绪标签Buff,PAD区间P∈[-1,-0.7),A∈[-1,0],D任意。彻底泄了气,整个人垮掉了。对建造超强抑制,超强促进休闲,抑制所有爱好行为。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "mood_resonance",
+        "name": "共鸣",
+        "description": "特殊情绪标签Buff,不由PAD区间划分。伙伴间情感连结的状态,体验到彼此的情绪共振。影响待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_surprise_pos",
+        "name": "惊喜",
+        "description": "情绪波动Buff,PAD增量(+0.40,+0.60,-0.20),瞬时反应。意外惊喜、意外收获触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_gratitude",
+        "name": "感激",
+        "description": "情绪波动Buff,PAD增量(+0.40,+0.10,-0.30),瞬时反应。收到礼物、得到帮助触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_satisfaction",
+        "name": "满足",
+        "description": "情绪波动Buff,PAD增量(+0.40,-0.30,+0.60),瞬时反应。完成目标、达成成就触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_healed",
+        "name": "治愈",
+        "description": "情绪波动Buff,PAD增量(+0.30,-0.40,-0.30),瞬时反应。被安慰、被照顾触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_panic",
+        "name": "惊慌",
+        "description": "情绪波动Buff,PAD增量(-0.40,+0.60,-0.40),瞬时反应。意外惊吓、危险触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_embarrassment",
+        "name": "窘迫",
+        "description": "情绪波动Buff,PAD增量(-0.30,+0.30,-0.60),瞬时反应。出丑、社交尴尬触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_anger",
+        "name": "气愤",
+        "description": "情绪波动Buff,PAD增量(-0.50,+0.60,+0.30),瞬时反应。被不公对待、被阻挠触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_frustration",
+        "name": "挫败",
+        "description": "情绪波动Buff,PAD增量(-0.40,+0.40,+0.10),瞬时反应。失败、未达目标触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_disappointment",
+        "name": "失落",
+        "description": "情绪波动Buff,PAD增量(-0.30,-0.20,-0.40),瞬时反应。期望落空、失望触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_disgust",
+        "name": "嫌弃",
+        "description": "情绪波动Buff,PAD增量(-0.60,-0.30,+0.60),瞬时反应。接触脏乱、遗失物品、食物变质触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "emotion_moved",
+        "name": "触动",
+        "description": "情绪波动Buff,PAD向量特殊(待文档确认),瞬时反应。深刻的情感冲击、被感动触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_rainy_mood",
+        "name": "雨天情绪",
+        "description": "雨天天气对伙伴情绪的影响。降低活力相关属性,增加室内行为倾向。环境weather=雨天时自动获得。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_sunny_boost",
+        "name": "晴天增益",
+        "description": "晴天天气带来的积极增益。提高行动力与户外行为倾向,略微提升情绪。环境weather=晴天时自动获得。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_cold_weather",
+        "name": "寒冷",
+        "description": "寒冷天气对体力的负面影响。增加体力消耗速度,需要更多休息与温暖行为。冬季或低温时获得。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_hot_weather",
+        "name": "炎热",
+        "description": "炎热天气对体力与状态的负面影响。增加体力消耗,降低户外活动倾向。夏季或高温时获得。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_night_tired",
+        "name": "夜晚疲惫",
+        "description": "夜晚时段的生理疲惫状态。降低行动力与活动倾向,增加休息/睡眠需求。time_of_day=夜晚且energy<30时获得。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_companion_nearby",
+        "name": "伙伴在附近",
+        "description": "有伙伴在附近的积极影响。提高社交满足度,增加社交互动行为倾向。其他伙伴进入同一场景时获得。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_lonely",
+        "name": "孤独",
+        "description": "长时间无社交互动的孤独状态。降低社交满足度与情绪,增加寻求社交的行为倾向。长时间独处且social<30时获得。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_friendship_bonus",
+        "name": "友谊加成",
+        "description": "良好朋友关系带来的加成。与好友一起进行活动时效果更好,增加协作效率。relationship_level>=好友的伙伴同场时获得。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_jealous",
+        "name": "吼醋",
+        "description": "看到好友与其他伙伴亲密互动产生的吃醋情绪。降低对两者的好感度,可能触发负面行为。特定社交场景下触发。行为图全集P1需求。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "buff_stuck",
+        "name": "卡住",
+        "description": "装备物处于卡住状态，无法正常脱离当前交互物。由相关行为施加，通过解卡行为移除；具体触发与解除条件由行为规则定义。",
+        "enabled": true,
+        "objectTypes": [
+          "equippedItem"
+        ]
+      },
+      {
+        "id": "buff_be_stuck",
+        "name": "被卡住",
+        "description": "环境物或交互物被装备物卡住的状态，与装备物自身的「卡住」状态对应。由相关行为施加，通过解卡行为移除；具体触发、影响与解除条件由行为规则定义。",
+        "enabled": false,
+        "objectTypes": [
+          "interactObject",
+          "environmentItem"
+        ]
+      },
+      {
+        "id": "fishing_focus",
+        "name": "认真钓鱼",
+        "description": "观察鱼群获得1层，层数提高钓获结果倾向。模拟约定最多5层，本次钓鱼内可跨抛竿保留，离开本行为清除；超时只用模拟暂定600游戏秒，不作为正式平衡值。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_multi_catch",
+        "name": "一钩多鱼",
+        "description": "施加给钓获伙伴，标记本轮一钩多鱼结果。模拟暂定600游戏秒；不代替鱼数量结算、不重复发放产物。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_huge_catch",
+        "name": "巨大的鱼",
+        "description": "施加给钓获伙伴，标记本轮钓到巨大鱼的经历。模拟暂定600游戏秒；尺寸与鱼种由产物实例记录，不修改所有鱼实例。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_treasure_catch",
+        "name": "钓获宝箱",
+        "description": "施加给钓获伙伴，标记钓出宝藏的经历。模拟暂定600游戏秒；宝箱实例由产物结算单独生成。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_relaxation",
+        "name": "钓鱼放松",
+        "description": "伙伴临时情绪效果：P上升、A下降、D下降；用于感受风、摸阳光、昆虫停靠。具体幅度及600游戏秒仅模拟参数；不是直接替换安适情绪标签。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_discovery",
+        "name": "新鱼发现喜悦",
+        "description": "伙伴临时情绪效果：P上升、A上升、D不变。由首次发现鱼种触发；鱼种及首次发现来自收藏业务，不由Buff本身判定。幅度、时长为模拟参数。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_target_satisfaction",
+        "name": "目标鱼满足",
+        "description": "伙伴临时情绪效果：P上升，A与D不变。由得到目标鱼种触发；目标鱼种来自目标上下文。幅度、时长为模拟参数。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      },
+      {
+        "id": "fishing_settling",
+        "name": "钓鱼平复",
+        "description": "伙伴临时情绪效果：将当前PAD向中性拉近，区别于直接添加平静标签；不固定正负方向。幅度、时长为模拟参数。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true,
+        "objectTypes": [
+          "partner"
+        ]
+      }
+    ],
+    "items": [
+      {
+        "id": "partner/reczz28PAvx7wYyE",
+        "objectType": "partner",
+        "name": "行为伙伴",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "partner/reczz28PAw0ujgFF",
+        "objectType": "partner",
+        "name": "任意伙伴",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "partner/reczz28PAw3ygZHg",
+        "objectType": "partner",
+        "name": "好感最高伙伴",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "partner/reczz28PAwCCLnzo",
+        "objectType": "partner",
+        "name": "好感最低伙伴",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "partner/reczz28PAwF5jSTP",
+        "objectType": "partner",
+        "name": "陌生伙伴",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "food/reczz28P97TZeAHv",
+        "objectType": "food",
+        "name": "饼干",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "food/reczz28P97X5X2XM",
+        "objectType": "food",
+        "name": "蛋糕",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "food/reczz28P97d4UkQh",
+        "objectType": "food",
+        "name": "水果",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "material/reczz28P81JmdGLh",
+        "objectType": "material",
+        "name": "木材",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "material/reczz28P81SOLfdP",
+        "objectType": "material",
+        "name": "蔬果",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "material/reczz28P81T3OvMJ",
+        "objectType": "material",
+        "name": "石材",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "material/reczz28P81TfjMNa",
+        "objectType": "material",
+        "name": "肉类",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "material/reczz28P81UInvsZ",
+        "objectType": "material",
+        "name": "纤维",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "material/reczz28P81gDu7uG",
+        "objectType": "material",
+        "name": "蛋奶",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactPlace/reczz28P8vM5Gf9F",
+        "objectType": "interactPlace",
+        "name": "钓台",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactPlace/reczz28P8vfpp3LD",
+        "objectType": "interactPlace",
+        "name": "工地",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "furniture/reczz28P8x9Av9Zx",
+        "objectType": "furniture",
+        "name": "雕塑",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "collectible/reczz28PAxVeDkg8",
+        "objectType": "collectible",
+        "name": "鱼",
+        "description": "",
+        "enabled": false
+      },
+      {
+        "id": "container/reczz28P8vvujp9D",
+        "objectType": "container",
+        "name": "鱼缸",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "container/reczz28P8vzqvV5B",
+        "objectType": "container",
+        "name": "冰箱",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "item/treasure_chest",
+        "objectType": "item",
+        "name": "宝箱",
+        "description": "钓获宝藏的道具定义；产物结算生成具体实例并记录数量。内部奖励、开箱表与工程编号待定义；不自动发放未定义奖励。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/reczz28P8xJ80qwg",
+        "objectType": "interactObject",
+        "name": "椅子",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/reczz28P8xNNcY2y",
+        "objectType": "interactObject",
+        "name": "桌子",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/reczz28P8xQVLtEi",
+        "objectType": "interactObject",
+        "name": "鱼竿架",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/reczz28P8xjlDFys",
+        "objectType": "interactObject",
+        "name": "工具柜",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/reczz28PCNa6LD2v",
+        "objectType": "interactObject",
+        "name": "洗手池",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/reczz28PCXBRx3yn",
+        "objectType": "interactObject",
+        "name": "工匠台",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/reczz28PFuJF3HsA",
+        "objectType": "interactObject",
+        "name": "搓饵台",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/tool_rack",
+        "objectType": "interactObject",
+        "name": "工具架",
+        "description": "用于摆放工具并供伙伴取下指定斧头的交互物。具体可用性、库存和取放规则由行为及交互业务定义。 来源：GitLab master 行为文件 从工具架拿取斧头.json；2026-11-02补充设计名录，不表示工程或美术资产已实现。",
+        "enabled": true
+      },
+      {
+        "id": "interactObject/bed",
+        "objectType": "interactObject",
+        "name": "床",
+        "description": "供伙伴进行睡眠交互的物件。睡眠准入、恢复与离开规则由行为定义。 来源：GitLab master 行为文件 在床上睡觉.json；2026-11-02补充设计名录，不表示工程或美术资产已实现。",
+        "enabled": true
+      },
+      {
+        "id": "environmentItem/reczz28PAurCbpZn",
+        "objectType": "environmentItem",
+        "name": "乔木",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "environmentItem/reczz28PAuw3LD3o",
+        "objectType": "environmentItem",
+        "name": "矿石",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "environmentItem/reczz28PAv2dO0s2",
+        "objectType": "environmentItem",
+        "name": "灌木",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "environmentItem/reczz28PAvGKppNb",
+        "objectType": "environmentItem",
+        "name": "花丛",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "environmentItem/banyan_tree",
+        "objectType": "environmentItem",
+        "name": "榕树",
+        "description": "乔木中的榕树类型，供砍伐行为选择的环境物名录。产量、卡住等实例状态由相关属性与行为规则定义。 来源：GitLab master 行为文件 用斧头砍榕树.json；2026-11-02补充设计名录，不表示工程或美术资产已实现。",
+        "enabled": true
+      },
+      {
+        "id": "environmentItem/puddle",
+        "objectType": "environmentItem",
+        "name": "水坑",
+        "description": "供雨中踩水坑行为选择的环境物。天气准入与踩水表演由行为定义。 来源：GitLab master 行为文件 雨中踩水坑.json；2026-11-02补充设计名录，不表示工程或美术资产已实现。",
+        "enabled": true
+      },
+      {
+        "id": "equippedItem/reczz28P8wQhomvk",
+        "objectType": "equippedItem",
+        "name": "斧头",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "equippedItem/reczz28P8wX9jHQL",
+        "objectType": "equippedItem",
+        "name": "镐子",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "equippedItem/reczz28P8wcbRpgX",
+        "objectType": "equippedItem",
+        "name": "鱼竿",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "equippedItem/reczz28P8wrVvkgO",
+        "objectType": "equippedItem",
+        "name": "锤子",
+        "description": "",
+        "enabled": true
+      },
+      {
+        "id": "equippedItem/reczz28PCS8WCi4z",
+        "objectType": "equippedItem",
+        "name": "扳手",
+        "description": "",
+        "enabled": false
+      },
+      {
+        "id": "equippedItem/reczz28PCSBIqd6X",
+        "objectType": "equippedItem",
+        "name": "抹布",
+        "description": "",
+        "enabled": false
+      },
+      {
+        "id": "buff/buff_10001",
+        "objectType": "buff",
+        "name": "雀跃",
+        "description": "文档Buff基础表编号10001、效果10001；情绪组，PAD增量+60/+30/+10，固定600秒为文档配置示例。实际工程Buff表尚未提供，参数不得作为已核验工程事实。Buff名不等于情绪分类；每次获得独立一层。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_10003",
+        "objectType": "buff",
+        "name": "得意",
+        "description": "文档Buff基础表编号10003、效果10003；情绪组，PAD增量+40/+60/-20，固定600秒为文档配置示例。实际工程Buff表尚未提供；添加/移除本层PAD贡献，分类由累计PAD决定。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_11001",
+        "objectType": "buff",
+        "name": "NPC速度上限",
+        "description": "文档Buff编号11001；速度组容量1，按节点完成结束。现有效果切换运动档位，不能把参数1当增加1点速度；参数语义待对齐，暂不作为可选项。",
+        "enabled": false
+      },
+      {
+        "id": "buff/design_fishing_bait",
+        "objectType": "buff",
+        "name": "鱼饵",
+        "description": "状态Buff,容量1层,消耗型。钓鱼行为可选前置,影响上鱼概率并在结算时消耗。正式Buff编号待工程提供。",
+        "enabled": true
+      },
+      {
+        "id": "buff/design_super_excited",
+        "objectType": "buff",
+        "name": "超级兴奋",
+        "description": "状态Buff,禁止休息行为(坐下/睡觉)前置检查。不等于属性10043'兴奋'。正式Buff编号待工程提供。",
+        "enabled": true
+      },
+      {
+        "id": "buff/design_dizzy",
+        "objectType": "buff",
+        "name": "晕眩",
+        "description": "状态Buff,睡觉失败获得,影响移动表现。触发监听行为[晕倒]。正式Buff编号待工程提供。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_sick",
+        "objectType": "buff",
+        "name": "生病",
+        "description": "状态Buff,影响行为效率与表现。正式Buff编号待工程提供。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_startled",
+        "objectType": "buff",
+        "name": "吓一跳",
+        "description": "情绪波动Buff,PAD增量待文档确认。制作意外结果触发,瞬时情绪反应。正式Buff编号待工程提供。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_showoff",
+        "objectType": "buff",
+        "name": "炫耀",
+        "description": "情绪/行为Buff,获得时插入监听行为[炫耀]。正式Buff编号待工程提供。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_super_happy",
+        "objectType": "buff",
+        "name": "超开心",
+        "description": "情绪波动Buff,PAD增量待文档确认。制作超额产出/全新产物触发。正式Buff编号待工程提供。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_achievement",
+        "objectType": "buff",
+        "name": "成就感",
+        "description": "情绪波动Buff,PAD增量待文档确认。制作高品质产物触发。正式Buff编号待工程提供。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_blissful",
+        "objectType": "buff",
+        "name": "幸福",
+        "description": "情绪标签Buff,PAD区间P∈(0.7,1.0],A∈[-1,1],D∈(0,1]。满溢的满足感。对建造行为超强促进,促进表演/音乐/艺术/料理。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_enraptured",
+        "objectType": "buff",
+        "name": "陶醉",
+        "description": "情绪标签Buff,PAD区间P∈(0.7,1.0],A∈[-1,1],D∈[-1,0]。完全沉浸在快乐里。促进观星/童心/观鸟,抑制运动/探索/种田。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_excited",
+        "objectType": "buff",
+        "name": "兴奋",
+        "description": "情绪标签Buff,PAD区间P∈(0.2,0.7],A∈(0,1],D∈(0,1]。干劲十足。对建造行为强促进,促进运动/探索/表演/种田/捕虫,抑制研究/文学/钓鱻/手工。替代属性表旧mood_excited(10043)。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_eager",
+        "objectType": "buff",
+        "name": "热切",
+        "description": "情绪标签Buff,PAD区间P∈(0.2,0.7],A∈(0,1],D∈[-1,0]。满怀期待。对建造行为强促进,促进钓鱻/采集/考古/童心,抑制家务/园艺/研究。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_assured",
+        "objectType": "buff",
+        "name": "自得",
+        "description": "情绪标签Buff,PAD区间P∈(0.2,0.7],A∈[-1,0],D∈(0,1]。悠然自得。对建造行为强促进,促进研究/文学/益智/艺术/手工/音乐,抑制表演/运动/探索。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_content",
+        "objectType": "buff",
+        "name": "安适",
+        "description": "情绪标签Buff,PAD区间P∈(0.2,0.7],A∈[-1,0],D∈[-1,0]。软绵绵的,安全舒服。促进家务/园艺/料理/观鸟/观星,抑制探索/捕虫/运动/表演。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_calm",
+        "objectType": "buff",
+        "name": "平静",
+        "description": "情绪标签Buff,PAD区间P∈[-0.2,0.2],A任意,D任意。心如止水,最舒服的日常状态。无特定行为倾向。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_bothered",
+        "objectType": "buff",
+        "name": "心烦",
+        "description": "情绪标签Buff,PAD区间P∈[-0.7,-0.2),A∈(0,1],D∈(0,1]。心里像长了草。对建造弱抑制,弱促进休闲,促进运动/家务/种田,抑制钓鱻/益智/手工。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_uneasy",
+        "objectType": "buff",
+        "name": "不安",
+        "description": "情绪标签Buff,PAD区间P∈[-0.7,-0.2),A∈(0,1],D∈[-1,0]。心悬着,担心发生不好的事。对建造弱抑制,弱促进休闲,促进家务/园艺,抑制探索/表演/考古/捕虫。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_weary",
+        "objectType": "buff",
+        "name": "厌倦",
+        "description": "情绪标签Buff,PAD区间P∈[-0.7,-0.2),A∈[-1,0],D∈(0,1]。意兴阑珊,高冷拒绝。对建造强抑制,强促进休闲,促进文学/观星,抑制运动/表演/音乐/探索。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_down",
+        "objectType": "buff",
+        "name": "低落",
+        "description": "情绪标签Buff,PAD区间P∈[-0.7,-0.2),A∈[-1,0],D∈[-1,0]。闷闷不乐,需要安慰。对建造强抑制,强促进休闲,促进音乐/文学,抑制表演/料理/运动/童心。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_frantic",
+        "objectType": "buff",
+        "name": "抓狂",
+        "description": "情绪标签Buff,PAD区间P∈[-1,-0.7),A∈(0,1],D∈(0,1]。情绪快炸开,急得团团转。对建造超强抑制,抑制所有爱好行为。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_grieving",
+        "objectType": "buff",
+        "name": "悲恨",
+        "description": "情绪标签Buff,PAD区间P∈[-1,-0.7),A∈(0,1],D∈[-1,0]。巨大悲伤,泣不成声。对建造超强抑制,超强促进休闲,抑制所有爱好行为。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_slumped",
+        "objectType": "buff",
+        "name": "颓丧",
+        "description": "情绪标签Buff,PAD区间P∈[-1,-0.7),A∈[-1,0],D任意。彻底泄了气,整个人垮掉了。对建造超强抑制,超强促进休闲,抑制所有爱好行为。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/mood_resonance",
+        "objectType": "buff",
+        "name": "共鸣",
+        "description": "特殊情绪标签Buff,不由PAD区间划分。伙伴间情感连结的状态,体验到彼此的情绪共振。影响待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_surprise_pos",
+        "objectType": "buff",
+        "name": "惊喜",
+        "description": "情绪波动Buff,PAD增量(+0.40,+0.60,-0.20),瞬时反应。意外惊喜、意外收获触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_gratitude",
+        "objectType": "buff",
+        "name": "感激",
+        "description": "情绪波动Buff,PAD增量(+0.40,+0.10,-0.30),瞬时反应。收到礼物、得到帮助触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_satisfaction",
+        "objectType": "buff",
+        "name": "满足",
+        "description": "情绪波动Buff,PAD增量(+0.40,-0.30,+0.60),瞬时反应。完成目标、达成成就触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_healed",
+        "objectType": "buff",
+        "name": "治愈",
+        "description": "情绪波动Buff,PAD增量(+0.30,-0.40,-0.30),瞬时反应。被安慰、被照顾触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_panic",
+        "objectType": "buff",
+        "name": "惊慌",
+        "description": "情绪波动Buff,PAD增量(-0.40,+0.60,-0.40),瞬时反应。意外惊吓、危险触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_embarrassment",
+        "objectType": "buff",
+        "name": "窘迫",
+        "description": "情绪波动Buff,PAD增量(-0.30,+0.30,-0.60),瞬时反应。出丑、社交尴尬触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_anger",
+        "objectType": "buff",
+        "name": "气愤",
+        "description": "情绪波动Buff,PAD增量(-0.50,+0.60,+0.30),瞬时反应。被不公对待、被阻挠触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_frustration",
+        "objectType": "buff",
+        "name": "挫败",
+        "description": "情绪波动Buff,PAD增量(-0.40,+0.40,+0.10),瞬时反应。失败、未达目标触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_disappointment",
+        "objectType": "buff",
+        "name": "失落",
+        "description": "情绪波动Buff,PAD增量(-0.30,-0.20,-0.40),瞬时反应。期望落空、失望触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_disgust",
+        "objectType": "buff",
+        "name": "嫌弃",
+        "description": "情绪波动Buff,PAD增量(-0.60,-0.30,+0.60),瞬时反应。接触脏乱、遗失物品、食物变质触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/emotion_moved",
+        "objectType": "buff",
+        "name": "触动",
+        "description": "情绪波动Buff,PAD向量特殊(待文档确认),瞬时反应。深刻的情感冲击、被感动触发。持续时间待设计确认。适用对象:伙伴角色。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_rainy_mood",
+        "objectType": "buff",
+        "name": "雨天情绪",
+        "description": "雨天天气对伙伴情绪的影响。降低活力相关属性,增加室内行为倾向。环境weather=雨天时自动获得。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_sunny_boost",
+        "objectType": "buff",
+        "name": "晴天增益",
+        "description": "晴天天气带来的积极增益。提高行动力与户外行为倾向,略微提升情绪。环境weather=晴天时自动获得。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_cold_weather",
+        "objectType": "buff",
+        "name": "寒冷",
+        "description": "寒冷天气对体力的负面影响。增加体力消耗速度,需要更多休息与温暖行为。冬季或低温时获得。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_hot_weather",
+        "objectType": "buff",
+        "name": "炎热",
+        "description": "炎热天气对体力与状态的负面影响。增加体力消耗,降低户外活动倾向。夏季或高温时获得。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_night_tired",
+        "objectType": "buff",
+        "name": "夜晚疲惫",
+        "description": "夜晚时段的生理疲惫状态。降低行动力与活动倾向,增加休息/睡眠需求。time_of_day=夜晚且energy<30时获得。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_companion_nearby",
+        "objectType": "buff",
+        "name": "伙伴在附近",
+        "description": "有伙伴在附近的积极影响。提高社交满足度,增加社交互动行为倾向。其他伙伴进入同一场景时获得。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_lonely",
+        "objectType": "buff",
+        "name": "孤独",
+        "description": "长时间无社交互动的孤独状态。降低社交满足度与情绪,增加寻求社交的行为倾向。长时间独处且social<30时获得。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_friendship_bonus",
+        "objectType": "buff",
+        "name": "友谊加成",
+        "description": "良好朋友关系带来的加成。与好友一起进行活动时效果更好,增加协作效率。relationship_level>=好友的伙伴同场时获得。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_jealous",
+        "objectType": "buff",
+        "name": "吼醋",
+        "description": "看到好友与其他伙伴亲密互动产生的吃醋情绪。降低对两者的好感度,可能触发负面行为。特定社交场景下触发。行为图全集P1需求。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_stuck",
+        "objectType": "buff",
+        "name": "卡住",
+        "description": "装备物处于卡住状态，无法正常脱离当前交互物。由相关行为施加，通过解卡行为移除；具体触发与解除条件由行为规则定义。",
+        "enabled": true
+      },
+      {
+        "id": "buff/buff_be_stuck",
+        "objectType": "buff",
+        "name": "被卡住",
+        "description": "环境物或交互物被装备物卡住的状态，与装备物自身的「卡住」状态对应。由相关行为施加，通过解卡行为移除；具体触发、影响与解除条件由行为规则定义。",
+        "enabled": false
+      },
+      {
+        "id": "buff/fishing_focus",
+        "objectType": "buff",
+        "name": "认真钓鱼",
+        "description": "观察鱼群获得1层，层数提高钓获结果倾向。模拟约定最多5层，本次钓鱼内可跨抛竿保留，离开本行为清除；超时只用模拟暂定600游戏秒，不作为正式平衡值。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      },
+      {
+        "id": "buff/fishing_multi_catch",
+        "objectType": "buff",
+        "name": "一钩多鱼",
+        "description": "施加给钓获伙伴，标记本轮一钩多鱼结果。模拟暂定600游戏秒；不代替鱼数量结算、不重复发放产物。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      },
+      {
+        "id": "buff/fishing_huge_catch",
+        "objectType": "buff",
+        "name": "巨大的鱼",
+        "description": "施加给钓获伙伴，标记本轮钓到巨大鱼的经历。模拟暂定600游戏秒；尺寸与鱼种由产物实例记录，不修改所有鱼实例。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      },
+      {
+        "id": "buff/fishing_treasure_catch",
+        "objectType": "buff",
+        "name": "钓获宝箱",
+        "description": "施加给钓获伙伴，标记钓出宝藏的经历。模拟暂定600游戏秒；宝箱实例由产物结算单独生成。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      },
+      {
+        "id": "buff/fishing_relaxation",
+        "objectType": "buff",
+        "name": "钓鱼放松",
+        "description": "伙伴临时情绪效果：P上升、A下降、D下降；用于感受风、摸阳光、昆虫停靠。具体幅度及600游戏秒仅模拟参数；不是直接替换安适情绪标签。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      },
+      {
+        "id": "buff/fishing_discovery",
+        "objectType": "buff",
+        "name": "新鱼发现喜悦",
+        "description": "伙伴临时情绪效果：P上升、A上升、D不变。由首次发现鱼种触发；鱼种及首次发现来自收藏业务，不由Buff本身判定。幅度、时长为模拟参数。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      },
+      {
+        "id": "buff/fishing_target_satisfaction",
+        "objectType": "buff",
+        "name": "目标鱼满足",
+        "description": "伙伴临时情绪效果：P上升，A与D不变。由得到目标鱼种触发；目标鱼种来自目标上下文。幅度、时长为模拟参数。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      },
+      {
+        "id": "buff/fishing_settling",
+        "objectType": "buff",
+        "name": "钓鱼平复",
+        "description": "伙伴临时情绪效果：将当前PAD向中性拉近，区别于直接添加平静标签；不固定正负方向。幅度、时长为模拟参数。 依据：钓鱼细分-核心行为及2026-11-03用户批准的补库方案。仅设计定义；工程编号和正式数值未确认。",
+        "enabled": true
+      }
+    ]
+  }
+}

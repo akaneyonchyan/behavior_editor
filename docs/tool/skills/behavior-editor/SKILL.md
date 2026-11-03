@@ -5,6 +5,8 @@ description: 使用与维护 PPS 行为编辑器（akaneyonchyan/behavior_editor
 
 # 行为编辑器使用与维护
 
+2026-11-03 GitHub分支恢复入口：docs/tool/github-complete-version.md 与 docs/content-library/github-restore.md。用户已授权同步正式行为图及附属资源；仓库提供独立公共库快照，原始飞书备份留本机。新库尚未创建，Pages/Actions仍停用。操作本GitHub副本时优先遵循这两份说明；下方GitLab生产部署及历史迁移规则继续适用于相应环境。
+
 2026-10-26 后续切换：当前入口 petpals-behavior-editor.workers.xd-sites.com，心动 SSO、公司网络、列表隐藏，用户已确认可登录。以 deploy/xd-sites-automation.md 为准；Cindy 检测 GitLab master 与云端飞书有效快照变化，通过 XD Sites 插件更新，不导出登录令牌、不绕过发布流程。上海网站自动发布暂停，云端公共库 timer 保留。下方早期迁移说明仅供追溯。
 
 2026-10-26 生产迁移更新：以公司 GitLab petpals/shared/design_behavior_editor 为维护源，正式入口 behavior-editor.online，飞书登录。代码由本机定时构建部署；公共库由云服务器独立约每 5 分钟只读同步飞书，校验后原子发布，代码发布不得覆盖较新快照。旧 GitHub Pages/Actions 已停用。具体操作优先读 deploy/automatic-release.md、deploy/library-sync.md、deploy/feishu-auth.md；下文 GitHub/Pages 流程只适用于历史版本，不得自动恢复旧发布链路。

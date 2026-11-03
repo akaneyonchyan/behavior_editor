@@ -1,0 +1,139 @@
+{
+  "behavior": {
+    "name": "寻找一个空地｜最简循环",
+    "templateVersion": 4,
+    "matchTargets": [],
+    "targetRules": [
+      {
+        "id": "goal_initial",
+        "source": "object:partner",
+        "attribute": "leisure",
+        "influence": "增加"
+      }
+    ],
+    "description": "按指定结构制作：开始→循环→结束，循环内部仅一个执行节点「寻找一个空地」。循环条件暂按找到符合需求的空地结束；未找到继续寻找。",
+    "preconditions": {
+      "interactObject": "",
+      "interactObjectType": "",
+      "consumables": [],
+      "attributes": [],
+      "interactObjectRules": [
+        {
+          "id": "e6557df3-7f9e-4b07-9fb7-a909b6eb81d4",
+          "objectType": "environmen",
+          "objectName": "空地"
+        }
+      ],
+      "consumableRules": [],
+      "attributeRules": []
+    }
+  },
+  "graph": {
+    "layout": {
+      "version": 1,
+      "scopes": [
+        {
+          "loopId": "loop",
+          "entry": "find",
+          "members": [
+            "find"
+          ]
+        }
+      ],
+      "positions": {}
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "data": {
+          "name": "开始"
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "loop",
+        "type": "loop",
+        "data": {
+          "name": "循环寻找空地",
+          "loopVersion": 3,
+          "checkTiming": "before",
+          "loopMode": "goal",
+          "completionCondition": "已找到一个符合需求的空地",
+          "completionRules": [],
+          "loopConditions": [
+            {
+              "id": "found",
+              "kind": "count",
+              "condition": "已找到一个符合需求的空地",
+              "rules": [],
+              "maxIterations": "默认随机"
+            }
+          ]
+        },
+        "position": {
+          "x": 340,
+          "y": 0
+        }
+      },
+      {
+        "id": "find",
+        "type": "result",
+        "data": {
+          "name": "寻找一个空地",
+          "animation": "环顾四周，寻找一个符合需求的空地。",
+          "playMode": "单次",
+          "playExpectation": "",
+          "description": "每轮寻找一次，并更新寻找结果；找到则记录该空地，未找到则继续循环。",
+          "effectRules": [],
+          "outputs": []
+        },
+        "position": {
+          "x": 667.8989795918367,
+          "y": 5.745306122449023
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "data": {
+          "name": "结束",
+          "animation": "伸懒腰",
+          "playMode": "单次",
+          "playExpectation": ""
+        },
+        "position": {
+          "x": 1060,
+          "y": 0
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "6330fb3f-d206-40aa-b1d9-a4e67762f973",
+        "source": "start",
+        "target": "loop"
+      },
+      {
+        "id": "68a9d365-dbef-49da-a996-0b2b4ee181c4",
+        "source": "loop",
+        "target": "find",
+        "sourceHandle": "continue"
+      },
+      {
+        "id": "2a36df93-86f0-4e25-a6dd-821e12a9b314",
+        "source": "find",
+        "target": "loop"
+      },
+      {
+        "id": "ef22f3e4-802e-469e-a1e4-497c5a2c8431",
+        "source": "loop",
+        "target": "end",
+        "sourceHandle": "complete"
+      }
+    ]
+  }
+}

@@ -1,5 +1,7 @@
 # 协作入口
 
+2026-11-03 GitHub分支补充：用户授权将GitLab正式行为图及附属资源同步到GitHub。以 docs/tool/github-complete-version.md 和 docs/content-library/github-restore.md 为恢复入口；resources保存已授权的内容快照与归档，behaviors保存正式JSON。原始飞书表备份和凭据仍仅存本机。新库尚未创建，Pages/Actions尚未启用；下文生产部署规则适用于GitLab，不应覆盖GitHub独立内容配置。
+
 修改本仓库前先读 [工具说明](docs/tool/README.md)；公共库任务另读 [公共库说明](docs/content-library/README.md) 和 [来源](docs/content-library/sources.md)。核对实际源码与当前文件变更，不把历史文档当作实时实现。
 
 可加载项目 [behavior-editor Skill](.agents/skills/behavior-editor/SKILL.md)，按任务读取文档并执行使用指导、功能维护、内容库核对或发布排查。Skill 共享源随本仓库维护。

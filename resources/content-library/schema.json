@@ -1,0 +1,330 @@
+{
+  "version": 1,
+  "tables": [
+    {
+      "name": "对象类型",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        },
+        {
+          "name": "对象表ID",
+          "type": 1
+        }
+      ]
+    },
+    {
+      "name": "属性类型",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "数据类型",
+          "type": 3,
+          "options": [
+            "数值",
+            "枚举",
+            "对象引用",
+            "JSON",
+            "数组"
+          ]
+        },
+        {
+          "name": "适用对象",
+          "type": 18,
+          "relatedTable": "对象类型",
+          "multiple": true
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        },
+        {
+          "name": "开发状态",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "Buff 类型",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "适用对象",
+          "type": 18,
+          "relatedTable": "对象类型",
+          "multiple": true
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "伙伴条件表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "食物表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "原料表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "交互建筑",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "交互物表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "家具摆件表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "收藏品表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "收藏容器表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "道具表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "环境物表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "装备物表",
+      "fields": [
+        {
+          "name": "名称",
+          "type": 1
+        },
+        {
+          "name": "标识",
+          "type": 1
+        },
+        {
+          "name": "说明",
+          "type": 1
+        },
+        {
+          "name": "启用",
+          "type": 7
+        }
+      ]
+    }
+  ]
+}

@@ -17,6 +17,7 @@ test('unified online graph simulation displays workbook-derived rhythm',async({p
  await page.getByLabel('预览模式').selectOption('single')
  await page.getByRole('button',{name:'单步',exact:true}).click()
  await page.locator('.preview-right nav').getByRole('button',{name:'记录',exact:true}).click()
- await expect(page.locator('.event-list')).toContainText('数值依据：睡觉')
+ await page.locator('.experience-raw summary').click()
+ await expect(page.locator('.experience-raw')).toContainText('数值依据：睡觉')
  expect(errors).toEqual([])
 })

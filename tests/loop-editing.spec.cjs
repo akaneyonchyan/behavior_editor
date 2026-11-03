@@ -46,7 +46,7 @@ test('empty wrappers do not lock free nodes; drag into, between and out of loops
  }
  const body=await page.locator('.structured-canvas').boundingBox();await dragCenter(page,free,{x:body.x+body.width/2,y:body.y+body.height-100})
  const out=await state(page);expect(out.graph.layout.scopes.every(s=>!s.members.includes('free'))).toBe(true);expect(out.graph.edges.some(e=>e.source==='free'||e.target==='free')).toBe(false)
- await page.evaluate(async()=>{const {flushDraft}=await import('/src/store/documentSession.js');flushDraft()});await page.reload();expect((await state(page)).graph.layout).toEqual(out.graph.layout)
+ await page.evaluate(async()=>{const {flushDraft}=await import('/src/store/documentSession.js');flushDraft()});await page.reload();await expect(free).toBeVisible();expect((await state(page)).graph.layout).toEqual(out.graph.layout)
 })
 test('ordered OR conditions can be edited in sidebar, reordered and reflected on container and JSON',async({page})=>{
  await page.locator('.scope-title').click();const panel=page.locator('.property-panel'),header=page.locator('.loop-scope')

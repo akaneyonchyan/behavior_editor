@@ -15,7 +15,8 @@ m._compile(buildSync({entryPoints:['src/utils/onlineBehaviors.js'],bundle:true,p
 const lib=JSON.parse(fs.readFileSync('public/data/library.json','utf8')).library,index=JSON.parse(fs.readFileSync('public/data/behaviors/index.json','utf8'))
 const files=index.files.map(f=>({...f,config:m.exports.parseBehavior(fs.readFileSync('public/data/behaviors/'+f.sha+'.json','utf8'))})),original=JSON.stringify({files,lib})
 const q=new RhythmScheduler(files,lib,makeScenarioWorld(lib,undefined,files),'pip',{}, {dayMode:true})
-assert.equal(q.files.length,18);for(const f of q.files)assert.ok(RHYTHM_MAP[f.config.previewIntegration])
+assert.equal(q.files.length,files.length)
+assert.deepEqual(q.files.filter(f=>!RHYTHM_MAP[f.config.previewIntegration]).map(f=>f.name),['寻找一个空地散步.json'])
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-6,a+' vs '+b)
 function sim(id){const f=q.files.find(f=>f.config.previewIntegration===id);return new Simulation(f.config,q.lib,q.world,bound(f.config,q.lib,q.world,'pip'),'pip',{rhythm:true,stateRules:true,delta:999})}
 const sleep=sim('rest');sleep.current='sleep';sleep.tick(60)

@@ -1,5 +1,7 @@
 # 行为编辑器
 
+2026-11-03 GitHub完整资源版已同步代码、正式行为图、图片归档、公共库快照及维护手册。恢复入口见[GitHub完整资源版](docs/tool/github-complete-version.md)，新库重建见[公共库备份与重建](docs/content-library/github-restore.md)。下方GitLab生产入口和迁移记录继续保留；GitHub Pages尚未开启。
+
 2026-10-26 当前入口：https://petpals-behavior-editor.workers.xd-sites.com（公司网络、心动 SSO、站点列表隐藏）。用户已确认可登录。公共库与代码自动发布见 [XD Sites 自动化](deploy/xd-sites-automation.md)。下方上海服务器和旧站说明保留作历史参考。
 
 当前维护仓库为公司 GitLab，正式入口：https://behavior-editor.online/（飞书登录）。自动发布采用本机定时构建与云服务器部署，见 [自动部署说明](deploy/automatic-release.md)。下方 GitHub Pages 说明仅作为历史参考，旧站按迁移安排停用。
