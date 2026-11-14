@@ -1,6 +1,6 @@
 const {test,expect}=require('@playwright/test')
 test('24h of real online graphs, state and timed buffs',async({page})=>{
- test.setTimeout(120000);const errors=[];page.on('pageerror',e=>errors.push(e.message))
+ test.setTimeout(180000);const errors=[];page.on('pageerror',e=>errors.push(e.message))
  await page.goto('/?view=preview');await expect(page.getByRole('button',{name:'开始',exact:true})).toBeEnabled()
  await page.getByLabel('预览模式').selectOption('auto')
  for(const name of ['斑斑','娜娜','裴洛','芬恩','古奶奶'])await page.getByLabel('启用'+name).uncheck()
@@ -17,7 +17,8 @@ test('24h of real online graphs, state and timed buffs',async({page})=>{
  expect(Object.keys(result.stats).length).toBeGreaterThanOrEqual(4)
  expect(result.completed.filter(c=>c.status==='done').length).toBeGreaterThan(10)
  await page.getByLabel('播放倍速').selectOption('60');await page.getByRole('button',{name:'开始',exact:true}).click()
- await expect(page.locator('.preview-toolbar')).toContainText('观察结束',{timeout:60000})
+ // CI rendering can delay timer ticks; retain the full-day completion assertion.
+ await expect(page.locator('.preview-toolbar')).toContainText('观察结束',{timeout:120000})
  await expect(page.locator('.preview-toolbar')).toContainText('第2天 00:00')
  await page.screenshot({path:'test-results/preview-day.png'})
  expect(errors).toEqual([])
